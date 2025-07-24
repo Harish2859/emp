@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Work Environment Feedback Survey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* Base & Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0; padding: 64px 48px;
+      background: linear-gradient(to bottom, #007bbd, #00aaff);
+      min-height: 100vh;
+      color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .container {
+      background: #f9fbff;
+      border-radius: 22px;
+      padding: 64px 72px 72px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 26px 60px rgba(0,123,186,0.22);
+    }
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: 3rem;
+      color: #004a75;
+      text-align: center;
+      margin-bottom: 56px;
+      user-select: text;
+    }
+    h2 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #007bbd;
+      border-bottom: 3px solid #00aaff;
+      padding-bottom: 8px;
+      margin-bottom: 28px;
+      user-select: text;
+    }
+
+    /* Floating Inputs */
+    .floating-input {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    .floating-input input[type="text"],
+    .floating-input input[type="email"] {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 18px 18px 18px 18px;
+      font-size: 1.15rem;
+      background: #e6f1ff;
+      color: #004a75;
+      outline-offset: 5px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: text;
+      box-shadow: inset 0 2px 5px rgba(2,64,122,0.12);
+    }
+    .floating-input input:focus {
+      background-color: #d0e4ff;
+      box-shadow: 0 0 10px 3px #007bbdcc;
+      outline: none;
+    }
+    .floating-input label {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #007bbd;
+      pointer-events: none;
+      background: #f9fbff;
+      padding: 0 8px;
+      border-radius: 6px;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .floating-input input:not(:placeholder-shown) + label,
+    .floating-input input:focus + label {
+      top: -10px;
+      left: 14px;
+      font-size: 0.85rem;
+      color: #004a75;
+      font-weight: 700;
+    }
+
+    /* Checkbox Group */
+    fieldset.checkbox-group {
+      background: #e3f0ff;
+      border-radius: 18px;
+      padding: 28px 36px;
+      margin-bottom: 48px;
+      border: none;
+      box-shadow: inset 0 0 10px #abd4ff99;
+      user-select: none;
+    }
+    .checkbox-group legend {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #005a9b;
+      margin-bottom: 22px;
+      user-select: text;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #00345d;
+      padding: 10px 0;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .checkbox-group label:hover {
+      color: #001f3f;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: #007bbd;
+      cursor: pointer;
+    }
+    .checkbox-group input[type="checkbox"]:focus-visible {
+      outline-offset: 3px;
+      outline: 3px solid #005f9b;
+    }
+
+    /* Toggle Switch Groups */
+    .switch-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #def0ff;
+      border-radius: 18px;
+      padding: 18px 26px;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+    .switch-group label.question-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #004a75;
+      cursor: pointer;
+      flex: 1;
+      user-select: text;
+    }
+    .switch {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      left: -9999px;
+    }
+    .slider {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      border-radius: 28px;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.15);
+      transition: background-color 0.4s ease;
+    }
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      top: 3px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, background-color 0.4s ease;
+    }
+    .switch input:checked + .slider {
+      background-color: #217ac0;
+      box-shadow: inset 0 0 10px #3a85d3cc;
+    }
+    .switch input:checked + .slider::before {
+      transform: translateX(22px);
+    }
+    .switch input:focus-visible + .slider {
+      box-shadow:
+        0 0 0 3px rgba(33, 122, 192, 0.5),
+        inset 0 0 6px rgba(0,0,0,0.25);
+      outline: none;
+    }
+
+    /* Custom pill-shaped radio buttons */
+    .likert-group {
+      background: #def0ff;
+      padding: 40px 50px;
+      border-radius: 18px;
+      box-shadow: inset 0 0 14px #8bbce9cc;
+      user-select: none;
+      margin-top: 48px;
+    }
+    .likert-group h2 {
+      margin-top: 0;
+      margin-bottom: 40px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #007bbd;
+    }
+    .likert-question {
+      margin-bottom: 36px;
+    }
+    .likert-question strong {
+      display: block;
+      font-size: 1.17rem;
+      margin-bottom: 20px;
+      color: #00345e;
+      user-select: text;
+    }
+    .likert-options {
+      display: flex;
+      gap: 40px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .likert-options input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .likert-options label {
+      font-size: 1.05rem;
+      color: #004a75;
+      cursor: pointer;
+      user-select: none;
+      padding: 12px 32px;
+      border-radius: 24px;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 6px rgba(33, 122, 194, 0.15);
+      transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 90px;
+    }
+    .likert-options label:hover,
+    .likert-options label:focus-visible {
+      border-color: #005f9b;
+      box-shadow: 0 5px 18px rgba(33, 122, 192, 0.35);
+      outline: none;
+      transform: scale(1.05);
+    }
+    .likert-options input[type="radio"]:checked + label {
+      background-color: #007bbd;
+      color: white;
+      border-color: #0060a4;
+      box-shadow: 0 0 14px 3px #005a94bb;
+      transform: scale(1.1);
+    }
+
+    /* Submit Button */
+    button[type="submit"] {
+      width: 100%;
+      margin-top: 48px;
+      background: #007bbd;
+      color: white;
+      padding: 20px 0;
+      font-weight: 900;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 24px;
+      cursor: pointer;
+      box-shadow: 0 12px 35px rgba(0, 123, 189, 0.65);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+      user-select: none;
+      font-family: "Poppins", sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    button[type="submit"]:hover,
+    button[type="submit"]:focus {
+      background: #185c8e;
+      box-shadow: 0 20px 54px rgba(24, 92, 142, 0.85);
+      outline: none;
+      transform: scale(1.03);
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      body {
+        padding: 28px 5vw 40px;
+      }
+      .container {
+        padding: 40px 32px 48px;
+        border-radius: 16px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 48px;
+      }
+      .switch-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .switch-group label.question-label {
+        font-size: 1.1rem;
+      }
+      .likert-group {
+        padding: 30px 24px;
+      }
+      .likert-group h2 {
+        font-size: 1.5rem;
+        margin-bottom: 32px;
+      }
+      .likert-question strong {
+        font-size: 1.05rem;
+        margin-bottom: 16px;
+      }
+      .likert-options {
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .likert-options label {
+        min-width: 80px;
+        padding: 10px 24px;
+        font-size: 1rem;
+      }
+      button[type="submit"] {
+        padding: 16px 0;
+        font-size: 1.3rem;
+        margin-top: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="form" aria-labelledby="surveyTitle" tabindex="-1">
+    <h1 id="surveyTitle">Work Environment Feedback Survey</h1>
+
+    <!-- Floating inputs -->
+    <div class="floating-input">
+      <input type="text" id="employeeName" name="employeeName" placeholder=" " aria-required="true" autocomplete="name" />
+      <label for="employeeName">Employee Name</label>
+    </div>
+
+    <div class="floating-input">
+      <input type="email" id="employeeEmail" name="employeeEmail" placeholder=" " aria-required="true" autocomplete="email" />
+      <label for="employeeEmail">E-Mail</label>
+    </div>
+
+    <div class="floating-input">
+      <input type="text" id="team" name="team" placeholder=" " aria-required="true" />
+      <label for="team">Team / Department</label>
+    </div>
+
+    <!-- Work Environment Satisfaction Checkboxes -->
+    <fieldset class="checkbox-group" aria-labelledby="envSatisfactionLabel">
+      <legend id="envSatisfactionLabel"><h2>Work Environment Satisfaction</h2></legend>
+      <label><input type="checkbox" name="environment" value="Comfortable Workspace" /> Comfortable Workspace</label>
+      <label><input type="checkbox" name="environment" value="Good Lighting" /> Good Lighting</label>
+      <label><input type="checkbox" name="environment" value="Adequate Tools" /> Adequate Tools</label>
+      <label><input type="checkbox" name="environment" value="Quiet Surroundings" /> Quiet Surroundings</label>
+      <label><input type="checkbox" name="environment" value="Supportive Colleagues" /> Supportive Colleagues</label>
+    </fieldset>
+
+    <!-- Toggle switch feedback questions -->
+    <div class="switch-group">
+      <label class="question-label" for="workspaceComfortToggle">I feel comfortable in my workspace.</label>
+      <label class="switch" for="workspaceComfortToggle" role="checkbox" aria-checked="false" tabindex="0"
+        onclick="toggleCheckbox('workspaceComfortToggle')"
+        onkeydown="if(event.key===' ' || event.key==='Enter'){event.preventDefault(); toggleCheckbox('workspaceComfortToggle');}">
+        <input type="checkbox" id="workspaceComfortToggle" name="workspaceComfortToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-group">
+      <label class="question-label" for="collaborationToggle">My team collaborates effectively.</label>
+      <label class="switch" for="collaborationToggle" role="checkbox" aria-checked="false" tabindex="0"
+        onclick="toggleCheckbox('collaborationToggle')"
+        onkeydown="if(event.key===' ' || event.key==='Enter'){event.preventDefault(); toggleCheckbox('collaborationToggle');}">
+        <input type="checkbox" id="collaborationToggle" name="collaborationToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-group">
+      <label class="question-label" for="resourcesToggle">I have access to required resources.</label>
+      <label class="switch" for="resourcesToggle" role="checkbox" aria-checked="false" tabindex="0"
+        onclick="toggleCheckbox('resourcesToggle')"
+        onkeydown="if(event.key===' ' || event.key==='Enter'){event.preventDefault(); toggleCheckbox('resourcesToggle');}">
+        <input type="checkbox" id="resourcesToggle" name="resourcesToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="switch-group">
+      <label class="question-label" for="managementSupportToggle">Management supports my work.</label>
+      <label class="switch" for="managementSupportToggle" role="checkbox" aria-checked="false" tabindex="0"
+        onclick="toggleCheckbox('managementSupportToggle')"
+        onkeydown="if(event.key===' ' || event.key==='Enter'){event.preventDefault(); toggleCheckbox('managementSupportToggle');}">
+        <input type="checkbox" id="managementSupportToggle" name="managementSupportToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <button type="submit" aria-label="Submit Work Environment Feedback Survey">
+      Submit Survey
+    </button>
+  </main>
+
+  <script>
+    // Toggle function for switches
+    function toggleCheckbox(id) {
+      const checkbox = document.getElementById(id);
+      if (!checkbox) return;
+      checkbox.checked = !checkbox.checked;
+      const label = checkbox.parentElement;
+      if (label) {
+        label.setAttribute('aria-checked', checkbox.checked.toString());
+      }
+    }
+    // Keep aria-checked sync on manual checkbox changes
+    document.querySelectorAll('.switch input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const label = cb.parentElement;
+        if (label) label.setAttribute('aria-checked', cb.checked.toString());
+      });
+    });
+  </script>
+</body>
+</html>

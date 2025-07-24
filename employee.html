@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Employee Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" /> 
+  <style>
+    /* Base reset & font */
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    html, body {
+      height: 100%;
+      background: linear-gradient(to bottom right, #007cf0, #00dfd8);
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      user-select: none;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    nav.sidebar {
+      width: 280px;
+      background: #0366c9;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 2.5rem 1.8rem;
+      box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 20;
+    }
+    nav.sidebar h2 {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.9rem;
+      margin-bottom: 2rem;
+      user-select: text;
+      letter-spacing: 1px;
+    }
+.profile-card {
+  width: 220px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(0, 147, 255, 0.13);
+  padding: 2.2rem 1.6rem 1.7rem 1.6rem;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.circle-avatar {
+  width: 100px;
+  height: 100px;
+  background: #0093ff;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 14px 4px #0099ff77;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4.5rem;
+  color: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow 0.25s, transform 0.25s;
+  outline: none;
+}
+
+/* Avatar glow and slight "pop" when hovered or focused */
+.circle-avatar:hover,
+.circle-avatar:focus {
+  box-shadow: 0 0 30px 10px #0093ffcc;
+  transform: scale(1.06);
+}
+
+/* Popup styles */
+.popup-info {
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  background: #fff;
+  color: #222;
+  min-width: 190px;
+  min-height: 60px;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(9, 93, 159, 0.18);
+  font-size: 1rem;
+  padding: 14px 18px;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.23s, transform 0.23s;
+  z-index: 10;
+  text-align: left;
+}
+
+/* Reveal popup on hover/focus of circle or popup itself */
+.popup-info:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1);
+  pointer-events: auto;
+}
+
+/* Name and Role styling */
+.profile-card .name {
+  font-weight: 700;
+  font-size: 1.32rem;
+  margin-bottom: 0.48rem;
+  color: #212832;
+  user-select: text;
+}
+
+.profile-card .role {
+  font-style: italic;
+  font-size: 1.08rem;
+  color: #1896ffcc;
+  user-select: text;
+  margin-bottom: 0.7rem;
+}
+
+
+    /* Sidebar Buttons */
+    .nav-buttons {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .nav-buttons button {
+      background-color: #00b0ff;
+      border: none;
+      padding: 0.9rem 1rem;
+      font-weight: 600;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      box-shadow: 0 5px 18px #0099ffcc;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .nav-buttons button:hover,
+    .nav-buttons button:focus {
+      background-color: #0083c9;
+      outline: none;
+    }
+
+    /* Main Content */
+    main.dashboard {
+      margin-left: 280px;
+      flex: 1;
+      padding: 2.5rem 3.5rem 3.5rem;
+      background: #f7fbff;
+      min-height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.8rem;
+      box-shadow: -2px 0 20px rgba(0,0,0,0.07);
+    }
+
+    main.dashboard h1 {
+      font-weight: 800;
+      font-size: 2.7rem;
+      letter-spacing: 1.1px;
+      color: #0366c9;
+      user-select: text;
+    }
+
+    /* Profile form */
+    .profile-form {
+      background: white;
+      border-radius: 18px;
+      padding: 2.7rem 3rem;
+      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+      gap: 1.6rem 2.5rem;
+    }
+    .profile-form label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: #00497d;
+      user-select: text;
+    }
+    .profile-form input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      background: #e0e7fc;
+      color: #222;
+      transition: border-color 0.3s ease;
+    }
+    .profile-form input[type="text"]:focus {
+      outline: none;
+      border-color: #007cf0;
+      background: #f2f8ff;
+    }
+    .profile-form input[readonly] {
+      background-color: #d7dce7;
+      color: #555;
+      cursor: not-allowed;
+    }
+
+    /* Resume Download Btn */
+    .resume-section {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1.4rem;
+      background: white;
+      padding: 1.8rem 3rem;
+      border-radius: 18px;
+      box-shadow: 0 8px 28px rgba(0,115,195,0.13);
+      user-select: none;
+    }
+    .resume-section h2 {
+      font-weight: 700;
+      font-size: 1.45rem;
+      margin: 0;
+      color: #0369c9;
+    }
+    .download-btn {
+      background: #00b0ff;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 18px rgb(0 176 255 / 0.8);
+      transition: background-color 0.3s ease;
+    }
+    .download-btn:hover,
+    .download-btn:focus {
+      background: #0083c9;
+      outline: none;
+    }
+
+    /* Graph and Score Section */
+    .graph-score-section {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+      user-select: none;
+      flex-wrap: wrap;
+    }
+    .card.graph-section {
+      flex: 2;
+      background: #f2f8ff;
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.15);
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+    #burnoutTrendChart {
+      flex-grow: 1;
+      width: 100% !important;
+      max-height: 320px !important;
+      user-select: none;
+    }
+    .burnout-score {
+      flex: 1;
+      background: rgba(243, 223, 12, 0.16);
+      border-radius: 16px;
+      padding: 40px 25px;
+      color: #000000;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      user-select: text;
+      min-width: 280px;
+    }
+    .burnout-score h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      text-shadow: 0 0 8px #000000bb;
+    }
+    .score-box {
+      font-family: monospace, monospace;
+      font-weight: 900;
+      font-size: 2.6rem;
+      color: #ffeb3b;
+      letter-spacing: 0.15em;
+      padding: 18px 32px;
+      background: #000000;
+      border-radius: 16px;
+      user-select: text;
+      line-height: 1;
+    }
+
+    /* Skill chart card */
+    .card.skill-chart {
+      background: white;
+      border-radius: 18px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 300px;
+      max-width: 340px;
+      user-select: none;
+      justify-content: center;
+    }
+    .card.skill-chart h2 {
+      font-weight: 700;
+      color: #0366c9;
+      margin-bottom: 1.1rem;
+      text-align: center;
+    }
+    #skillsChart {
+      width: 260px !important;
+      height: 260px !important;
+    }
+
+    /* Role Matches Section */
+    .role-matches {
+      margin-top: 1rem;
+      color: #04455f;
+      user-select: none;
+    }
+    .role-matches h2 {
+      font-weight: 800;
+      font-size: 2.3rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 1.4px;
+      color: #01496c;
+      user-select: text;
+    }
+    .role-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+      gap: 2rem 2.5rem;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .role-card {
+      background: #e3f0ff;
+      padding: 2rem 1.9rem;
+      border-radius: 16px;
+      color: #034765;
+      box-shadow: 0 8px 28px rgba(1, 64, 106, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      transition: box-shadow 0.3s ease;
+      outline-offset: 3px;
+    }
+    .role-card:hover,
+    .role-card:focus-visible {
+      box-shadow: 0 12px 40px rgba(1, 64, 106, 0.27);
+      outline: 2px solid #007cf0;
+    }
+    .role-card h3 {
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 1.4rem;
+      user-select: text;
+    }
+    .role-card p {
+      font-weight: 900;
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      letter-spacing: 0.06em;
+      user-select: text;
+    }
+    .role-card button {
+      background: #00b0ff;
+      border: none;
+      color: white;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 12px 30px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgb(0 176 255 / 0.8);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .role-card button:hover,
+    .role-card button:focus {
+      background: #0083c9;
+      outline: none;
+    }
+    .role-card.green p { color: #0a8210; }
+    .role-card.yellow p { color: #c9a400; }
+    .role-card.red p { color: #a12712; }
+
+    /* Career Timeline Table */
+ .timeline {
+  /* Removed max-width & overflow-x */
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
+  margin-top: 2rem;
+}
+
+table {
+  min-width: 850px; /* keeps table columns sized */
+  width: 100%; /* takes full container width */
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Responsive smaller width */
+@media (max-width: 900px) {
+  table {
+    min-width: 700px; /* a smaller minimum on smaller screens */
+  }
+}
+
+    .timeline h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: #0366c9;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #0366c9;
+      padding-bottom: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      min-width: 850px;
+      color: #333;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1.5px solid #eee;
+      text-align: left;
+      vertical-align: middle;
+    }
+    thead tr {
+      background-color: #0366c9;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    tbody tr:hover {
+      background-color: #eaf6ff;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: underline;
+      transition: color 0.3s ease;
+    }
+    a:hover, a:focus {
+      color: #0c47a1;
+      outline: none;
+    }
+
+    /* Edit Profile Popup Card */
+    #edit-profile-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0, 124, 240, 0.33);
+      padding: 2.5rem 3rem;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      user-select: text;
+      outline: none;
+    }
+    #edit-profile-card h2 {
+      margin-top: 0;
+      margin-bottom: 1.8rem;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: #0366c9;
+    }
+    #edit-profile-card label {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #0b3e6b;
+      margin-bottom: 6px;
+    }
+    #edit-profile-card input[type="text"] {
+      padding: 12px 16px;
+      font-size: 1.05rem;
+      border-radius: 12px;
+      border: 1.8px solid #b8d5ff;
+      transition: border-color 0.25s ease;
+      margin-bottom: 1.4rem;
+    }
+    #edit-profile-card input[type="text"]:focus {
+      outline: none;
+      border-color: #0472e9;
+      background: #e8f0ff;
+    }
+    #edit-profile-card button#saveProfileBtn {
+      margin-top: 0.4rem;
+      background-color: #007cf0;
+      border: none;
+      color: white;
+      padding: 16px 36px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      cursor: pointer;
+      box-shadow: 0 9px 27px #0092ffcc;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #edit-profile-card button#saveProfileBtn:hover,
+    #edit-profile-card button#saveProfileBtn:focus {
+      background-color: #004b94;
+      outline: none;
+    }
+
+    /* Overlay */
+    #popup-overlay {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.25);
+      display: none;
+      z-index: 9998;
+    }
+    #popup-overlay.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .graph-score-section {
+        flex-direction: column;
+      }
+      .profile-form {
+        grid-template-columns: 1fr;
+      }
+      main.dashboard {
+        margin-left: 0;
+        padding: 2rem 1.5rem 3rem;
+      }
+      nav.sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 1rem 0;
+      }
+      .profile-preview {
+        display: none;
+      }
+      .resume-section {
+        justify-content: center;
+      }
+      .role-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 600px) {
+      #edit-profile-card {
+        padding: 1rem;
+        max-height: 90vh;
+      }
+      .timeline {
+        padding: 0.5rem;
+      }
+      table {
+        min-width: 600px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" aria-label="Sidebar Navigation">
+    <h2>Employee Dashboard</h2>
+<div class="profile-card" aria-label="Employee Profile Card">
+  <div class="circle-avatar" tabindex="0" aria-label="Profile Info">
+    <div class="popup-info" role="tooltip">
+      <strong>John Smith</strong><br/>
+      Senior Frontend Developer<br/>
+      john.smith@example.com
+    </div>
+  </div>
+  <div class="name">John Smith</div>
+  <div class="role">Senior Frontend Developer</div>
+</div>
+
+
+
+
+    <div class="nav-buttons">
+      <button id="editProfileBtn" type="button" aria-label="Edit Profile">Edit Profile</button>
+      <button type="button" aria-label="Take Survey">Take Survey</button>
+      <button type="button" aria-label="View Dashboard">Dashboard</button>
+    </div>
+  </nav>
+
+  <main class="dashboard" role="main" aria-label="Employee Dashboard Main Content">
+    <h1>Employee Profile</h1>
+
+    <form class="profile-form" novalidate aria-labelledby="profile-info-title">
+      <h2 id="profile-info-title">Profile Information</h2>
+      <label for="joinYear">Current Job Join Year</label>
+      <input type="text" id="joinYear" name="joinYear" value="2019" readonly />
+
+      <label for="role">Role / Designation</label>
+      <input type="text" id="role" name="role" value="Senior Frontend Developer" readonly />
+
+      <label for="salary">Current Salary</label>
+      <input type="text" id="salary" name="salary" value="₹1,200,000" readonly />
+
+      <label for="userName">User Name</label>
+      <input type="text" id="userName" name="userName" value="jsmith" readonly />
+
+      <label for="employeePh">Employee Phone</label>
+      <input type="text" id="employeePh" name="employeePh" value="+1 (555) 123-4567" readonly />
+
+      <label for="employeeId">Employee ID</label>
+      <input type="text" id="employeeId" name="employeeId" value="EMP20253" readonly />
+
+      <label for="employeeName">Employee Name</label>
+      <input type="text" id="employeeName" name="employeeName" value="John Smith" readonly />
+
+      <label for="department">Department</label>
+      <input type="text" id="department" name="department" value="Software Engineering" readonly />
+
+      <label for="team">Team</label>
+      <input type="text" id="team" name="team" value="Frontend Development" readonly />
+    </form>
+
+    <section class="resume-section" aria-label="Resume Download Section">
+      <h2>Resume</h2>
+      <button class="download-btn" type="button" aria-label="Download your Resume">📝 Download CV</button>
+    </section>
+
+    <section class="graph-score-section" aria-label="Burnout Score and Skill Chart">
+      <div class="card graph-section" aria-label="Burnout Trend Chart">
+        <canvas id="burnoutTrendChart" role="img" aria-label="Line chart showing burnout score trends"></canvas>
+      </div>
+
+      <div class="burnout-score" aria-live="polite" aria-atomic="true" aria-label="Burnout score">
+        <h3>🌡️ Your Burnout Score</h3>
+        <div class="score-box" id="burnoutScore">16 / 25</div>
+      </div>
+
+      <div class="card skill-chart" aria-label="Skill Proficiency Chart">
+        <h2>Skill Proficiency</h2>
+        <canvas id="skillsChart"></canvas>
+      </div>
+    </section>
+
+    <section class="role-matches" aria-label="Top Role Matches">
+      <h2>🎯 Top Role Matches</h2>
+      <div class="role-cards">
+        <div class="role-card green" tabindex="0">
+          <h3>Business Analyst</h3>
+          <p>✅ 88% Match</p>
+          <button type="button" aria-label="View Business Analyst details">View Role</button>
+        </div>
+        <div class="role-card yellow" tabindex="0">
+          <h3>Data Analyst</h3>
+          <p>⚠️ 73% Match</p>
+          <button type="button" aria-label="View Data Analyst details">View Role</button>
+        </div>
+        <div class="role-card red" tabindex="0">
+          <h3>UI/UX Designer</h3>
+          <p>🔍 61% Match</p>
+          <button type="button" aria-label="View UI/UX Designer details">View Role</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="timeline" aria-label="Career Timeline">
+      <h2>Career Timeline</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Topic</th>
+            <th>Subtopics / Skills</th>
+            <th>Tools / Tech</th>
+            <th>Purpose</th>
+            <th>Outcome</th>
+            <th>Tutorials</th>
+            <th>Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jan 20, 2023</td>
+            <td>JavaScript Fundamentals</td>
+            <td>ES6, Closures, Promises</td>
+            <td>VSCode, Chrome DevTools</td>
+            <td>Build strong JS basics</td>
+            <td>Improved code quality</td>
+            <td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noopener noreferrer">MDN JS Guide</a></td>
+            <td><a href="https://stackoverflow.com/questions/tagged/javascript" target="_blank" rel="noopener noreferrer">StackOverflow JS</a></td>
+          </tr>
+          <tr>
+            <td>Jun 14, 2023</td>
+            <td>React.js Deep Dive</td>
+            <td>Hooks, Context API, Router</td>
+            <td>React, Redux, Storybook</td>
+            <td>Build scalable UI</td>
+            <td>Faster dev & reuse</td>
+            <td><a href="https://reactjs.org/docs/getting-started.html" target="_blank" rel="noopener noreferrer">React Docs</a></td>
+            <td><a href="https://reactpatterns.com/" target="_blank" rel="noopener noreferrer">React Patterns</a></td>
+          </tr>
+          <tr>
+            <td>Mar 3, 2024</td>
+            <td>Testing & Debugging</td>
+            <td>Jest, Cypress, Chrome DevTools</td>
+            <td>Jest, Cypress</td>
+            <td>Quality Assurance</td>
+            <td>Fewer bugs in prod</td>
+            <td><a href="https://jestjs.io/docs/en/getting-started" target="_blank" rel="noopener noreferrer">Jest Tutorial</a></td>
+            <td><a href="https://docs.cypress.io/guides/overview/why-cypress" target="_blank" rel="noopener noreferrer">Cypress Docs</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Edit Profile Popup -->
+  <section id="edit-profile-card" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title" tabindex="-1">
+    <h2 id="edit-profile-title">Edit Profile</h2>
+    <label for="editJoinYear">Current Job Join Year</label>
+    <input type="text" id="editJoinYear" />
+    <label for="editRole">Role / Designation</label>
+    <input type="text" id="editRole" />
+    <label for="editSalary">Current Salary</label>
+    <input type="text" id="editSalary" />
+    <label for="editUserName">User Name</label>
+    <input type="text" id="editUserName" />
+    <label for="editEmployeePh">Employee Phone</label>
+    <input type="text" id="editEmployeePh" />
+    <label for="editEmployeeId">Employee ID</label>
+    <input type="text" id="editEmployeeId" />
+    <label for="editEmployeeName">Employee Name</label>
+    <input type="text" id="editEmployeeName" />
+    <label for="editDepartment">Department</label>
+    <input type="text" id="editDepartment" />
+    <label for="editTeam">Team</label>
+    <input type="text" id="editTeam" />
+    <button id="saveProfileBtn" type="button" aria-label="Save Profile">Save</button>
+  </section>
+
+  <!-- Overlay -->
+  <div id="popup-overlay" aria-hidden="true"></div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Burnout and Skill charts init
+    document.addEventListener('DOMContentLoaded', function() {
+      const burnoutCtx = document.getElementById('burnoutTrendChart').getContext('2d');
+      const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+
+      const burnoutTrendChart = new Chart(burnoutCtx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+          datasets: [{
+            label: 'Burnout Score',
+            data: [10, 12, 15, 14, 16, 18, 16],
+            borderColor: '#f3df0c',
+            backgroundColor: 'rgba(243, 223, 12, 0.28)',
+            fill: true,
+            tension: 0.25,
+            pointRadius: 5,
+            pointBackgroundColor: '#664d00',
+            borderWidth: 3,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, max: 25, ticks: { stepSize: 5 }, grid: { color: 'rgba(0,0,0,0.05)' }},
+            x: { grid: { color: 'rgba(0,0,0,0.05)' }}
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#222',
+              titleColor: '#ffc',
+              bodyColor: '#ffd',
+              cornerRadius: 7,
+            }
+          }
+        }
+      });
+
+      const skillsChart = new Chart(skillsCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['JavaScript', 'React', 'Testing', 'UI/UX'],
+          datasets: [{
+            data: [85, 90, 70, 60],
+            backgroundColor: ['#3a7bd5', '#44a144', '#fca311', '#4361ee'],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: false,
+          cutout: '65%',
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+          }
+        }
+      });
+    });
+
+    // Edit profile popup logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const editBtn = document.getElementById('editProfileBtn');
+      const editCard = document.getElementById('edit-profile-card');
+      const overlay = document.getElementById('popup-overlay');
+      const saveBtn = document.getElementById('saveProfileBtn');
+
+      // Main form inputs
+      const inputs = {
+        joinYear: document.getElementById('joinYear'),
+        role: document.getElementById('role'),
+        salary: document.getElementById('salary'),
+        userName: document.getElementById('userName'),
+        employeePh: document.getElementById('employeePh'),
+        employeeId: document.getElementById('employeeId'),
+        employeeName: document.getElementById('employeeName'),
+        department: document.getElementById('department'),
+        team: document.getElementById('team')
+      };
+
+      // Edit popup inputs
+      const popupInputs = {
+        joinYear: document.getElementById('editJoinYear'),
+        role: document.getElementById('editRole'),
+        salary: document.getElementById('editSalary'),
+        userName: document.getElementById('editUserName'),
+        employeePh: document.getElementById('editEmployeePh'),
+        employeeId: document.getElementById('editEmployeeId'),
+        employeeName: document.getElementById('editEmployeeName'),
+        department: document.getElementById('editDepartment'),
+        team: document.getElementById('editTeam'),
+      };
+
+      function openEdit() {
+        for (const key in inputs) {
+          popupInputs[key].value = inputs[key].value;
+        }
+        editCard.style.display = 'flex';
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        editCard.focus();
+      }
+
+      function closeEdit() {
+        editCard.style.display = 'none';
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        editBtn.focus();
+      }
+
+      editBtn.addEventListener('click', openEdit);
+
+      saveBtn.addEventListener('click', () => {
+        if (!popupInputs.employeeName.value.trim()) {
+          alert('Employee Name cannot be empty.');
+          popupInputs.employeeName.focus();
+          return;
+        }
+        for (const key in inputs) {
+          inputs[key].value = popupInputs[key].value.trim();
+        }
+        document.getElementById('sidebar-name').textContent = inputs.employeeName.value;
+        document.getElementById('sidebar-role').textContent = inputs.role.value;
+        closeEdit();
+      });
+
+      overlay.addEventListener('click', closeEdit);
+
+      // Trap focus inside popup
+      editCard.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeEdit();
+          e.preventDefault();
+        }
+        if (e.key === 'Tab') {
+          const focusable = editCard.querySelectorAll('input, button');
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (e.shiftKey) {
+            if (document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            }
+          } else {
+            if (document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

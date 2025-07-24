@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Professional Survey Form with Skill Tags</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== Reset & base ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #f4f7fb;
+      min-height: 100vh;
+      margin: 0;
+      padding: 48px 24px 64px;
+      color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ===== Container ===== */
+    .container {
+      background: white;
+      border-radius: 16px;
+      max-width: 960px;
+      width: 100%;
+      padding: 64px 72px 56px;
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 123, 186, 0.12);
+      transition: box-shadow 0.3s ease;
+    }
+    .container:hover {
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.12),
+        0 16px 40px rgba(0, 123, 186, 0.20);
+    }
+
+    /* ===== Headings ===== */
+    h1#surveyTitle {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: 3rem;
+      color: #004a75;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 56px;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+    }
+    h2 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 1.9rem;
+      margin-bottom: 32px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid #217ac0;
+      color: #216b9c;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== Sections ===== */
+    section.section {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgb(33 122 194 / 0.12);
+      padding: 48px 48px 40px;
+      margin-bottom: 48px;
+      transition: box-shadow 0.3s;
+    }
+    section.section:hover {
+      box-shadow: 0 9px 46px rgb(33 122 194 / 0.22);
+    }
+
+    /* ===== Rating Slider ===== */
+    .rating-slider-container label {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #124068;
+      margin-bottom: 12px;
+      user-select: text;
+      display: block;
+    }
+    input[type="range"].rating-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      outline-offset: 2px;
+      background: linear-gradient(to right, #d93025 0%, #fbbc04 50%, #34a853 100%);
+      box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+    input[type="range"].rating-slider:focus {
+      box-shadow:
+        0 0 0 4px #217ac0aa,
+        inset 0 1px 3px rgb(0 0 0 / 0.15);
+      outline: none;
+    }
+    input[type="range"].rating-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      background: #217ac0;
+      border-radius: 50%;
+      border: 3px solid white;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(33,122,192,0.7);
+      transition: background-color 0.3s, transform 0.2s ease;
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    input[type="range"].rating-slider::-webkit-slider-thumb:hover,
+    input[type="range"].rating-slider::-webkit-slider-thumb:active {
+      background-color: #185c8e;
+      transform: translateY(-50%) scale(1.15);
+      box-shadow: 0 5px 15px rgba(24,92,142,0.9);
+    }
+    input[type="range"].rating-slider::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      background: #217ac0;
+      border-radius: 50%;
+      border: 3px solid white;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(33,122,192,0.7);
+      transition: background-color 0.3s, transform 0.2s ease;
+    }
+    input[type="range"].rating-slider::-moz-range-thumb:hover,
+    input[type="range"].rating-slider::-moz-range-thumb:active {
+      background-color: #185c8e;
+      transform: scale(1.15);
+      box-shadow: 0 5px 15px rgba(24,92,142,0.9);
+    }
+    .rating-labels {
+      display: flex;
+      justify-content: space-between;
+      color: #217ac0;
+      font-size: 1.5rem;
+      user-select: none;
+      padding: 0 24px;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      letter-spacing: 0.07em;
+    }
+    .rating-labels span {
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+    }
+    #ratingValue {
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: #185c8e;
+      user-select: text;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    /* ===== Switches ===== */
+    .switch-group {
+      display: flex;
+      align-items: center;
+      gap: 56px;
+      margin-bottom: 36px;
+      user-select: none;
+      flex-wrap: wrap;
+    }
+    .switch-group label {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #124068;
+      cursor: pointer;
+      user-select: text;
+      flex: 1 1 200px;
+      min-width: 180px;
+    }
+    /* Custom Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 28px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      left: -9999px;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      border-radius: 28px;
+      transition: background-color 0.4s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 0 8px rgb(0 0 0 / 0.1);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      top: 3px;
+      background-color: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, background-color 0.4s ease;
+    }
+    input:checked + .slider {
+      background-color: #217ac0;
+      box-shadow: inset 0 0 15px #3a85d3dd;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+      background-color: white;
+    }
+    .switch:focus-visible .slider {
+      box-shadow:
+        0 0 0 3px rgba(33, 122, 192, 0.5),
+        inset 0 0 8px rgb(0 0 0 / 0.15);
+      outline: none;
+    }
+
+    /* ===== Chips multi-select styles ===== */
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 20px;
+      margin-top: 12px;
+      user-select: none;
+      justify-content: center;
+    }
+    .chip {
+      background: #e3ecfb;
+      color: #216b9c;
+      padding: 14px 28px;
+      border-radius: 28px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 5px rgb(33 122 194 / 0.12);
+      transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.15s ease;
+      outline-offset: 4px;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 130px;
+      text-align: center;
+    }
+    .chip:hover,
+    .chip:focus-visible {
+      background: #217ac0;
+      color: white;
+      border-color: #1b6590;
+      box-shadow: 0 4px 16px rgba(33, 122, 192, 0.5);
+      outline: none;
+      transform: scale(1.04);
+    }
+    .chip.selected {
+      background: #185c8e;
+      border-color: #13527a;
+      color: white;
+      box-shadow: 0 5px 16px rgba(24, 92, 142, 0.8);
+      transform: scale(1.08);
+    }
+    .chip:focus {
+      outline: 3px solid #217ac0;
+      outline-offset: 3px;
+    }
+
+    /* ===== Skill Assessment ===== */
+    .skills-section .skill-row {
+      display: flex;
+      align-items: flex-start;
+      margin: 28px 0;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .skills-section label {
+      font-weight: 700;
+      font-size: 1.15rem;
+      min-width: 200px;
+      color: #184a73;
+      user-select: text;
+      margin-top: 8px;
+    }
+    .skill-input-wrapper {
+      display: flex;
+      gap: 16px;
+      flex: 1 1 400px;
+      max-width: 600px;
+    }
+    .skill-input-wrapper input[type="text"] {
+      flex: 1;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1.6px solid #9abbdc;
+      background: #f9fbff;
+      font-size: 1.1rem;
+      color: #222;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+      box-shadow: inset 0 0 4px rgb(33 122 194 / 0.1);
+    }
+    .skill-input-wrapper input[type="text"]:focus {
+      border-color: #217ac0;
+      background: #e6f0fc;
+      outline: none;
+      box-shadow: 0 0 14px #217ac0cc inset;
+    }
+    .add-skill-btn {
+      background-color: #217ac0;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 1.05rem;
+      border-radius: 12px;
+      padding: 12px 28px;
+      cursor: pointer;
+      box-shadow: 0 5px 18px rgba(33,122,192,0.55);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .add-skill-btn:hover,
+    .add-skill-btn:focus {
+      background-color: #185c8e;
+      outline: none;
+      box-shadow: 0 7px 22px rgba(24,92,142,0.85);
+    }
+
+    .skill-tags {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      max-width: 600px;
+      user-select:none;
+    }
+    .skill-tag {
+      background: #217acddd;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 20px;
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select:none;
+      box-shadow: 0 2px 10px rgb(33 122 192 / 0.45);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .skill-tag button {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.35rem;
+      line-height: 1;
+      font-weight: 900;
+      padding: 0;
+      user-select:none;
+      transition: color 0.3s ease;
+    }
+    .skill-tag button:hover {
+      color: #ffafaf;
+    }
+
+    /* ===== Date input styling ===== */
+    input[type="date"] {
+      padding: 14px 18px;
+      font-size: 1.1rem;
+      border-radius: 14px;
+      border: 1.8px solid #9abbdc;
+      background: #f9fbff;
+      color: #222;
+      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      width: 220px;
+      cursor: pointer;
+      margin-top: 12px;
+      box-shadow: inset 0 0 4px rgb(33 122 194 / 0.08);
+    }
+    input[type="date"]:focus {
+      border-color: #217ac0;
+      background: #e6f0fc;
+      outline: none;
+      box-shadow: 0 0 14px #217ac0cc;
+    }
+
+    /* ===== Floating Textarea with counter ===== */
+    .floating-textarea-container {
+      position: relative;
+      margin-top: 32px;
+      max-width: 100%;
+    }
+    .floating-textarea-container textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 170px;
+      padding: 40px 24px 36px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 16px;
+      border: 1.8px solid #9abbdc;
+      background: #f9fbff;
+      color: #222;
+      transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: 'Inter', sans-serif;
+      line-height: 1.4;
+      box-shadow: inset 0 0 6px rgb(33 122 194 / 0.12);
+    }
+    .floating-textarea-container textarea:focus {
+      border-color: #217ac0;
+      background: #e6f0fc;
+      outline: none;
+      box-shadow: 0 0 16px #217ac0cc inset;
+    }
+    .floating-textarea-container label {
+      position: absolute;
+      top: 26px;
+      left: 30px;
+      color: #759cc8;
+      font-size: 1.05rem;
+      font-weight: 600;
+      pointer-events: none;
+      transition: all 0.25s ease-in-out;
+      background: #f9fbff;
+      padding: 0 10px;
+      border-radius: 6px;
+      user-select:none;
+    }
+    .floating-textarea-container textarea:not(:placeholder-shown) + label,
+    .floating-textarea-container textarea:focus + label {
+      top: -10px;
+      left: 22px;
+      font-size: 0.85rem;
+      color: #184a73;
+      font-weight: 700;
+    }
+    .char-counter {
+      position: absolute;
+      bottom: 20px;
+      right: 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #5a7bad;
+      user-select: none;
+      letter-spacing: 0.05em;
+    }
+
+    /* ===== Submit button ===== */
+    .submit-button {
+      text-align: center;
+      margin-top: 52px;
+    }
+    .submit-button button {
+      background: #217ac0;
+      color: white;
+      padding: 18px 56px;
+      border-radius: 28px;
+      font-weight: 900;
+      font-size: 1.5rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 14px 40px rgba(33,122,192,0.6);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .submit-button button:hover,
+    .submit-button button:focus {
+      background: #185c8e;
+      box-shadow: 0 20px 54px rgba(24,92,142,0.85);
+      outline: none;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 900px) {
+      .container {
+        padding: 40px 32px 48px;
+      }
+      h1#surveyTitle {
+        font-size: 2.5rem;
+        margin-bottom: 48px;
+      }
+      h2 {
+        font-size: 1.6rem;
+        margin-bottom: 24px;
+        padding-bottom: 6px;
+      }
+      .switch-group {
+        gap: 36px;
+      }
+      .chips-container {
+        justify-content: flex-start;
+      }
+      .chip {
+        min-width: 110px;
+        padding: 12px 20px;
+        font-size: 1rem;
+      }
+      .skill-input-wrapper {
+        max-width: 100%;
+      }
+      input[type="date"] {
+        width: 100%;
+        max-width: 220px;
+      }
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 28px 16px 36px;
+      }
+      h1#surveyTitle {
+        font-size: 2rem;
+        margin-bottom: 32px;
+      }
+      .switch-group {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      .switch-group label {
+        min-width: auto;
+      }
+      .chips-container {
+        justify-content: center;
+      }
+      .chip {
+        min-width: 100px;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+      }
+      .submit-button button {
+        width: 100%;
+        padding: 16px 0;
+        font-size: 1.3rem;
+      }
+      input[type="date"] {
+        max-width: 100%;
+      }
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Rating slider dynamic text
+      const ratingSlider = document.getElementById('satisfactionSlider');
+      const ratingValueDisplay = document.getElementById('ratingValue');
+      const ratingTexts = ['Very Unsatisfied', 'Unsatisfied', 'Neutral', 'Satisfied', 'Very Satisfied'];
+      function updateRatingText() {
+        let val = parseInt(ratingSlider.value);
+        ratingValueDisplay.textContent = `Current selection: ${ratingTexts[val]}`;
+        ratingSlider.setAttribute('aria-valuenow', val);
+        ratingSlider.setAttribute('aria-valuetext', ratingTexts[val]);
+      }
+      updateRatingText();
+      ratingSlider.addEventListener('input', updateRatingText);
+
+      // Accessible Toggle Switches
+      window.toggleCheckbox = function(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.checked = !el.checked;
+        const label = el.parentElement;
+        if (label) label.setAttribute('aria-checked', el.checked.toString());
+      };
+
+      // Keyboard accessibility support for toggle switches
+      document.querySelectorAll('.switch').forEach(switchLabel => {
+        switchLabel.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            const input = switchLabel.querySelector('input[type=checkbox]');
+            if(input) {
+              input.checked = !input.checked;
+              switchLabel.setAttribute('aria-checked', input.checked.toString());
+            }
+          }
+        });
+      });
+
+      // Chips multi-select toggle
+      window.toggleChip = function(chip) {
+        if (!chip) return;
+        const selected = chip.classList.toggle('selected');
+        chip.setAttribute('aria-checked', selected.toString());
+      };
+      // Keyboard support for chips
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleChip(chip);
+          }
+        });
+      });
+
+      // Skill tags add/remove functionality
+      function setupSkillInput(inputId, tagsId) {
+        const input = document.getElementById(inputId);
+        const tagsContainer = document.getElementById(tagsId);
+        const addBtn = input.nextElementSibling;
+        const addedSkills = new Set();
+
+        function addSkill() {
+          const skill = input.value.trim();
+          if (!skill || addedSkills.has(skill.toLowerCase())) {
+            input.value = '';
+            return;
+          }
+          addedSkills.add(skill.toLowerCase());
+          const tag = document.createElement('span');
+          tag.className = 'skill-tag';
+          tag.textContent = skill;
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.setAttribute('aria-label', `Remove skill ${skill}`);
+          removeBtn.innerHTML = '&times;';
+          removeBtn.onclick = () => {
+            tagsContainer.removeChild(tag);
+            addedSkills.delete(skill.toLowerCase());
+          };
+          tag.appendChild(removeBtn);
+          tagsContainer.appendChild(tag);
+          input.value = '';
+          input.focus();
+        }
+        addBtn.addEventListener('click', addSkill);
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addSkill();
+          }
+        });
+      }
+      setupSkillInput('frontendInput', 'frontendTags');
+      setupSkillInput('backendInput', 'backendTags');
+      setupSkillInput('devtoolsInput', 'devtoolsTags');
+      setupSkillInput('dbInput', 'dbTags');
+      setupSkillInput('cloudInput', 'cloudTags');
+
+      // Char counter for textarea
+      const textarea = document.getElementById('feedbackText');
+      const charCount = document.getElementById('charCount');
+      charCount.textContent = `0 / 400`; // initial
+      textarea.addEventListener('input', () => {
+        charCount.textContent = `${textarea.value.length} / 400`;
+      });
+    });
+  </script>
+</head>
+<body>
+  <main class="container" role="form" aria-labelledby="surveyTitle" tabindex="-1">
+    <h1 id="surveyTitle">Survey</h1>
+
+    <section class="section" aria-labelledby="workstyleTitle">
+      <h2 id="workstyleTitle">Workstyle & Task Preferences</h2>
+      <div class="rating-slider-container">
+        <label for="satisfactionSlider">How satisfied are you with your current role?</label>
+        <input type="range" id="satisfactionSlider" min="0" max="4" step="1" value="2" class="rating-slider"
+          aria-valuemin="0" aria-valuemax="4" aria-valuenow="2" aria-valuetext="Neutral" />
+        <div class="rating-labels" aria-hidden="true">
+          <span title="Very Unsatisfied" aria-label="Very Unsatisfied">😞</span>
+          <span title="Unsatisfied" aria-label="Unsatisfied">😕</span>
+          <span title="Neutral" aria-label="Neutral">😐</span>
+          <span title="Satisfied" aria-label="Satisfied">🙂</span>
+          <span title="Very Satisfied" aria-label="Very Satisfied">🏆</span>
+        </div>
+        <div id="ratingValue" aria-live="polite">Current selection: Neutral</div>
+      </div>
+      <div style="margin-top: 36px;">
+        <div class="switch-group">
+          <label for="clientRoleToggle">I enjoy client-facing roles</label>
+          <label class="switch" aria-checked="false" role="checkbox" tabindex="0" for="clientRoleToggle" onclick="toggleCheckbox('clientRoleToggle')">
+            <input type="checkbox" id="clientRoleToggle" aria-labelledby="clientRoleToggleLabel" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-group">
+          <label for="creativeProblemsToggle">I like solving creative problems</label>
+          <label class="switch" aria-checked="false" role="checkbox" tabindex="0" for="creativeProblemsToggle" onclick="toggleCheckbox('creativeProblemsToggle')">
+            <input type="checkbox" id="creativeProblemsToggle" aria-labelledby="creativeProblemsToggleLabel" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-group">
+          <label for="repetitiveTasksToggle">I enjoy structured, repetitive tasks</label>
+          <label class="switch" aria-checked="false" role="checkbox" tabindex="0" for="repetitiveTasksToggle" onclick="toggleCheckbox('repetitiveTasksToggle')">
+            <input type="checkbox" id="repetitiveTasksToggle" aria-labelledby="repetitiveTasksToggleLabel" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-group">
+          <label for="fastPacedToggle">I like fast-paced environments</label>
+          <label class="switch" aria-checked="false" role="checkbox" tabindex="0" for="fastPacedToggle" onclick="toggleCheckbox('fastPacedToggle')">
+            <input type="checkbox" id="fastPacedToggle" aria-labelledby="fastPacedToggleLabel" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="careerIntentTitle">
+      <h2 id="careerIntentTitle">Career Intent</h2>
+      <div class="chips-container" role="group" aria-label="Select your career intent">
+        <div tabindex="0" class="chip" role="checkbox" aria-checked="false" data-value="Change In Role" onclick="toggleChip(this)" onkeypress="if(event.key==='Enter' || event.key===' ') toggleChip(this)">
+          Change In Role
+        </div>
+        <div tabindex="0" class="chip" role="checkbox" aria-checked="false" data-value="Fresh Start" onclick="toggleChip(this)" onkeypress="if(event.key==='Enter' || event.key===' ') toggleChip(this)">
+          Fresh Start
+        </div>
+        <div tabindex="0" class="chip" role="checkbox" aria-checked="false" data-value="Upskill" onclick="toggleChip(this)" onkeypress="if(event.key==='Enter' || event.key===' ') toggleChip(this)">
+          Upskill
+        </div>
+        <div tabindex="0" class="chip" role="checkbox" aria-checked="false" data-value="Growth" onclick="toggleChip(this)" onkeypress="if(event.key==='Enter' || event.key===' ') toggleChip(this)">
+          Growth
+        </div>
+      </div>
+    </section>
+
+    <section class="section skills-section" aria-labelledby="skillAssessmentTitle">
+      <h2 id="skillAssessmentTitle">Skill Assessment</h2>
+
+      <div class="skill-row" id="frontendRow">
+        <label for="frontendInput">Frontend Skills</label>
+        <div class="skill-input-wrapper">
+          <input type="text" id="frontendInput" placeholder="e.g., React, HTML, CSS" aria-label="Frontend skill input" />
+          <button type="button" class="add-skill-btn" aria-label="Add frontend skill">Add</button>
+        </div>
+        <div class="skill-tags" id="frontendTags" aria-live="polite" aria-relevant="additions removals"></div>
+      </div>
+
+      <div class="skill-row" id="backendRow">
+        <label for="backendInput">Backend Skills</label>
+        <div class="skill-input-wrapper">
+          <input type="text" id="backendInput" placeholder="e.g., Node.js, Django" aria-label="Backend skill input" />
+          <button type="button" class="add-skill-btn" aria-label="Add backend skill">Add</button>
+        </div>
+        <div class="skill-tags" id="backendTags" aria-live="polite" aria-relevant="additions removals"></div>
+      </div>
+
+      <div class="skill-row" id="devtoolsRow">
+        <label for="devtoolsInput">Dev Tools</label>
+        <div class="skill-input-wrapper">
+          <input type="text" id="devtoolsInput" placeholder="e.g., Git, Docker" aria-label="Dev tools skill input" />
+          <button type="button" class="add-skill-btn" aria-label="Add dev tools skill">Add</button>
+        </div>
+        <div class="skill-tags" id="devtoolsTags" aria-live="polite" aria-relevant="additions removals"></div>
+      </div>
+
+      <div class="skill-row" id="dbRow">
+        <label for="dbInput">Databases</label>
+        <div class="skill-input-wrapper">
+          <input type="text" id="dbInput" placeholder="e.g., MySQL, MongoDB" aria-label="Databases skill input" />
+          <button type="button" class="add-skill-btn" aria-label="Add databases skill">Add</button>
+        </div>
+        <div class="skill-tags" id="dbTags" aria-live="polite" aria-relevant="additions removals"></div>
+      </div>
+
+      <div class="skill-row" id="cloudRow">
+        <label for="cloudInput">Cloud Platforms</label>
+        <div class="skill-input-wrapper">
+          <input type="text" id="cloudInput" placeholder="e.g., AWS, Azure" aria-label="Cloud platforms skill input" />
+          <button type="button" class="add-skill-btn" aria-label="Add cloud platforms skill">Add</button>
+        </div>
+        <div class="skill-tags" id="cloudTags" aria-live="polite" aria-relevant="additions removals"></div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="preferredJoiningTitle">
+      <h2 id="preferredJoiningTitle">Preferred Joining Date</h2>
+      <input type="date" name="joiningDate" aria-label="Preferred joining date" />
+    </section>
+
+    <section class="section" aria-labelledby="additionalFeedbackTitle">
+      <h2 id="additionalFeedbackTitle">Additional Feedback</h2>
+      <div class="floating-textarea-container">
+        <textarea id="feedbackText" placeholder=" " maxlength="400" aria-describedby="charCount" aria-label="Additional feedback"></textarea>
+        <label for="feedbackText">Write your feedback here...</label>
+        <div class="char-counter" id="charCount" aria-live="polite" aria-atomic="true">0 / 400</div>
+      </div>
+    </section>
+
+    <div class="submit-button">
+      <button type="submit" aria-label="Submit Survey Form">Submit Survey</button>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard - Professional</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+    }
+    html, body {
+      height: 100%;
+      background: linear-gradient(135deg, #007cf0, #00dfd8);
+      color: #222;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    nav.sidebar {
+      width: 280px;
+      background: #004d73;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 2.5rem 1.8rem;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      box-shadow: 2px 0 22px rgba(0, 72, 105, 0.9);
+      z-index: 20;
+      user-select: none;
+    }
+
+    nav.sidebar h2 {
+      font-weight: 900;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      letter-spacing: 1.5px;
+      user-select: text;
+    }
+
+    /* Profile Section in Sidebar */
+    .profile-section {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #009fde;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5rem;
+      color: white;
+      box-shadow: 0 0 15px #00bfffaa;
+      margin-bottom: 0.5rem;
+      user-select: none;
+    }
+    .profile-name {
+      font-weight: 700;
+      font-size: 1.3rem;
+      user-select: text;
+    }
+    .profile-role {
+      font-style: italic;
+      font-weight: 500;
+      font-size: 1rem;
+      color: #74bbd3;
+      user-select: text;
+    }
+    /* Organization Info Images below profile */
+    .org-images {
+      margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.9rem;
+      user-select: none;
+    }
+    .org-images img {
+      width: 52px;
+      height: 52px;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 2px solid #007cf0;
+      background: white;
+      transition: transform 0.3s ease;
+      cursor: default;
+    }
+    .org-images img:hover,
+    .org-images img:focus {
+      outline: none;
+      transform: scale(1.2);
+      box-shadow: 0 0 12px #00afffcc;
+    }
+
+    /* Sidebar Navigation Buttons */
+    .nav-buttons {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .nav-buttons button {
+      background-color: #00b0ff;
+      color: white;
+      border: none;
+      padding: 0.9rem 1rem;
+      font-weight: 700;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px #00a0eecc;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .nav-buttons button:hover,
+    .nav-buttons button:focus {
+      background-color: #0083c9;
+      outline: none;
+    }
+
+    /* Main Content */
+    main.dashboard {
+      margin-left: 280px;
+      flex: 1;
+      padding: 3rem 3.5rem 3.5rem;
+      background: #f9fbfc;
+      min-height: 100vh;
+      overflow-y: auto;
+      box-shadow: -2px 0 22px rgba(0, 72, 105, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* Header */
+    header.header {
+      display: flex;
+      align-items: center;
+      gap: 1.3rem;
+      color: #007cf0;
+      user-select: text;
+    }
+    header.header .back-arrow {
+      font-size: 2.5rem;
+      font-weight: 900;
+      cursor: pointer;
+      color: #0099f0;
+      padding: 0 7px 3px 7px;
+      border-radius: 7px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    header.header .back-arrow:hover,
+    header.header .back-arrow:focus {
+      background-color: #0077c4aa;
+      outline: none;
+    }
+    header.header h1 {
+      font-weight: 900;
+      font-size: 2.9rem;
+      letter-spacing: 1.6px;
+      user-select: text;
+    }
+
+    /* Metrics Row */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 26px;
+      user-select: none;
+    }
+    .card {
+      background: white;
+      padding: 30px 22px;
+      border-radius: 16px;
+      box-shadow: 0 5px 20px rgba(0, 124, 240, 0.12);
+      text-align: center;
+      font-weight: 700;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #006692;
+      cursor: default;
+      transition: box-shadow 0.3s ease;
+    }
+    .card strong {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.65px;
+      margin-bottom: 12px;
+      color: #0098d6;
+      user-select: text;
+    }
+    .card p {
+      font-size: 2.5rem;
+      margin: 0;
+      color: #00415a;
+      user-select: text;
+    }
+    .card.loading p {
+      color: #bfc7d1;
+      font-weight: 400;
+      font-size: 1.4rem;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Dashboard Rows (Charts + Stats) */
+    .dashboard-row {
+      display: flex;
+      gap: 44px;
+      align-items: flex-start;
+      user-select: none;
+    }
+    .chart-block {
+      flex-grow: 2;
+      background: white;
+      border-radius: 18px;
+      padding: 28px 34px 34px 34px;
+      box-shadow: 0 6px 24px rgba(0, 124, 240, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 500px;
+    }
+    .chart-block h3 {
+      font-weight: 800;
+      color: #007cf0;
+      margin: 0 0 22px 6px;
+      letter-spacing: 1.1px;
+      font-size: 1.3rem;
+      user-select: text;
+    }
+    .chart-block canvas {
+      width: 100% !important;
+      height: 260px !important;
+      border-radius: 14px;
+      background: #f9fbfc;
+      box-shadow: inset 0 0 15px rgb(0 124 240 / 0.12);
+      user-select: none;
+    }
+
+    /* Stat Boxes */
+    .stat-box {
+      flex-basis: 245px;
+      background: white;
+      border-radius: 18px;
+      padding: 34px 24px;
+      box-shadow: 0 5px 21px rgba(0, 124, 240, 0.1);
+      text-align: center;
+      color: #005670;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 190px;
+      user-select: text;
+    }
+    .stat-box h4 {
+      font-size: 1.15rem;
+      margin-bottom: 20px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      user-select: text;
+    }
+    .stat-box p {
+      font-size: 3.3rem;
+      font-weight: 900;
+      letter-spacing: 1.25px;
+      margin: 0;
+    }
+    .stat-box.green p {
+      color: #01a652;
+    }
+    .stat-box.red p {
+      color: #d64545;
+    }
+
+    /* Document Buttons */
+    .doc-buttons {
+      display: flex;
+      gap: 30px;
+      padding-left: 12px;
+      user-select: none;
+    }
+    .doc-buttons button {
+      background: rgba(255 255 255 / 0.9);
+      border: 2px solid #00cde1;
+      color: #007799;
+      padding: 16px 30px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.45px;
+      box-shadow: 0 2px 12px rgb(0 205 225 / 0.7);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .doc-buttons button:hover,
+    .doc-buttons button:focus {
+      background-color: #00cde1;
+      color: white;
+      outline: none;
+      box-shadow: 0 5px 18px rgb(0 205 225 / 0.95);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1250px) {
+      main.dashboard {
+        padding: 2rem 2.5rem 3rem;
+      }
+      .metrics-row {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      .dashboard-row {
+        flex-direction: column;
+        gap: 34px;
+      }
+      .chart-block {
+        min-width: 100%;
+        height: 290px;
+      }
+      .stat-box {
+        min-width: 100%;
+        padding: 30px 22px;
+      }
+      .doc-buttons {
+        flex-direction: column;
+        gap: 20px;
+        padding-left: 0;
+      }
+    }
+    @media (max-width: 600px) {
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      header.header h1 {
+        font-size: 2.2rem;
+      }
+      .stat-box h4 {
+        font-size: 1.05rem;
+      }
+      .stat-box p {
+        font-size: 2.85rem;
+      }
+      .doc-buttons button {
+        font-size: 1rem;
+        padding: 14px 22px;
+      }
+    }
+    @media (max-width: 420px) {
+      .metrics-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar" aria-label="Sidebar with profile and organization info">
+    <h2>Admin Panel</h2>
+    <section class="profile-section" aria-label="Admin profile information">
+      <div class="profile-avatar" aria-hidden="true">🛡️</div>
+      <p class="profile-name" tabindex="0">Alex Morgan</p>
+      <p class="profile-role" tabindex="0">System Administrator</p>
+    </section>
+
+    <section class="org-images" aria-label="Organization related images">
+      <img src="https://via.placeholder.com/52x52.png?text=Org1" alt="Organization Logo 1" tabindex="0" />
+      <img src="https://via.placeholder.com/52x52.png?text=DeptA" alt="Department A Logo" tabindex="0" />
+      <img src="https://via.placeholder.com/52x52.png?text=ProjX" alt="Project X Logo" tabindex="0" />
+      <img src="https://via.placeholder.com/52x52.png?text=HQ" alt="Headquarters Logo" tabindex="0" />
+      <img src="https://via.placeholder.com/52x52.png?text=Cult" alt="Company Culture Logo" tabindex="0" />
+    </section>
+
+    <div class="nav-buttons" role="navigation" aria-label="Sidebar primary actions">
+      <button type="button" aria-label="View Dashboard">Dashboard</button>
+      <button type="button" aria-label="View Employees">Employees</button>
+      <button type="button" aria-label="View Projects">Projects</button>
+      <button type="button" aria-label="View Reports">Reports</button>
+      <button type="button" aria-label="Logout">Logout</button>
+    </div>
+  </nav>
+
+  <main class="dashboard" role="main" aria-label="Admin Dashboard main content">
+    <header class="header">
+      <button class="back-arrow" aria-label="Go back" title="Go back" tabindex="0">←</button>
+      <h1>Admin Dashboard</h1>
+    </header>
+
+    <section class="metrics-row" aria-label="Key metrics summary">
+      <div class="card loading" id="employeesCard" tabindex="0">
+        <strong>Total Employees</strong>
+        <p>Loading…</p>
+      </div>
+      <div class="card loading" id="teamsCard" tabindex="0">
+        <strong>Total Teams</strong>
+        <p>Loading…</p>
+      </div>
+      <div class="card loading" id="pendingProjectsCard" tabindex="0">
+        <strong>Pending Projects</strong>
+        <p>Loading…</p>
+      </div>
+      <div class="card loading" id="openPositionsCard" tabindex="0">
+        <strong>Open Job Positions</strong>
+        <p>Loading…</p>
+      </div>
+      <div class="card loading" id="monthlyRevenueCard" tabindex="0">
+        <strong>Monthly Revenue</strong>
+        <p>Loading…</p>
+      </div>
+      <div class="card loading" id="monthlyExpensesCard" tabindex="0">
+        <strong>Monthly Expenses</strong>
+        <p>Loading…</p>
+      </div>
+    </section>
+
+    <section class="dashboard-row" aria-label="Employee growth chart and ML accuracy">
+      <div class="chart-block">
+        <h3>Employee Growth</h3>
+        <canvas id="employeeGrowthChart" role="img" aria-label="Line chart showing employee growth"></canvas>
+      </div>
+      <div class="stat-box green" role="region" aria-live="polite" aria-atomic="true" aria-label="Machine learning accuracy">
+        <h4>ML Accuracy</h4>
+        <p id="accuracyStat">–</p>
+      </div>
+    </section>
+
+    <section class="dashboard-row" aria-label="Turnover rate and burnout statistic">
+      <div class="chart-block">
+        <h3>Attrition / Turnover Rate</h3>
+        <canvas id="turnoverChart" role="img" aria-label="Bar chart showing turnover rate"></canvas>
+      </div>
+      <div class="stat-box red" role="region" aria-live="polite" aria-atomic="true" aria-label="High burnout cases">
+        <h4>High Burnout Cases</h4>
+        <p id="burnoutCasesStat">–</p>
+      </div>
+    </section>
+
+    <section class="doc-buttons" role="region" aria-label="Documents and resources actions">
+      <button aria-label="Open HR policies documents">HR Policies 🗎</button>
+      <button aria-label="Open compliance documents">Compliance Docs 🗎</button>
+      <button aria-label="Open payroll templates">Payroll Templates 🗎</button>
+    </section>
+  </main>
+
+  <script>
+    // Simulated async fetch of dashboard data
+    function fetchDashboardData() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve({
+            totalEmployees: 1242,
+            totalTeams: 8,
+            pendingProjects: 17,
+            openPositions: 4,
+            monthlyRevenue: 2943500,
+            monthlyExpenses: 2078400,
+            accuracy: 91.3,
+            highBurnoutCases: 9,
+            growth: {
+              months: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+              employeeCount: [1113, 1155, 1194, 1207, 1227, 1238, 1242]
+            },
+            turnover: {
+              months: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+              turnoverRate: [12.2, 10.5, 9.8, 11.4, 9.0, 8.9, 7.9]
+            }
+          });
+        }, 1100);
+      });
+    }
+
+    function formatNumber(num) {
+      return num.toLocaleString();
+    }
+    function formatCurrency(num) {
+      return "₹" + num.toLocaleString();
+    }
+
+    async function initDashboard() {
+      const data = await fetchDashboardData();
+      const fillCard = (id, title, value, formatFn = v => v) => {
+        const el = document.getElementById(id);
+        el.classList.remove('loading');
+        el.innerHTML = `<strong>${title}</strong><p>${formatFn(value)}</p>`;
+      };
+      fillCard('employeesCard', 'Total Employees', data.totalEmployees, formatNumber);
+      fillCard('teamsCard', 'Total Teams', data.totalTeams, formatNumber);
+      fillCard('pendingProjectsCard', 'Pending Projects', data.pendingProjects, formatNumber);
+      fillCard('openPositionsCard', 'Open Job Positions', data.openPositions, formatNumber);
+      fillCard('monthlyRevenueCard', 'Monthly Revenue', data.monthlyRevenue, formatCurrency);
+      fillCard('monthlyExpensesCard', 'Monthly Expenses', data.monthlyExpenses, formatCurrency);
+
+      document.getElementById('accuracyStat').textContent = data.accuracy.toFixed(1) + "%";
+      document.getElementById('burnoutCasesStat').textContent = data.highBurnoutCases;
+
+      // Employee Growth Chart
+      new Chart(document.getElementById('employeeGrowthChart'), {
+        type: 'line',
+        data: {
+          labels: data.growth.months,
+          datasets: [{
+            label: 'Employees',
+            data: data.growth.employeeCount,
+            borderColor: "#007cf0",
+            backgroundColor: "rgba(0,124,240,0.14)",
+            fill: true,
+            tension: 0.25,
+            pointRadius: 5,
+            pointBackgroundColor: "#00dfd8"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false },
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: { stepSize: 20 },
+              grid: { color: "#d9eefb" }
+            },
+            x: {
+              grid: { color: "#d9eefb" }
+            }
+          }
+        }
+      });
+
+      // Turnover Rate Bar Chart
+      new Chart(document.getElementById('turnoverChart'), {
+        type: 'bar',
+        data: {
+          labels: data.turnover.months,
+          datasets: [{
+            label: 'Turnover Rate (%)',
+            data: data.turnover.turnoverRate,
+            backgroundColor: "#c0392bcc",
+            borderRadius: 8,
+            maxBarThickness: 40,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: Math.max(16, ...data.turnover.turnoverRate),
+              grid: { color: "#fae4e2" },
+              ticks: {
+                stepSize: 2,
+                color: "#7f1d1a"
+              }
+            },
+            x: {
+              grid: { color: "#fae4e2" },
+            }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>

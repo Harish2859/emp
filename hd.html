@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HR Survey Dashboard - Professional Interactive</title>
+<style>
+  :root {
+    --primary-blue: #007BBA;
+    --primary-blue-light: #2BB8F0;
+    --primary-blue-dark: #144a6d;
+    --danger-red: #c0392b;
+    --warning-yellow: #fbc02d;
+    --success-green: #27ae60;
+    --dark-text: #2b2b2b;
+    --gray-light: #f8fbfe;
+    --gray-medium: #546e8a;
+    --bg-light: #f0f5fc;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, var(--primary-blue), var(--primary-blue-light));
+    min-height: 100vh;
+    color: var(--dark-text);
+    padding: 16px 24px; /* Reduced padding for wider content */
+    user-select: none;
+    overflow-x: hidden;
+  }
+
+  h1 {
+    color: white;
+    font-weight: 800;
+    font-size: 2.8rem;
+    margin-bottom: 36px;
+    text-shadow: 0 0 12px rgba(0,0,0,0.3);
+  }
+
+  .filters {
+    max-width: 100%;
+    margin: 0 auto 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255,0.15);
+    padding: 14px 24px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.12);
+  }
+  .filters > * {
+    flex: 1 1 180px;
+    max-width: 240px;
+  }
+  select, input[type=search] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    outline-offset: 2px;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  select:focus, input[type=search]:focus {
+    outline: 2px solid var(--primary-blue);
+    box-shadow: 0 0 8px var(--primary-blue);
+  }
+
+  .dashboard-grid {
+    max-width: 100%;      /* Stretch full width */
+    margin: 0 auto 52px auto;
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 48px;
+    width: 100%;
+  }
+
+  /* Pie Chart Section */
+  .pie-section {
+    background: rgba(255,255,255,0.95);
+    padding: 36px 24px;
+    border-radius: 18px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .pie-section h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: var(--primary-blue-dark);
+    text-align: center;
+  }
+  #burnoutPieChart {
+    width: 280px !important;
+    height: 280px !important;
+  }
+
+  /* Main content */
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  /* Survey table */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fefefe;
+    box-shadow: 0 4px 23px rgba(0,0,0,0.05);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  thead {
+    background: var(--gray-light);
+  }
+  th, td {
+    padding: 14px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15.5px;
+    color: var(--dark-text);
+    border-bottom: 1px solid #e9edf2;
+    cursor: default;
+    user-select: none;
+  }
+  th {
+    text-transform: uppercase;
+    color: var(--gray-medium);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  th.sortable:hover {
+    color: var(--primary-blue);
+  }
+  th.sorted-asc::after, th.sorted-desc::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    border-style: solid;
+    border-width: 6px 5px 0 5px;
+    border-color: var(--primary-blue) transparent transparent transparent;
+    transform-origin: center;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.3s ease;
+  }
+  th.sorted-desc::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  tbody tr:hover {
+    background: #edf6ff;
+    transition: background 0.3s ease;
+  }
+
+  /* Burnout colors */
+  .burnout-red { color: var(--danger-red); font-weight: 700; }
+  .burnout-yellow { color: var(--warning-yellow); font-weight: 700; }
+  .burnout-green { color: var(--success-green); font-weight: 700; }
+
+  /* Transfer radio group */
+  .radio-group {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+  }
+  .radio-group label {
+    cursor: pointer;
+    font-size: 1.4rem;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  .radio-group input[type="radio"] {
+    cursor: pointer;
+    transform: scale(1.3);
+    transition: transform 0.25s ease;
+  }
+  .radio-group input[type="radio"]:hover {
+    transform: scale(1.4);
+  }
+
+  /* Details button styling */
+  .details-btn {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    font-size: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,123,186,0.45);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    user-select: none;
+  }
+  .details-btn:hover, .details-btn:focus {
+    background: var(--primary-blue-light);
+    box-shadow: 0 6px 18px rgba(43,184,240,0.55);
+    transform: scale(1.1);
+    outline: none;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: flex;
+    gap: 28px;
+    justify-content: space-between;
+  }
+  .stat-box {
+    background: var(--bg-light);
+    flex: 1 1 30%;
+    padding: 28px 20px;
+    border-radius: 14px;
+    box-shadow: 0 5px 22px rgba(33, 93, 166, 0.07);
+    text-align: center;
+    color: #1e3258;
+  }
+  .stat-box h3 {
+    margin: 0 0 14px 0;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .stat-box .value {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+  }
+  .stat-box .value.green { color: var(--success-green); }
+  .stat-box .value.yellow { color: #b59f00; }
+  .stat-box .value.accuracy { color: #1b6a4d; }
+
+  /* Heatmap Section */
+  .heatmap-section {
+    text-align: center;
+  }
+  .heatmap-section h2 {
+    color: var(--primary-blue-dark);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 22px;
+  }
+  .heatmap-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+    flex-wrap: wrap;
+  }
+  .heatmap-buttons button {
+    flex: 1 1 210px;
+    max-width: 270px;
+    background: gray;
+    border: none;
+    padding: 14px 0;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 14px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.20);
+    transition: background-color 0.35s ease, transform 0.25s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+  .heatmap-buttons button:hover,
+  .heatmap-buttons button:focus {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.30);
+    outline: none;
+  }
+  .heatmap-buttons button.se   { background: var(--danger-red); }
+  .heatmap-buttons button.se:hover,
+  .heatmap-buttons button.se:focus { background: #923327; }
+  .heatmap-buttons button.devops { background: #f39c12; }
+  .heatmap-buttons button.devops:hover,
+  .heatmap-buttons button.devops:focus { background: #b8750a; }
+  .heatmap-buttons button.uiux  { background: var(--success-green); }
+  .heatmap-buttons button.uiux:hover,
+  .heatmap-buttons button.uiux:focus { background: #1f8045; }
+
+  /* Modal styles */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1500;
+  }
+  .modal-overlay.active {
+    display: flex;
+  }
+  .modal {
+    background: white;
+    border-radius: 18px;
+    padding: 24px 30px;
+    max-width: 520px;
+    width: 90vw;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .modal h3 {
+    font-size: 1.6rem;
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .modal .close-btn {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: var(--primary-blue);
+    cursor: pointer;
+  }
+  .modal .modal-content {
+    font-size: 1rem;
+    color: var(--dark-text);
+  }
+  .modal canvas {
+    margin-top: 20px;
+    max-width: 100%;
+    height: 180px !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 1180px) {
+    body {
+      padding: 24px 30px;
+    }
+    .dashboard-grid {
+      grid-template-columns: 1fr !important;
+      gap: 36px;
+    }
+    .pie-section {
+      width: 100% !important;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .stats-grid {
+      flex-direction: column;
+      gap: 28px;
+    }
+  }
+  @media (max-width: 600px) {
+    body {
+      padding: 20px 20px;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+    .filters {
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+    .filters > * {
+      max-width: 100%;
+      flex: 1 1 100%;
+    }
+    table {
+      font-size: 14px;
+    }
+    .heatmap-buttons {
+      flex-direction: column;
+      gap: 16px;
+    }
+    .heatmap-buttons button {
+      max-width: 100%;
+    }
+    .stat-box .value {
+      font-size: 24px;
+    }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>HR Survey Dashboard</h1>
+
+  <nav class="filters" aria-label="Filter survey data">
+    <select id="filterDepartment" aria-label="Filter by Department">
+      <option value="">All Departments</option>
+      <option value="Software Engineers">Software Engineers</option>
+      <option value="DevOps">DevOps</option>
+      <option value="UI/UX">UI/UX</option>
+      <option value="Product Analyst">Product Analyst</option>
+    </select>
+    <select id="filterRole" aria-label="Filter by Role">
+      <option value="">All Roles</option>
+      <option value="Software Engineer">Software Engineer</option>
+      <option value="DevOps">DevOps</option>
+      <option value="UI/UX">UI/UX</option>
+      <option value="Product Analyst">Product Analyst</option>
+    </select>
+    <input type="search" id="searchName" placeholder="Search by Name…" aria-label="Search by employee name" />
+    <select id="filterDate" aria-label="Filter by Submission Date">
+      <option value="">All Dates</option>
+      <option value="last7">Last 7 Days</option>
+      <option value="last30">Last 30 Days</option>
+    </select>
+  </nav>
+
+  <div class="dashboard-grid">
+    <section class="pie-section" aria-label="Burnout distribution pie chart section">
+      <h2>Burnout Risk Distribution</h2>
+      <canvas id="burnoutPieChart" role="img" aria-label="Pie chart showing burnout risk distribution"></canvas>
+    </section>
+
+    <div class="main-content">
+      <section aria-label="Survey responses table">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-sort="name" tabindex="0" role="button" aria-label="Sort by Name">Name</th>
+              <th class="sortable" data-sort="submitted" tabindex="0" role="button" aria-label="Sort by Submitted Date">Submitted</th>
+              <th class="sortable" data-sort="burnout" tabindex="0" role="button" aria-label="Sort by Burnout Score">Burnout</th>
+              <th class="sortable" data-sort="match" tabindex="0" role="button" aria-label="Sort by Match Role">Match</th>
+              <th>Transfer</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="survey-body">
+            <!-- Rendered with JS -->
+          </tbody>
+        </table>
+      </section>
+
+      <section class="stats-grid" aria-label="Summary statistics of surveys">
+        <div class="stat-box" aria-live="polite" aria-atomic="true">
+          <h3>Total Surveys</h3>
+          <div class="value green" id="totalSurveys">...</div>
+        </div>
+        <div class="stat-box" aria-live="polite" aria-atomic="true">
+          <h3>🧪 Avg Burnout</h3>
+          <div class="value yellow" id="avgBurnout">...</div>
+        </div>
+        <div class="stat-box" aria-live="polite" aria-atomic="true">
+          <h3>🧠 ML Model Insights</h3>
+          <div class="value accuracy" id="mlAccuracy">...</div>
+          <div>Feedback Loops Enabled: ✅</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <section class="heatmap-section" aria-label="Burnout heatmap filter by department">
+    <h2>🔥 Burnout Heatmap by Department</h2>
+    <div class="heatmap-buttons" role="group" aria-label="Filter by Department">
+      <button type="button" class="se" aria-label="Show Software Engineers burnout heatmap">Software Engineers</button>
+      <button type="button" class="devops" aria-label="Show DevOps burnout heatmap">DevOps</button>
+      <button type="button" class="uiux" aria-label="Show UI/UX burnout heatmap">UI/UX</button>
+    </div>
+  </section>
+
+  <!-- Modal for Employee Details -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal" role="document">
+      <button class="close-btn" aria-label="Close modal" id="modalCloseBtn">&times;</button>
+      <h3 id="modalTitle">Employee Details</h3>
+      <div class="modal-content" id="modalContent">
+        <!-- dynamic content here -->
+      </div>
+      <canvas id="modalBurnoutTrend"></canvas>
+    </div>
+  </div>
+
+<script>
+  // Sample data with submission dates as ISO strings for example filtering
+  const surveyData = [
+    { name: "Ananya R", submitted: "2025-07-03", burnout: 48, match: "Product Analyst", department: "Product Analyst", role: "Product Analyst", notes: "Solid performance, no red flags." },
+    { name: "Sam K", submitted: "2025-07-02", burnout: 65, match: "DevOps", department: "DevOps", role: "DevOps", notes: "Heavy workload lately." },
+    { name: "Tyler", submitted: "2025-07-05", burnout: 90, match: "UI/UX", department: "UI/UX", role: "UI/UX", notes: "Significant burnout risk, requires intervention." },
+    { name: "Jamie L", submitted: "2025-06-25", burnout: 32, match: "Software Engineer", department: "Software Engineers", role: "Software Engineer", notes: "Engaged and happy." },
+    { name: "Alex P", submitted: "2025-06-28", burnout: 75, match: "Software Engineer", department: "Software Engineers", role: "Software Engineer", notes: "Moderate risk, watching closely." }
+  ];
+
+  function formatDate(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  function getBurnoutClass(percent) {
+    if(percent >= 80) return 'burnout-red';
+    if(percent >= 50) return 'burnout-yellow';
+    return 'burnout-green';
+  }
+
+  let filters = {
+    department: "",
+    role: "",
+    searchName: "",
+    dateRange: ""
+  };
+  let sortState = {
+    column: null,
+    direction: null
+  };
+
+  const filterDepartmentEl = document.getElementById('filterDepartment');
+  const filterRoleEl = document.getElementById('filterRole');
+  const searchNameEl = document.getElementById('searchName');
+  const filterDateEl = document.getElementById('filterDate');
+  const tbody = document.getElementById('survey-body');
+  const totalSurveysEl = document.getElementById('totalSurveys');
+  const avgBurnoutEl = document.getElementById('avgBurnout');
+  const mlAccuracyEl = document.getElementById('mlAccuracy');
+
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalContent = document.getElementById('modalContent');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalBurnoutTrendCanvas = document.getElementById('modalBurnoutTrend');
+  let modalBurnoutTrendChart = null;
+
+  function applyFilters(data) {
+    const now = new Date();
+    return data.filter(employee => {
+      if(filters.department && employee.department !== filters.department) return false;
+      if(filters.role && employee.role !== filters.role) return false;
+      if(filters.searchName && !employee.name.toLowerCase().includes(filters.searchName.toLowerCase())) return false;
+      if(filters.dateRange) {
+        const submittedDate = new Date(employee.submitted);
+        if (filters.dateRange === 'last7') {
+          const cutoff = new Date(now.getTime() - 7*24*60*60*1000);
+          if(submittedDate < cutoff) return false;
+        }
+        if (filters.dateRange === 'last30') {
+          const cutoff = new Date(now.getTime() - 30*24*60*60*1000);
+          if(submittedDate < cutoff) return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  function applySort(data) {
+    const col = sortState.column;
+    const dir = sortState.direction;
+    if(!col || !dir) return data;
+
+    return [...data].sort((a,b) => {
+      let aVal = a[col];
+      let bVal = b[col];
+      if(col === "submitted") {
+        aVal = new Date(aVal);
+        bVal = new Date(bVal);
+      }
+      if(typeof aVal === "string") {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      if(aVal < bVal) return dir === 'asc' ? -1 : 1;
+      if(aVal > bVal) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  function renderTable(data) {
+    tbody.innerHTML = "";
+    if(data.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" style="padding: 24px; font-style: italic; color:#777;">No survey data matches the filters/search.</td></tr>';
+      return;
+    }
+    data.forEach((row,i) => {
+      const formattedDate = formatDate(row.submitted);
+      tbody.innerHTML += `
+        <tr tabindex="0" data-index="${i}" role="row" aria-label="Survey data for ${row.name}">
+          <td>${row.name}</td>
+          <td data-sort="${row.submitted}">${formattedDate}</td>
+          <td class="${getBurnoutClass(row.burnout)}" data-sort="${row.burnout}">${row.burnout}%</td>
+          <td>${row.match}</td>
+          <td class="radio-group" role="radiogroup" aria-label="Select transfer option for ${row.name}">
+            <label><input type="radio" name="transfer-${i}" value="no" checked aria-checked="true" tabindex="0">❌</label>
+            <label><input type="radio" name="transfer-${i}" value="yes" tabindex="0">✅</label>
+          </td>
+          <td><button class="details-btn" aria-label="View details of ${row.name}" data-index="${i}">🔍</button></td>
+        </tr>
+      `;
+    });
+  }
+
+  function updateStats(data) {
+    const total = data.length;
+    totalSurveysEl.textContent = total;
+
+    if(total === 0) {
+      avgBurnoutEl.textContent = "-";
+      mlAccuracyEl.textContent = "Accuracy: -";
+      return;
+    }
+    const avgBurnout = (data.reduce((acc, cur) => acc + cur.burnout, 0) / total).toFixed(1);
+    avgBurnoutEl.textContent = avgBurnout + '%';
+    mlAccuracyEl.textContent = "Accuracy: 89.6%";
+  }
+
+  const pieCtx = document.getElementById('burnoutPieChart').getContext('2d');
+  let burnoutPieChart = null;
+
+  function updatePieChart(data) {
+    const counts = {
+      low: data.filter(x => x.burnout < 50).length,
+      medium: data.filter(x => x.burnout >= 50 && x.burnout < 80).length,
+      high: data.filter(x => x.burnout >= 80).length
+    };
+    const chartData = [counts.low, counts.medium, counts.high];
+
+    if(burnoutPieChart) {
+      burnoutPieChart.data.datasets[0].data = chartData;
+      burnoutPieChart.update();
+    }
+    else {
+      burnoutPieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: ['Low (<50%)', 'Medium (50-79%)', 'High (≥80%)'],
+          datasets: [{
+            data: chartData,
+            backgroundColor: [
+              getComputedStyle(document.documentElement).getPropertyValue('--success-green').trim(), 
+              getComputedStyle(document.documentElement).getPropertyValue('--warning-yellow').trim(), 
+              getComputedStyle(document.documentElement).getPropertyValue('--danger-red').trim()
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          animation: {duration: 600},
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { padding: 14, font: { size: 14 } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => {
+                  const label = ctx.label || "";
+                  const val = ctx.raw;
+                  const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                  const percent = ((val/total)*100).toFixed(1);
+                  return `${label}: ${val} (${percent}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  function updateSortUI() {
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.classList.remove('sorted-asc', 'sorted-desc');
+      if(sortState.column === th.dataset.sort) {
+        th.classList.add(sortState.direction === 'asc' ? 'sorted-asc' : 'sorted-desc');
+      }
+    });
+  }
+
+  function render() {
+    let filtered = applyFilters(surveyData);
+    filtered = applySort(filtered);
+    renderTable(filtered);
+    updateStats(filtered);
+    updatePieChart(filtered);
+  }
+
+  filterDepartmentEl.addEventListener('change', () => {
+    filters.department = filterDepartmentEl.value;
+    render();
+  });
+  filterRoleEl.addEventListener('change', () => {
+    filters.role = filterRoleEl.value;
+    render();
+  });
+  searchNameEl.addEventListener('input', () => {
+    filters.searchName = searchNameEl.value.trim();
+    render();
+  });
+  filterDateEl.addEventListener('change', () => {
+    filters.dateRange = filterDateEl.value;
+    render();
+  });
+
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if(sortState.column === col) {
+        sortState.direction = (sortState.direction === 'asc') ? 'desc' : 'asc';
+      } else {
+        sortState.column = col;
+        sortState.direction = 'asc';
+      }
+      updateSortUI();
+      render();
+    });
+    th.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        th.click();
+      }
+    });
+  });
+
+  function openModal(employee) {
+    modalTitle.textContent = `Details for ${employee.name}`;
+    modalContent.innerHTML = `
+      <p><strong>Submitted:</strong> ${formatDate(employee.submitted)}</p>
+      <p><strong>Burnout Risk:</strong> <span class="${getBurnoutClass(employee.burnout)}">${employee.burnout}%</span></p>
+      <p><strong>Role Match:</strong> ${employee.match}</p>
+      <p><strong>Notes:</strong> ${employee.notes || 'No additional notes.'}</p>
+    `;
+
+    if(modalBurnoutTrendChart) {
+      modalBurnoutTrendChart.destroy();
+      modalBurnoutTrendChart = null;
+    }
+
+    const trendData = {
+      labels: ['June 1', 'June 8', 'June 15', 'June 22', 'June 29', 'July 5'],
+      datasets: [{
+        label: 'Burnout % Over Time',
+        data: [employee.burnout - 12, employee.burnout - 8, employee.burnout - 5, employee.burnout - 3, employee.burnout - 1, employee.burnout],
+        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--danger-red').trim(),
+        backgroundColor: 'rgba(192, 57, 43, 0.15)',
+        fill: true,
+        tension: 0.3
+      }]
+    };
+
+    modalBurnoutTrendChart = new Chart(modalBurnoutTrendCanvas.getContext('2d'), {
+      type: 'line',
+      data: trendData,
+      options: {
+        animations: { tension: { duration: 1000, easing: 'easeInOutQuad', from: 0.5, to: 0, loop: false }},
+        scales: {
+          y: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } }
+        },
+        plugins: {
+          legend: {labels: {font: { size: 14 }}},
+          tooltip: {mode: 'index', intersect: false},
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+      }
+    });
+
+    modalOverlay.classList.add('active');
+    modalCloseBtn.focus();
+  }
+  function closeModal() {
+    modalOverlay.classList.remove('active');
+    if(modalBurnoutTrendChart) {
+      modalBurnoutTrendChart.destroy();
+      modalBurnoutTrendChart = null;
+    }
+  }
+
+  modalCloseBtn.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if(e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+      closeModal();
+    }
+  });
+
+  tbody.addEventListener('click', (e) => {
+    if(e.target && e.target.classList.contains('details-btn')) {
+      const index = +e.target.dataset.index;
+      const filtered = applyFilters(surveyData);
+      const sorted = applySort(filtered);
+      if(index >= 0 && index < sorted.length) {
+        openModal(sorted[index]);
+      }
+    }
+  });
+
+  document.querySelectorAll('.heatmap-buttons button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      alert(`Filter heatmap: ${btn.textContent.trim()}`);
+    });
+  });
+
+  updateSortUI();
+  render();
+</script>
+</body>
+</html>
