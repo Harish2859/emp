@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoleFit Pro - Smart Employee-Role Matching</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Navigation */
+.navbar {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo h2 {
+    color: #3b82f6;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.logo .tagline {
+    color: #6b7280;
+    font-size: 0.85rem;
+    display: block;
+    margin-top: -5px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #3b82f6;
+}
+
+.login-btn, .signup-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.login-btn {
+    background: transparent;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.login-btn:hover {
+    background: #f3f4f6;
+}
+
+.signup-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.signup-btn:hover {
+    background: #1d4ed8;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 3px;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #374151;
+    transition: 0.3s;
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 120px 0 80px;
+    margin-top: 80px;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.cta-primary, .cta-secondary, .cta-video {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cta-primary {
+    background: #fff;
+    color: #2563eb;
+}
+
+.cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.cta-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.cta-secondary:hover {
+    background: white;
+    color: #2563eb;
+}
+
+.cta-video {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.cta-video:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.hero-graphic {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+}
+
+.hero-graphic i {
+    font-size: 8rem;
+    opacity: 0.8;
+}
+
+/* Features Section */
+.features {
+    padding: 80px 0;
+    background: #f9fafb;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #1f2937;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 3rem;
+}
+
+.feature-category {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.feature-category:hover {
+    transform: translateY(-5px);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.category-header i {
+    font-size: 2rem;
+    color: #2563eb;
+}
+
+.category-header h3 {
+    color: #1f2937;
+    font-size: 1.5rem;
+}
+
+.feature-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.feature-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.feature-item h4 {
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.feature-item p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+/* How It Works Section */
+.how-it-works {
+    padding: 80px 0;
+    background: white;
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.step {
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: #2563eb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1rem;
+}
+
+.step h3 {
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.step p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+/* Benefits Section */
+.benefits {
+    padding: 80px 0;
+    background: #1f2937;
+    color: white;
+}
+
+.benefits .section-title {
+    color: white;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.benefit-item {
+    text-align: center;
+    padding: 2rem;
+}
+
+.benefit-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+}
+
+.benefit-text {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Testimonials Section */
+.testimonials {
+    padding: 80px 0;
+    background: #f9fafb;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.testimonial {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.testimonial-content {
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-content p {
+    font-style: italic;
+    color: #374151;
+    line-height: 1.6;
+}
+
+.testimonial-author strong {
+    color: #1f2937;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.testimonial-author span {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Footer */
+.footer {
+    background: #111827;
+    color: white;
+    padding: 60px 0 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section h3, .footer-section h4 {
+    margin-bottom: 1rem;
+    color: #f9fafb;
+}
+
+.footer-section p {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    color: #3b82f6;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-links a {
+    color: #9ca3af;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #3b82f6;
+}
+
+.footer-bottom {
+    border-top: 1px solid #374151;
+    padding-top: 2rem;
+    text-align: center;
+    color: #9ca3af;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 2% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    z-index: 1;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* User Type Selection */
+.user-type-selection {
+    padding: 2rem;
+    text-align: center;
+}
+
+.user-type-selection h3 {
+    margin-bottom: 2rem;
+    color: #1f2937;
+    font-size: 1.5rem;
+}
+
+.user-cards {
+    display: grid;
+    gap: 1rem;
+}
+
+.user-card {
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.user-card:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.user-card i {
+    font-size: 2rem;
+    color: #2563eb;
+    margin-bottom: 1rem;
+}
+
+.user-card h4 {
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.user-card p {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Auth Forms */
+.auth-form {
+    padding: 2rem;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.back-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5rem;
+}
+
+.back-btn:hover {
+    color: #2563eb;
+}
+
+.form-header h3 {
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.form-header p {
+    color: #6b7280;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group.half {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal !important;
+}
+
+.checkbox input {
+    width: auto !important;
+    margin: 0 !important;
+}
+
+.form-options a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.form-options a:hover {
+    text-decoration: underline;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auth-btn.primary {
+    background: #2563eb;
+    color: white;
+}
+
+.auth-btn.primary:hover {
+    background: #1d4ed8;
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.form-footer p {
+    color: #6b7280;
+}
+
+.form-footer a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+    
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons {
+        justify-content: center;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .steps-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .benefits-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 100px 0 60px;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .cta-primary, .cta-secondary, .cta-video {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .benefit-number {
+        font-size: 2.5rem;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error Messages */
+.message {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.message.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.message.error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus Styles */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    .modal,
+    .hero-buttons,
+    .footer {
+        display: none;
+    }
+    
+    .hero {
+        background: white;
+        color: black;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+}
+
+</style>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h2>RoleFit Pro</h2>
+                <span class="tagline">Smart Employee-Role Matching</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#contact">Contact</a>
+                <button class="login-btn" onclick="openAuthModal()">Login</button>
+                <button class="signup-btn" onclick="openAuthModal('signup')">Sign Up</button>
+            </div>
+            <div class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Match the Right Talent to the Right Role</h1>
+                <p class="hero-subtitle">AI-powered employee assessment and role matching platform that helps organizations optimize team performance and employee satisfaction</p>
+                <div class="hero-buttons">
+                    <button class="cta-primary" onclick="openAuthModal('signup')">Get Started Free</button>
+                    <button class="cta-secondary" onclick="requestDemo()">Request Demo</button>
+                    <button class="cta-video" onclick="playVideo()">
+                        <i class="fas fa-play"></i> Watch Video
+                    </button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-graphic">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features for Every User</h2>
+            
+            <div class="features-grid">
+                <!-- HR Manager Features -->
+                <div class="feature-category">
+                    <div class="category-header">
+                        <i class="fas fa-users"></i>
+                        <h3>For HR Managers</h3>
+                    </div>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h4>Intelligent Role Matching</h4>
+                            <p>AI algorithms analyze employee skills, personality, and performance data</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Comprehensive Assessments</h4>
+                            <p>360-degree employee evaluations with behavioral and technical assessments</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Analytics Dashboard</h4>
+                            <p>Real-time insights on team dynamics and role optimization opportunities</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Compliance Tracking</h4>
+                            <p>Ensure fair and unbiased hiring and role assignment processes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Features -->
+                <div class="feature-category">
+                    <div class="category-header">
+                        <i class="fas fa-user"></i>
+                        <h3>For Employees</h3>
+                    </div>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h4>Career Path Visualization</h4>
+                            <p>See potential growth opportunities and skill gaps</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Skill Assessment Tools</h4>
+                            <p>Interactive assessments to identify strengths and development areas</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Personal Development Plans</h4>
+                            <p>Customized learning recommendations based on role fit analysis</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Goal Tracking</h4>
+                            <p>Monitor progress toward career objectives and role transitions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Administrator Features -->
+                <div class="feature-category">
+                    <div class="category-header">
+                        <i class="fas fa-cog"></i>
+                        <h3>For Administrators</h3>
+                    </div>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h4>Multi-tenant Management</h4>
+                            <p>Manage multiple organizations and departments</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Custom Assessment Creation</h4>
+                            <p>Build tailored evaluation frameworks</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Advanced Reporting</h4>
+                            <p>Generate detailed analytics and compliance reports</p>
+                        </div>
+                        <div class="feature-item">
+                            <h4>Integration Capabilities</h4>
+                            <p>Connect with existing HRIS and performance management systems</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Assessment</h3>
+                    <p>Employees complete comprehensive skill and personality assessments</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Analysis</h3>
+                    <p>AI algorithms analyze data to identify optimal role matches</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Recommendations</h3>
+                    <p>System provides actionable insights for role optimization</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Implementation</h3>
+                    <p>HR teams use insights to make informed decisions</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>Monitoring</h3>
+                    <p>Continuous tracking of role fit and performance improvements</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2 class="section-title">Proven Results</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-number">85%</div>
+                    <div class="benefit-text">Improvement in employee satisfaction scores</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-number">40%</div>
+                    <div class="benefit-text">Reduction in turnover rates</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-number">60%</div>
+                    <div class="benefit-text">Faster role transition processes</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-number">30%</div>
+                    <div class="benefit-text">Increase in team productivity metrics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Our Users Say</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"RoleFit Pro transformed how we approach talent management. Our team satisfaction scores increased dramatically."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Sarah Johnson</strong>
+                        <span>HR Director, TechCorp</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Finally found my perfect role match. The career path visualization helped me understand my growth potential."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Michael Chen</strong>
+                        <span>Software Engineer, InnovateLab</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"The administrative tools are incredibly powerful. Managing multiple organizations has never been easier."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Emily Rodriguez</strong>
+                        <span>System Administrator, GlobalTech</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>RoleFit Pro</h3>
+                    <p>Smart Employee-Role Matching Platform</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#integrations">Integrations</a></li>
+                        <li><a href="#api">API</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#careers">Careers</a></li>
+                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#security">Security</a></li>
+                        <li><a href="#compliance">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 RoleFit Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAuthModal()">&times;</span>
+            
+            <!-- User Type Selection -->
+            <div id="user-type-selection" class="user-type-selection">
+                <h3>Choose Your Account Type</h3>
+                <div class="user-cards">
+                    <div class="user-card" onclick="selectUserType('hr')">
+                        <i class="fas fa-users"></i>
+                        <h4>HR Manager</h4>
+                        <p>Manage team assessments and role optimization</p>
+                    </div>
+                    <div class="user-card" onclick="selectUserType('employee')">
+                        <i class="fas fa-user"></i>
+                        <h4>Employee</h4>
+                        <p>Access your assessments and career development</p>
+                    </div>
+                    <div class="user-card" onclick="selectUserType('admin')">
+                        <i class="fas fa-cog"></i>
+                        <h4>Administrator</h4>
+                        <p>System configuration and multi-org management</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HR Manager Forms -->
+            <div id="hr-login" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>HR Manager Login</h3>
+                    <p>Access your team management dashboard</p>
+                </div>
+                
+                <form onsubmit="handleLogin(event, 'hr')">
+                    <div class="form-group">
+                        <label>Company Email</label>
+                        <input type="email" name="email" placeholder="hr@company.com" value="hr@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="Enter your password" value="hr123" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox"> Remember me
+                        </label>
+                        <a href="#forgot">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Login to Dashboard</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>New to RoleFit Pro? <a href="#" onclick="showForm('hr-signup')">Create HR Account</a></p>
+                </div>
+            </div>
+
+            <div id="hr-signup" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>Create HR Manager Account</h3>
+                    <p>Start optimizing your team's role assignments</p>
+                </div>
+                
+                <form onsubmit="handleSignup(event, 'hr')">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>First Name</label>
+                            <input type="text" placeholder="John" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Last Name</label>
+                            <input type="text" placeholder="Smith" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Company Name</label>
+                        <input type="text" placeholder="Your Company" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Work Email</label>
+                        <input type="email" placeholder="hr@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Company Size</label>
+                        <select required>
+                            <option value="">Select size</option>
+                            <option value="1-10">1-10 employees</option>
+                            <option value="11-50">11-50 employees</option>
+                            <option value="51-200">51-200 employees</option>
+                            <option value="201-1000">201-1000 employees</option>
+                            <option value="1000+">1000+ employees</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Password</label>
+                            <input type="password" placeholder="Create password" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Confirm Password</label>
+                            <input type="password" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" required>
+                            I agree to the <a href="#terms">Terms of Service</a> and <a href="#privacy">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Create HR Account</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" onclick="showForm('hr-login')">Sign in here</a></p>
+                </div>
+            </div>
+
+            <!-- Employee Forms -->
+            <div id="employee-login" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>Employee Login</h3>
+                    <p>Access your career development dashboard</p>
+                </div>
+                
+                <form onsubmit="handleLogin(event, 'employee')">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="your.email@company.com" value="john@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="Enter your password" value="emp123" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Employee ID (Optional)</label>
+                        <input type="text" name="employeeId" placeholder="Enter your employee ID">
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox"> Keep me signed in
+                        </label>
+                        <a href="#forgot">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Access My Dashboard</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>First time user? <a href="#" onclick="showForm('employee-signup')">Create Account</a></p>
+                </div>
+            </div>
+
+            <div id="employee-signup" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>Create Employee Account</h3>
+                    <p>Join your organization's role optimization program</p>
+                </div>
+                
+                <form onsubmit="handleSignup(event, 'employee')">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>First Name</label>
+                            <input type="text" placeholder="First name" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Last Name</label>
+                            <input type="text" placeholder="Last name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Work Email</label>
+                        <input type="email" placeholder="your.email@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Employee ID</label>
+                        <input type="text" placeholder="Your employee ID" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select required>
+                            <option value="">Select department</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="sales">Sales</option>
+                            <option value="hr">Human Resources</option>
+                            <option value="finance">Finance</option>
+                            <option value="operations">Operations</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Current Role</label>
+                        <input type="text" placeholder="Your current job title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Invitation Code</label>
+                        <input type="text" placeholder="Code from your HR team" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>Password</label>
+                            <input type="password" placeholder="Create password" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Confirm Password</label>
+                            <input type="password" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" required>
+                            I agree to participate in role fit assessments and data collection
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Create Employee Account</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Already registered? <a href="#" onclick="showForm('employee-login')">Sign in here</a></p>
+                </div>
+            </div>
+
+            <!-- Administrator Forms -->
+            <div id="admin-login" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>Administrator Login</h3>
+                    <p>Access system administration panel</p>
+                </div>
+                
+                <form onsubmit="handleLogin(event, 'admin')">
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" name="email" placeholder="admin@rolefit.com" value="admin@rolefit.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="Enter admin password" value="admin123" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Two-Factor Authentication Code</label>
+                        <input type="text" name="2fa-code" placeholder="Enter 6-digit code" value="000000" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox"> Trust this device for 30 days
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Access Admin Panel</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Need admin access? <a href="#" onclick="showForm('admin-signup')">Request Access</a></p>
+                </div>
+            </div>
+
+            <div id="admin-signup" class="auth-form" style="display: none;">
+                <div class="form-header">
+                    <button class="back-btn" onclick="showUserTypeSelection()">← Back</button>
+                    <h3>Request Administrator Access</h3>
+                    <p>Submit application for system administration privileges</p>
+                </div>
+                
+                <form onsubmit="handleSignup(event, 'admin')">
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label>First Name</label>
+                            <input type="text" placeholder="First name" required>
+                        </div>
+                        <div class="form-group half">
+                            <label>Last Name</label>
+                            <input type="text" placeholder="Last name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Professional Email</label>
+                        <input type="email" placeholder="admin@company.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Organization</label>
+                        <input type="text" placeholder="Your organization name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Job Title</label>
+                        <input type="text" placeholder="System Administrator, IT Manager, etc." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Request Type</label>
+                        <select required>
+                            <option value="">Select request type</option>
+                            <option value="new-org">New Organization Setup</option>
+                            <option value="existing-org">Join Existing Organization</option>
+                            <option value="multi-org">Multi-Organization Management</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Justification</label>
+                        <textarea placeholder="Explain why you need administrator access..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" placeholder="+1 (555) 123-4567" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox">
+                            <input type="checkbox" required>
+                            I understand that administrator access requires approval and background verification
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">Submit Admin Request</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p>Already have admin access? <a href="#" onclick="showForm('admin-login')">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+let currentAuthMode = 'login';
+let currentUserType = '';
+
+// DOM Elements
+const authModal = document.getElementById('auth-modal');
+const userTypeSelection = document.getElementById('user-type-selection');
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+});
+
+function initializeApp() {
+    // Add smooth scrolling to navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add scroll effect to navbar
+    window.addEventListener('scroll', handleNavbarScroll);
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === authModal) {
+            closeAuthModal();
+        }
+    });
+
+    // Handle form validation
+    initializeFormValidation();
+}
+
+// Navigation functions
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    navLinks.classList.toggle('mobile-active');
+}
+
+function handleNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 100) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+}
+
+// Modal functions
+function openAuthModal(mode = 'login') {
+    currentAuthMode = mode;
+    authModal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    showUserTypeSelection();
+}
+
+function closeAuthModal() {
+    authModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    resetForms();
+}
+
+function showUserTypeSelection() {
+    // Hide all forms
+    document.querySelectorAll('.auth-form').forEach(form => {
+        form.style.display = 'none';
+    });
+    
+    // Show user type selection
+    userTypeSelection.style.display = 'block';
+}
+
+function selectUserType(userType) {
+    currentUserType = userType;
+    userTypeSelection.style.display = 'none';
+    
+    const formId = `${userType}-${currentAuthMode}`;
+    showForm(formId);
+}
+
+function showForm(formId) {
+    // Hide all forms
+    document.querySelectorAll('.auth-form').forEach(form => {
+        form.style.display = 'none';
+    });
+    
+    // Show selected form
+    const form = document.getElementById(formId);
+    if (form) {
+        form.style.display = 'block';
+    }
+}
+
+function resetForms() {
+    document.querySelectorAll('form').forEach(form => {
+        form.reset();
+    });
+    
+    document.querySelectorAll('.message').forEach(message => {
+        message.remove();
+    });
+}
+
+// Authentication functions
+function handleLogin(event, userType) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.innerHTML = '<span class="loading"></span> Signing in...';
+    submitBtn.disabled = true;
+    
+    // Dummy credential checks for redirect
+    const email = data.email || '';
+    const password = data.password || '';
+    const twofa = data['2fa-code'] || '';
+
+    const ok = (
+        (userType === 'hr' && email.toLowerCase() === 'hr@company.com' && password === 'hr123') ||
+        (userType === 'employee' && email.toLowerCase() === 'john@company.com' && password === 'emp123') ||
+        (userType === 'admin' && email.toLowerCase() === 'admin@rolefit.com' && password === 'admin123' && twofa === '000000')
+    );
+
+    // Simulate API call
+    setTimeout(() => {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        
+        if (ok) {
+            showMessage(form, 'Login successful! Redirecting...', 'success');
+            setTimeout(() => redirectToDashboard(userType), 800);
+        } else {
+            showMessage(form, 'Invalid credentials. Try demo creds: HR hr@company.com/hr123, Employee john@company.com/emp123, Admin admin@rolefit.com/admin123 + 000000', 'error');
+        }
+    }, 800);
+}
+
+function handleSignup(event, userType) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.innerHTML = '<span class="loading"></span> Creating account...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        
+        // Simulate successful signup
+        if (validateSignupData(data, userType)) {
+            if (userType === 'admin') {
+                showMessage(form, 'Admin request submitted successfully! You will receive an email with further instructions.', 'success');
+            } else {
+                showMessage(form, 'Account created successfully! Please check your email to verify your account.', 'success');
+            }
+            
+            setTimeout(() => {
+                if (userType !== 'admin') {
+                    redirectToDashboard(userType);
+                } else {
+                    closeAuthModal();
+                }
+            }, 2000);
+        } else {
+            showMessage(form, 'Please check your information and try again.', 'error');
+        }
+    }, 2000);
+}
+
+// Validation functions
+function validateLoginData(data, userType) {
+    // Basic validation - in real app, this would be server-side
+    if (!data.email || !data.password) {
+        return false;
+    }
+    
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+        return false;
+    }
+    
+    // Additional validation for admin
+    if (userType === 'admin' && !data['2fa-code']) {
+        return false;
+    }
+    
+    return true;
+}
+
+function validateSignupData(data, userType) {
+    // Basic validation
+    const requiredFields = ['email', 'password'];
+    
+    if (userType === 'hr') {
+        requiredFields.push('firstName', 'lastName', 'company', 'companySize');
+    } else if (userType === 'employee') {
+        requiredFields.push('firstName', 'lastName', 'employeeId', 'department', 'currentRole', 'invitationCode');
+    } else if (userType === 'admin') {
+        requiredFields.push('firstName', 'lastName', 'organization', 'jobTitle', 'requestType', 'justification', 'phone');
+    }
+    
+    // Check required fields
+    for (const field of requiredFields) {
+        if (!data[field]) {
+            return false;
+        }
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+        return false;
+    }
+    
+    // Password confirmation
+    if (data.password !== data.confirmPassword && userType !== 'admin') {
+        return false;
+    }
+    
+    // Phone validation for admin
+    if (userType === 'admin') {
+        const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+        if (!phoneRegex.test(data.phone)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+function initializeFormValidation() {
+    // Real-time validation
+    document.querySelectorAll('input[type="email"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            validateEmail(this);
+        });
+    });
+    
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        input.addEventListener('input', function() {
+            validatePassword(this);
+        });
+    });
+    
+    // Password confirmation validation
+    document.querySelectorAll('input[placeholder*="Confirm password"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            validatePasswordConfirmation(this);
+        });
+    });
+}
+
+function validateEmail(input) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(input.value);
+    
+    input.classList.toggle('invalid', !isValid && input.value);
+    input.classList.toggle('valid', isValid);
+    
+    return isValid;
+}
+
+function validatePassword(input) {
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(input.value);
+    const hasLowerCase = /[a-z]/.test(input.value);
+    const hasNumbers = /\d/.test(input.value);
+    
+    const isValid = input.value.length >= minLength && hasUpperCase && hasLowerCase && hasNumbers;
+    
+    input.classList.toggle('invalid', !isValid && input.value);
+    input.classList.toggle('valid', isValid);
+    
+    return isValid;
+}
+
+function validatePasswordConfirmation(input) {
+    const passwordInput = input.form.querySelector('input[placeholder*="Create password"]');
+    const isValid = input.value === passwordInput.value;
+    
+    input.classList.toggle('invalid', !isValid && input.value);
+    input.classList.toggle('valid', isValid);
+    
+    return isValid;
+}
+
+// Utility functions
+function showMessage(form, message, type) {
+    // Remove existing messages
+    form.querySelectorAll('.message').forEach(msg => msg.remove());
+    
+    // Create new message
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${type}`;
+    messageDiv.textContent = message;
+    
+    // Insert message at the top of the form
+    form.insertBefore(messageDiv, form.firstChild);
+    
+    // Auto-remove error messages after 5 seconds
+    if (type === 'error') {
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 5000);
+    }
+}
+
+function redirectToDashboard(userType) {
+    // Dummy credential map and target pages
+    // HR: hr@company.com / hr123 -> hr.html
+    // Employee: john@company.com / emp123 -> employee.html
+    // Admin: admin@rolefit.com / admin123 / 000000 -> admin.html
+    const pages = {
+        hr: 'hr.html',
+        employee: 'employee.html',
+        admin: 'admin.html'
+    };
+    window.location.href = pages[userType] || 'home.html';
+}
+
+// Demo functions
+function requestDemo() {
+    // Create demo request modal or redirect to demo page
+    alert('Demo request feature would be implemented here.');
+}
+
+function playVideo() {
+    // Open video modal or redirect to video page
+    alert('Video player would open here.');
+}
+
+// Error handling
+window.addEventListener('error', function(event) {
+    console.error('Application error:', event.error);
+    // In production, you might want to log this to an error tracking service
+});
+
+// Performance monitoring
+window.addEventListener('load', function() {
+    // Log page load time
+    const loadTime = performance.now();
+    console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+});
+
+// Accessibility enhancements
+document.addEventListener('keydown', function(event) {
+    // Close modal with Escape key
+    if (event.key === 'Escape' && authModal.style.display === 'block') {
+        closeAuthModal();
+    }
+    
+    // Navigate user cards with arrow keys
+    if (userTypeSelection.style.display === 'block') {
+        const cards = document.querySelectorAll('.user-card');
+        const focused = document.activeElement;
+        const currentIndex = Array.from(cards).indexOf(focused);
+        
+        if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            const nextIndex = (currentIndex + 1) % cards.length;
+            cards[nextIndex].focus();
+        } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+            event.preventDefault();
+            const prevIndex = (currentIndex - 1 + cards.length) % cards.length;
+            cards[prevIndex].focus();
+        } else if (event.key === 'Enter' && focused.classList.contains('user-card')) {
+            event.preventDefault();
+            focused.click();
+        }
+    }
+});
+
+// Make user cards focusable for keyboard navigation
+document.querySelectorAll('.user-card').forEach(card => {
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+});
+
+// Analytics tracking (placeholder)
+function trackEvent(eventName, properties = {}) {
+    // In a real application, this would send data to your analytics service
+    console.log(`Analytics: ${eventName}`, properties);
+}
+
+// Track user interactions
+document.addEventListener('click', function(event) {
+    if (event.target.matches('.user-card')) {
+        trackEvent('user_type_selected', {
+            userType: event.target.querySelector('h4').textContent
+        });
+    }
+    
+    if (event.target.matches('.auth-btn')) {
+        trackEvent('auth_button_clicked', {
+            action: event.target.textContent.toLowerCase()
+        });
+    }
+});
+
+    </script>
+</body>
+</html>
