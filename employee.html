@@ -1,939 +1,3320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Employee Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" /> 
-  <style>
-    /* Base reset & font */
-    *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-    html, body {
-      height: 100%;
-      background: linear-gradient(to bottom right, #007cf0, #00dfd8);
-      color: #111;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-      user-select: none;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    /* Sidebar */
-    nav.sidebar {
-      width: 280px;
-      background: #0366c9;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 2.5rem 1.8rem;
-      box-shadow: 2px 0 20px rgba(0,0,0,0.2);
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      z-index: 20;
-    }
-    nav.sidebar h2 {
-      text-align: center;
-      font-weight: 800;
-      font-size: 1.9rem;
-      margin-bottom: 2rem;
-      user-select: text;
-      letter-spacing: 1px;
-    }
-.profile-card {
-  width: 220px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 6px 32px rgba(0, 147, 255, 0.13);
-  padding: 2.2rem 1.6rem 1.7rem 1.6rem;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Employee Dashboard - Enterprise</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary-color: #6366f1;
+  --primary-light: #a5b4fc;
+  --secondary-color: #64748b;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --background-color: #f8fafc;
+  --card-background: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-width: 280px;
+  --collapsed-width: 100px;
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
-.circle-avatar {
-  width: 100px;
-  height: 100px;
-  background: #0093ff;
+/* Reset and Base */
+* {
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Utility Classes */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.text-sm { font-size: 0.875rem; }
+
+/* Section Content */
+.section-content {
+  display: block;
+}
+
+.section-content.hidden {
+  display: none !important;
+}
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--card-background);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--collapsed-width);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+  min-height: 2rem;
+}
+
+.sidebar-header h2 {
+  font-weight: 900;
+  font-size: 1.5rem;
+  transition: opacity 0.2s ease-in-out 0.1s, transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .sidebar-header h2 {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition-delay: 0s;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background: var(--border-color);
+}
+
+/* Profile Section */
+.profile-section {
+  background: var(--background-color);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar.collapsed .profile-section {
+  display: none;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-bottom: 1rem;
-  box-shadow: 0 0 14px 4px #0099ff77;
+  background: var(--primary-color);
+  margin: 0 auto 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 4.5rem;
-  color: #fff;
-  position: relative;
+  font-size: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  color: white;
+}
+
+.profile-info {
+  transition: all 0.2s ease-in-out;
+}
+
+.profile-name {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.profile-role {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+/* === Messages Section Styling === */
+.section-content {
+    display: none;
+}
+
+.section-content:not(.hidden) {
+    display: block;
+}
+
+/* Messages Container */
+.messages-container {
+    background: var(--card-background);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Messages Header */
+.messages-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-color);
+}
+
+.messages-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Messages Tabs */
+.messages-tabs {
+    display: flex;
+    background: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    position: relative;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: var(--card-background);
+}
+
+.tab-btn svg {
+    flex-shrink: 0;
+}
+
+.tab-badge {
+    background: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.25rem;
+}
+
+/* Messages Content */
+.messages-content {
+    padding: 2rem;
+}
+
+.message-tab-content {
+    display: none;
+}
+
+.message-tab-content.active {
+    display: block;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Messages List */
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Individual Message Item */
+.message-item {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: var(--transition);
+    position: relative;
+}
+
+.message-item:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+
+.message-item.unread {
+    border-left: 4px solid var(--primary-color);
+    background: rgba(99, 102, 241, 0.02);
+}
+
+.message-item.unread::before {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+}
+
+.message-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.message-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.message-author {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.message-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.message-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.message-type-badge.broadcast {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.message-type-badge.review {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.message-type-badge.approval {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.message-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.message-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.message-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.message-action-btn:hover {
+    background: var(--background-color);
+    color: var(--text-primary);
+}
+
+.message-action-btn.read {
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.message-action-btn.read:hover {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.message-action-btn.delete {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.message-action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.message-action-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Empty State */
+.empty-messages {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.empty-messages svg {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    opacity: 0.5;
+}
+
+.empty-messages h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.empty-messages p {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Navigation */
+.nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: box-shadow 0.25s, transform 0.25s;
-  outline: none;
-}
-
-/* Avatar glow and slight "pop" when hovered or focused */
-.circle-avatar:hover,
-.circle-avatar:focus {
-  box-shadow: 0 0 30px 10px #0093ffcc;
-  transform: scale(1.06);
-}
-
-/* Popup styles */
-.popup-info {
-  position: absolute;
-  left: 110%;
-  top: 50%;
-  transform: translateY(-50%) scale(0.95);
-  background: #fff;
-  color: #222;
-  min-width: 190px;
-  min-height: 60px;
-  border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(9, 93, 159, 0.18);
-  font-size: 1rem;
-  padding: 14px 18px;
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-  transition: opacity 0.23s, transform 0.23s;
-  z-index: 10;
+  transition: var(--transition);
   text-align: left;
+  width: 100%;
 }
 
-/* Reveal popup on hover/focus of circle or popup itself */
-.popup-info:hover {
+.nav-btn:hover {
+  background: var(--background-color);
+  color: var(--text-primary);
+}
+
+.nav-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.nav-btn i {
+  font-size: 1.125rem;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nav-btn span {
+  transition: opacity 0.2s ease-in-out 0.1s, transform 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.message-badge {
+  background: var(--danger-color);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .nav-btn span {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition-delay: 0s;
+}
+
+.sidebar.collapsed .nav-btn {
+  justify-content: center;
+  padding: 1rem 0.5rem;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100vh;
+}
+
+.sidebar.collapsed + .main-content {
+  margin-left: var(--collapsed-width);
+}
+
+/* Header */
+.header {
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-left h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  width: 300px;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.user-menu-btn:hover {
+  background: var(--background-color);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  overflow: hidden;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: var(--transition);
+}
+
+.user-dropdown.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(-50%) scale(1);
-  pointer-events: auto;
+  transform: translateY(0);
 }
 
-/* Name and Role styling */
-.profile-card .name {
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background: var(--background-color);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.5rem 0;
+}
+
+/* Content */
+.content {
+  padding: 2rem;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-background);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-width: 150px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-change.positive {
+  color: var(--success-color);
+}
+
+.stat-change.negative {
+  color: var(--danger-color);
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  background: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
   font-weight: 700;
-  font-size: 1.32rem;
-  margin-bottom: 0.48rem;
-  color: #212832;
-  user-select: text;
+  color: var(--text-primary);
 }
 
-.profile-card .role {
-  font-style: italic;
-  font-size: 1.08rem;
-  color: #1896ffcc;
-  user-select: text;
-  margin-bottom: 0.7rem;
+.chart-container {
+  position: relative;
+  height: 300px;
 }
 
-
-    /* Sidebar Buttons */
-    .nav-buttons {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .nav-buttons button {
-      background-color: #00b0ff;
-      border: none;
-      padding: 0.9rem 1rem;
-      font-weight: 600;
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      box-shadow: 0 5px 18px #0099ffcc;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    .nav-buttons button:hover,
-    .nav-buttons button:focus {
-      background-color: #0083c9;
-      outline: none;
-    }
-
-    /* Main Content */
-    main.dashboard {
-      margin-left: 280px;
-      flex: 1;
-      padding: 2.5rem 3.5rem 3.5rem;
-      background: #f7fbff;
-      min-height: 100vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 2.8rem;
-      box-shadow: -2px 0 20px rgba(0,0,0,0.07);
-    }
-
-    main.dashboard h1 {
-      font-weight: 800;
-      font-size: 2.7rem;
-      letter-spacing: 1.1px;
-      color: #0366c9;
-      user-select: text;
-    }
-
-    /* Profile form */
-    .profile-form {
-      background: white;
-      border-radius: 18px;
-      padding: 2.7rem 3rem;
-      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-      gap: 1.6rem 2.5rem;
-    }
-    .profile-form label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-      color: #00497d;
-      user-select: text;
-    }
-    .profile-form input[type="text"] {
-      width: 100%;
-      padding: 14px 18px;
-      font-weight: 600;
-      font-size: 1.05rem;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      background: #e0e7fc;
-      color: #222;
-      transition: border-color 0.3s ease;
-    }
-    .profile-form input[type="text"]:focus {
-      outline: none;
-      border-color: #007cf0;
-      background: #f2f8ff;
-    }
-    .profile-form input[readonly] {
-      background-color: #d7dce7;
-      color: #555;
-      cursor: not-allowed;
-    }
-
-    /* Resume Download Btn */
-    .resume-section {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 1.4rem;
-      background: white;
-      padding: 1.8rem 3rem;
-      border-radius: 18px;
-      box-shadow: 0 8px 28px rgba(0,115,195,0.13);
-      user-select: none;
-    }
-    .resume-section h2 {
-      font-weight: 700;
-      font-size: 1.45rem;
-      margin: 0;
-      color: #0369c9;
-    }
-    .download-btn {
-      background: #00b0ff;
-      color: white;
-      border: none;
-      padding: 14px 30px;
-      cursor: pointer;
-      font-weight: 700;
-      border-radius: 14px;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 18px rgb(0 176 255 / 0.8);
-      transition: background-color 0.3s ease;
-    }
-    .download-btn:hover,
-    .download-btn:focus {
-      background: #0083c9;
-      outline: none;
-    }
-
-    /* Graph and Score Section */
-    .graph-score-section {
-      display: flex;
-      gap: 40px;
-      align-items: stretch;
-      user-select: none;
-      flex-wrap: wrap;
-    }
-    .card.graph-section {
-      flex: 2;
-      background: #f2f8ff;
-      border-radius: 16px;
-      padding: 2rem 2.5rem;
-      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.15);
-      min-height: 320px;
-      display: flex;
-      flex-direction: column;
-    }
-    #burnoutTrendChart {
-      flex-grow: 1;
-      width: 100% !important;
-      max-height: 320px !important;
-      user-select: none;
-    }
-    .burnout-score {
-      flex: 1;
-      background: rgba(243, 223, 12, 0.16);
-      border-radius: 16px;
-      padding: 40px 25px;
-      color: #000000;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      user-select: text;
-      min-width: 280px;
-    }
-    .burnout-score h3 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1.2rem;
-      text-shadow: 0 0 8px #000000bb;
-    }
-    .score-box {
-      font-family: monospace, monospace;
-      font-weight: 900;
-      font-size: 2.6rem;
-      color: #ffeb3b;
-      letter-spacing: 0.15em;
-      padding: 18px 32px;
-      background: #000000;
-      border-radius: 16px;
-      user-select: text;
-      line-height: 1;
-    }
-
-    /* Skill chart card */
-    .card.skill-chart {
-      background: white;
-      border-radius: 18px;
-      padding: 2rem 2.5rem;
-      box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 300px;
-      max-width: 340px;
-      user-select: none;
-      justify-content: center;
-    }
-    .card.skill-chart h2 {
-      font-weight: 700;
-      color: #0366c9;
-      margin-bottom: 1.1rem;
-      text-align: center;
-    }
-    #skillsChart {
-      width: 260px !important;
-      height: 260px !important;
-    }
-
-    /* Role Matches Section */
-    .role-matches {
-      margin-top: 1rem;
-      color: #04455f;
-      user-select: none;
-    }
-    .role-matches h2 {
-      font-weight: 800;
-      font-size: 2.3rem;
-      text-align: center;
-      margin-bottom: 2rem;
-      letter-spacing: 1.4px;
-      color: #01496c;
-      user-select: text;
-    }
-    .role-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-      gap: 2rem 2.5rem;
-      max-width: 1080px;
-      margin: 0 auto;
-    }
-    .role-card {
-      background: #e3f0ff;
-      padding: 2rem 1.9rem;
-      border-radius: 16px;
-      color: #034765;
-      box-shadow: 0 8px 28px rgba(1, 64, 106, 0.15);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-      transition: box-shadow 0.3s ease;
-      outline-offset: 3px;
-    }
-    .role-card:hover,
-    .role-card:focus-visible {
-      box-shadow: 0 12px 40px rgba(1, 64, 106, 0.27);
-      outline: 2px solid #007cf0;
-    }
-    .role-card h3 {
-      font-size: 1.5rem;
-      font-weight: 900;
-      margin-bottom: 1.4rem;
-      user-select: text;
-    }
-    .role-card p {
-      font-weight: 900;
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-      letter-spacing: 0.06em;
-      user-select: text;
-    }
-    .role-card button {
-      background: #00b0ff;
-      border: none;
-      color: white;
-      font-weight: 800;
-      font-size: 1.05rem;
-      padding: 12px 30px;
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: 0 4px 18px rgb(0 176 255 / 0.8);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    .role-card button:hover,
-    .role-card button:focus {
-      background: #0083c9;
-      outline: none;
-    }
-    .role-card.green p { color: #0a8210; }
-    .role-card.yellow p { color: #c9a400; }
-    .role-card.red p { color: #a12712; }
-
-    /* Career Timeline Table */
- .timeline {
-  /* Removed max-width & overflow-x */
-  background: white;
-  padding: 1.5rem 2rem;
-  border-radius: 18px;
-  box-shadow: 0 8px 28px rgba(0, 115, 195, 0.13);
-  margin-top: 2rem;
+/* Table */
+.table-card {
+  background: var(--card-background);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 2rem;
 }
 
-table {
-  min-width: 850px; /* keeps table columns sized */
-  width: 100%; /* takes full container width */
+.table-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
-  color: #333;
 }
 
-/* Responsive smaller width */
-@media (max-width: 900px) {
-  table {
-    min-width: 700px; /* a smaller minimum on smaller screens */
+.data-table th,
+.data-table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--background-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.data-table td {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.data-table tbody tr:hover {
+  background: var(--background-color);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: var(--background-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: var(--border-color);
+}
+
+.btn-danger {
+  background: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-title {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: #374151;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-background);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: var(--transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Floating Action Button */
+.fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Enhanced profile banner section */
+.profile-banner {
+  background: var(--gradient-primary);
+  padding: 2rem;
+  border-radius: 20px;
+  color: white;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(50%, -50%);
+}
+
+.profile-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-banner-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.profile-banner-info h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.profile-banner-role {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.profile-quick-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.quick-stat {
+  text-align: center;
+}
+
+.quick-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: block;
+}
+
+.quick-stat-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-outline-white {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.btn-outline-white:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Enhanced bio section */
+.bio-section {
+  background: var(--card-background);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.bio-content {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.bio-edit-btn {
+  color: var(--primary-color);
+  background: none;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Enhanced wellness section */
+.wellness-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.wellness-card {
+  background: var(--card-background);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.wellness-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.burnout-score-display {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.burnout-score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--success-color) 0deg, var(--warning-color) 180deg, var(--danger-color) 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  position: relative;
+}
+
+.burnout-score-inner {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--card-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.burnout-last-measured {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.stress-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.stress-indicator.low {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.stress-indicator.medium {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+}
+
+.stress-indicator.high {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+}
+
+.engagement-highlights {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.engagement-item {
+  text-align: center;
+}
+
+.engagement-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.engagement-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Enhanced charts section */
+.charts-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dual-axis-chart {
+  grid-column: span 1;
+}
+
+/* Enhanced career timeline */
+.career-timeline {
+  background: var(--card-background);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.timeline-item {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.timeline-item:hover {
+  background: var(--background-color);
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--background-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+.timeline-position {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timeline-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.timeline-details.expanded {
+  max-height: 200px;
+}
+
+.timeline-description {
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Enhanced certifications section */
+.certifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.certification-card {
+  background: var(--background-color);
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.certification-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.certification-expiry {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.certification-expiry.warning {
+  color: var(--warning-color);
+}
+
+.certification-expiry.expired {
+  color: var(--danger-color);
+}
+
+/* Animation enhancements */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-    .timeline h2 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      font-weight: 700;
-      color: #0366c9;
-      letter-spacing: 0.05em;
-      border-bottom: 2px solid #0366c9;
-      padding-bottom: 0.5rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-      min-width: 850px;
-      color: #333;
-    }
-    th, td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1.5px solid #eee;
-      text-align: left;
-      vertical-align: middle;
-    }
-    thead tr {
-      background-color: #0366c9;
-      color: white;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-    tbody tr:hover {
-      background-color: #eaf6ff;
-    }
-    a {
-      color: #1a73e8;
-      text-decoration: underline;
-      transition: color 0.3s ease;
-    }
-    a:hover, a:focus {
-      color: #0c47a1;
-      outline: none;
-    }
+.animate-slide-in {
+  animation: slideInUp 0.6s ease-out;
+}
 
-    /* Edit Profile Popup Card */
-    #edit-profile-card {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      max-width: 700px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 12px 40px rgba(0, 124, 240, 0.33);
-      padding: 2.5rem 3rem;
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      user-select: text;
-      outline: none;
-    }
-    #edit-profile-card h2 {
-      margin-top: 0;
-      margin-bottom: 1.8rem;
-      font-weight: 800;
-      font-size: 1.8rem;
-      color: #0366c9;
-    }
-    #edit-profile-card label {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #0b3e6b;
-      margin-bottom: 6px;
-    }
-    #edit-profile-card input[type="text"] {
-      padding: 12px 16px;
-      font-size: 1.05rem;
-      border-radius: 12px;
-      border: 1.8px solid #b8d5ff;
-      transition: border-color 0.25s ease;
-      margin-bottom: 1.4rem;
-    }
-    #edit-profile-card input[type="text"]:focus {
-      outline: none;
-      border-color: #0472e9;
-      background: #e8f0ff;
-    }
-    #edit-profile-card button#saveProfileBtn {
-      margin-top: 0.4rem;
-      background-color: #007cf0;
-      border: none;
-      color: white;
-      padding: 16px 36px;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 1.15rem;
-      cursor: pointer;
-      box-shadow: 0 9px 27px #0092ffcc;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #edit-profile-card button#saveProfileBtn:hover,
-    #edit-profile-card button#saveProfileBtn:focus {
-      background-color: #004b94;
-      outline: none;
-    }
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
 
-    /* Overlay */
-    #popup-overlay {
-      position: fixed;
-      top:0; left:0; right:0; bottom:0;
-      background: rgba(0,0,0,0.25);
-      display: none;
-      z-index: 9998;
-    }
-    #popup-overlay.active {
-      display: block;
-    }
+.pulse {
+  animation: pulse 2s infinite;
+}
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .graph-score-section {
-        flex-direction: column;
-      }
-      .profile-form {
-        grid-template-columns: 1fr;
-      }
-      main.dashboard {
-        margin-left: 0;
-        padding: 2rem 1.5rem 3rem;
-      }
-      nav.sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 1rem 0;
-      }
-      .profile-preview {
-        display: none;
-      }
-      .resume-section {
-        justify-content: center;
-      }
-      .role-cards {
-        grid-template-columns: 1fr;
-      }
-    }
-    @media (max-width: 600px) {
-      #edit-profile-card {
-        padding: 1rem;
-        max-height: 90vh;
-      }
-      .timeline {
-        padding: 0.5rem;
-      }
-      table {
-        min-width: 600px;
-        font-size: 0.85rem;
-      }
-    }
-  </style>
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .profile-banner-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .profile-quick-stats {
+    justify-content: center;
+  }
+  
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .dual-axis-chart {
+    grid-column: span 1;
+  }
+  
+  .wellness-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 </head>
+
 <body>
-  <nav class="sidebar" aria-label="Sidebar Navigation">
-    <h2>Employee Dashboard</h2>
-<div class="profile-card" aria-label="Employee Profile Card">
-  <div class="circle-avatar" tabindex="0" aria-label="Profile Info">
-    <div class="popup-info" role="tooltip">
-      <strong>John Smith</strong><br/>
-      Senior Frontend Developer<br/>
-      john.smith@example.com
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>Employee Hub</h2>
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
-  </div>
-  <div class="name">John Smith</div>
-  <div class="role">Senior Frontend Developer</div>
-</div>
-
-
-
-
+    
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <div class="profile-avatar" id="profileAvatar">
+        <img id="sidebarProfileImage" src="/placeholder.svg?height=48&width=48" alt="Profile" class="w-12 h-12 rounded-full object-cover">
+      </div>
+      <div class="profile-info">
+        <p class="profile-name" id="profileName">John Doe</p>
+        <p class="profile-role" id="profileRole">Software Engineer</p>
+      </div>
+    </section>
+    
+    <!-- Navigation -->
     <div class="nav-buttons">
-      <button id="editProfileBtn" type="button" aria-label="Edit Profile">Edit Profile</button>
-      <button type="button" aria-label="Take Survey">Take Survey</button>
-      <button type="button" aria-label="View Dashboard">Dashboard</button>
+      <button class="nav-btn active" onclick="showSection('dashboard')">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-btn" onclick="window.location.href='empprofile.html'">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </button>
+      <button class="nav-btn" onclick="showSection('messages')">
+        <i class="fas fa-envelope"></i>
+        <span>Messages</span>
+        <span class="message-badge" id="messageBadge" style="display: none;">0</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-briefcase"></i>
+        <span>Career</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-chart-line"></i>
+        <span>Performance</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-heart"></i>
+        <span>Wellness</span>
+      </button>
     </div>
   </nav>
 
-  <main class="dashboard" role="main" aria-label="Employee Dashboard Main Content">
-    <h1>Employee Profile</h1>
-
-    <form class="profile-form" novalidate aria-labelledby="profile-info-title">
-      <h2 id="profile-info-title">Profile Information</h2>
-      <label for="joinYear">Current Job Join Year</label>
-      <input type="text" id="joinYear" name="joinYear" value="2019" readonly />
-
-      <label for="role">Role / Designation</label>
-      <input type="text" id="role" name="role" value="Senior Frontend Developer" readonly />
-
-      <label for="salary">Current Salary</label>
-      <input type="text" id="salary" name="salary" value="₹1,200,000" readonly />
-
-      <label for="userName">User Name</label>
-      <input type="text" id="userName" name="userName" value="jsmith" readonly />
-
-      <label for="employeePh">Employee Phone</label>
-      <input type="text" id="employeePh" name="employeePh" value="+1 (555) 123-4567" readonly />
-
-      <label for="employeeId">Employee ID</label>
-      <input type="text" id="employeeId" name="employeeId" value="EMP20253" readonly />
-
-      <label for="employeeName">Employee Name</label>
-      <input type="text" id="employeeName" name="employeeName" value="John Smith" readonly />
-
-      <label for="department">Department</label>
-      <input type="text" id="department" name="department" value="Software Engineering" readonly />
-
-      <label for="team">Team</label>
-      <input type="text" id="team" name="team" value="Frontend Development" readonly />
-    </form>
-
-    <section class="resume-section" aria-label="Resume Download Section">
-      <h2>Resume</h2>
-      <button class="download-btn" type="button" aria-label="Download your Resume">📝 Download CV</button>
-    </section>
-
-    <section class="graph-score-section" aria-label="Burnout Score and Skill Chart">
-      <div class="card graph-section" aria-label="Burnout Trend Chart">
-        <canvas id="burnoutTrendChart" role="img" aria-label="Line chart showing burnout score trends"></canvas>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <h1 id="sectionTitle">Employee Dashboard</h1>
       </div>
-
-      <div class="burnout-score" aria-live="polite" aria-atomic="true" aria-label="Burnout score">
-        <h3>🌡️ Your Burnout Score</h3>
-        <div class="score-box" id="burnoutScore">16 / 25</div>
-      </div>
-
-      <div class="card skill-chart" aria-label="Skill Proficiency Chart">
-        <h2>Skill Proficiency</h2>
-        <canvas id="skillsChart"></canvas>
-      </div>
-    </section>
-
-    <section class="role-matches" aria-label="Top Role Matches">
-      <h2>🎯 Top Role Matches</h2>
-      <div class="role-cards">
-        <div class="role-card green" tabindex="0">
-          <h3>Business Analyst</h3>
-          <p>✅ 88% Match</p>
-          <button type="button" aria-label="View Business Analyst details">View Role</button>
+      <div class="header-right">
+        <div class="search-bar">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search dashboard...">
         </div>
-        <div class="role-card yellow" tabindex="0">
-          <h3>Data Analyst</h3>
-          <p>⚠️ 73% Match</p>
-          <button type="button" aria-label="View Data Analyst details">View Role</button>
+        <!--Drop Down Button structure-->
+        <div class="user-menu" id="userMenu">
+  <button class="user-menu-btn" id="userMenuBtn">
+    <div class="user-avatar">
+      <img id="headerProfileImage" src="/placeholder.svg?height=32&width=32" alt="Profile" class="w-8 h-8 rounded-full object-cover">
+    </div>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+
+  <div class="user-dropdown" id="userDropdown">
+    <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+    <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+    <div class="dropdown-divider"></div>
+    <a href="#" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+</div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Dashboard Section -->
+      <div id="dashboardSection" class="section-content">
+        <!-- Enhanced Profile Banner -->
+        <div class="profile-banner animate-slide-in">
+          <div class="profile-banner-content">
+            <div class="profile-banner-avatar">
+              <img id="bannerProfileImage" src="/placeholder.svg?height=80&width=80" alt="Profile" class="w-20 h-20 rounded-full object-cover">
+            </div>
+            <div class="profile-banner-info">
+              <h1 id="bannerName">John Doe</h1>
+              <div class="profile-banner-role" id="bannerRole">Senior Software Engineer • Engineering • San Francisco</div>
+                <div class="profile-quick-stats">
+                  <div class="quick-stat">
+                    <span class="quick-stat-value" id="yearsHereValue">0</span>
+                    <span class="quick-stat-label">Years Here</span>
+                  </div>
+                  <div class="quick-stat">
+                    <span class="quick-stat-value" id="projectsQuickCount">0</span>
+                    <span class="quick-stat-label">Projects</span>
+                  </div>
+                  <div class="quick-stat">
+                    <span class="quick-stat-value" id="certsQuickCount">0</span>
+                    <span class="quick-stat-label">Certifications</span>
+                  </div>
+                </div>
+              <div class="profile-actions">
+                <button class="btn btn-outline-white" onclick="openModal('achievementModal')">
+                  <i class="fas fa-plus"></i>
+                  Add Achievement
+                </button>
+                <button class="btn btn-outline-white" onclick="openModal('skillsModal')">
+                  <i class="fas fa-cog"></i>
+                  Update Skills
+                </button>
+                <button class="btn btn-outline-white" onclick="exportProfile()">
+                  <i class="fas fa-download"></i>
+                  Export PDF
+                </button>
+                <button class="btn btn-outline-white" onclick="refreshDashboardData()">
+                  <i class="fas fa-sync-alt"></i>
+                  Refresh Data
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="role-card red" tabindex="0">
-          <h3>UI/UX Designer</h3>
-          <p>🔍 61% Match</p>
-          <button type="button" aria-label="View UI/UX Designer details">View Role</button>
+
+        <!-- Bio Section -->
+        <div class="bio-section animate-slide-in">
+          <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Career Highlights & Goals</h3>
+          <div class="bio-content" id="bioContent">
+            Passionate software engineer with expertise in full-stack development and team leadership. Led the migration of legacy systems to modern cloud architecture, resulting in 40% performance improvement. Currently focused on advancing machine learning capabilities and mentoring junior developers.
+          </div>
+          <button class="bio-edit-btn" onclick="editBio()">
+            <i class="fas fa-edit"></i>
+            Edit Bio
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <div class="filter-group">
+            <label class="filter-label">Time Period</label>
+            <select class="filter-select" id="timePeriod">
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Department</label>
+            <select class="filter-select" id="department">
+              <option value="all">All Departments</option>
+              <option value="engineering">Engineering</option>
+              <option value="marketing">Marketing</option>
+              <option value="sales">Sales</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Enhanced Wellness Section -->
+        <div class="wellness-grid">
+          <div class="wellness-card">
+            <h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Burnout Assessment</h3>
+            <div class="burnout-score-display">
+              <div class="burnout-score-circle"></div>
+              <div class="burnout-last-measured" id="burnoutLastMeasured">Last measured 5 days ago</div>
+                            <button class="btn btn-primary" onclick="window.location.href='survey.html'" style="margin-top: 1rem;">
+                Take Wellness Survey
+              </button>
+            </div>
+          </div>
+          
+          <div class="wellness-card">
+            <h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Current Status</h3>
+            <div class="stress-indicator low" id="stressIndicator">
+              <i class="fas fa-circle"></i>
+              <div>
+                <div style="font-weight: 600;">Low Stress</div>
+                <div style="font-size: 0.875rem; opacity: 0.8;">Based on current workload</div>
+              </div>
+            </div>
+            <div class="engagement-highlights">
+              <div class="engagement-item">
+                <div class="engagement-value" id="recognitionsCount">12</div>
+                <div class="engagement-label">Recent Kudos</div>
+              </div>
+              <div class="engagement-item">
+                <div class="engagement-value" id="feedbackScore">4.8</div>
+                <div class="engagement-label">Peer Rating</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Performance Score</span>
+              <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--primary-color);">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="performanceScoreValue">8.7/10</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              +0.3 this month
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Projects Completed</span>
+              <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="projectsCompletedValue">0</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              +2 this month
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Burnout Score</span>
+              <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning-color);">
+                <i class="fas fa-battery-half"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="burnoutDisplay">3.2/10</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-down"></i>
+              -0.5 this week
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-title">Team Collaboration</span>
+              <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="stat-value">9.1/10</div>
+            <div class="stat-change positive">
+              <i class="fas fa-arrow-up"></i>
+              +0.2 this month
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Charts Section -->
+        <div class="charts-section">
+          <div class="chart-card dual-axis-chart">
+            <div class="chart-header">
+              <h3 class="chart-title">Productivity vs Burnout Trend</h3>
+              <!-- Added edit button for chart data -->
+              <button class="btn btn-secondary" onclick="openModal('chartDataModal')" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                Edit Data
+              </button>
+            </div>
+            <div class="chart-container">
+              <canvas id="dualAxisChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Skills Radar</h3>
+              <!-- Added edit button for skills data -->
+              <button class="btn btn-secondary" onclick="openModal('skillsDataModal')" style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                Edit Skills
+              </button>
+            </div>
+            <div class="chart-container">
+              <canvas id="skillRadarChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Removed Peer Feedback chart card -->
         </div>
       </div>
-    </section>
 
-    <section class="timeline" aria-label="Career Timeline">
-      <h2>Career Timeline</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Topic</th>
-            <th>Subtopics / Skills</th>
-            <th>Tools / Tech</th>
-            <th>Purpose</th>
-            <th>Outcome</th>
-            <th>Tutorials</th>
-            <th>Reference</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Jan 20, 2023</td>
-            <td>JavaScript Fundamentals</td>
-            <td>ES6, Closures, Promises</td>
-            <td>VSCode, Chrome DevTools</td>
-            <td>Build strong JS basics</td>
-            <td>Improved code quality</td>
-            <td><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank" rel="noopener noreferrer">MDN JS Guide</a></td>
-            <td><a href="https://stackoverflow.com/questions/tagged/javascript" target="_blank" rel="noopener noreferrer">StackOverflow JS</a></td>
-          </tr>
-          <tr>
-            <td>Jun 14, 2023</td>
-            <td>React.js Deep Dive</td>
-            <td>Hooks, Context API, Router</td>
-            <td>React, Redux, Storybook</td>
-            <td>Build scalable UI</td>
-            <td>Faster dev & reuse</td>
-            <td><a href="https://reactjs.org/docs/getting-started.html" target="_blank" rel="noopener noreferrer">React Docs</a></td>
-            <td><a href="https://reactpatterns.com/" target="_blank" rel="noopener noreferrer">React Patterns</a></td>
-          </tr>
-          <tr>
-            <td>Mar 3, 2024</td>
-            <td>Testing & Debugging</td>
-            <td>Jest, Cypress, Chrome DevTools</td>
-            <td>Jest, Cypress</td>
-            <td>Quality Assurance</td>
-            <td>Fewer bugs in prod</td>
-            <td><a href="https://jestjs.io/docs/en/getting-started" target="_blank" rel="noopener noreferrer">Jest Tutorial</a></td>
-            <td><a href="https://docs.cypress.io/guides/overview/why-cypress" target="_blank" rel="noopener noreferrer">Cypress Docs</a></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <!-- Messages Section -->
+      <div id="messagesSection" class="section-content hidden">
+        <div class="messages-container">
+          <!-- Messages Header -->
+          <div class="messages-header">
+            <h2 class="messages-title">Messages Center</h2>
+            <button onclick="markAllAsRead()" class="btn btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9,11 12,14 22,4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+              Mark All as Read
+            </button>
+          </div>
+          
+          <!-- Messages Tabs -->
+          <div class="messages-tabs">
+            <button class="tab-btn active" onclick="switchMessageTab('all')" data-tab="all">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              All Messages
+              <span class="tab-badge" id="allBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchMessageTab('broadcast')" data-tab="broadcast">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              Broadcast
+              <span class="tab-badge" id="broadcastBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchMessageTab('reviews')" data-tab="reviews">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              Performance Reviews
+              <span class="tab-badge" id="reviewsBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchMessageTab('approvals')" data-tab="approvals">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22,4 12,14.01 9,11.01"></polyline>
+              </svg>
+              Role Changes
+              <span class="tab-badge" id="approvalsBadge">0</span>
+            </button>
+          </div>
+          
+          <!-- Messages Content -->
+          <div class="messages-content">
+            <!-- All Messages Tab -->
+            <div id="allMessagesTab" class="message-tab-content active">
+              <div id="allMessagesList" class="messages-list">
+                <!-- All messages will be populated here -->
+              </div>
+            </div>
+
+            <!-- Broadcast Messages Tab -->
+            <div id="broadcastMessagesTab" class="message-tab-content">
+              <div class="section-header">
+                <h3>HR Broadcast Messages</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button onclick="loadBroadcastMessages()" class="btn btn-secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 2v6h-6"></path>
+                      <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                      <path d="M3 22v-6h6"></path>
+                      <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                Refresh
+              </button>
+                  <button onclick="cleanupOldRoleChangeMessages()" class="btn btn-warning" style="font-size: 0.875rem;">
+                    <i class="fas fa-broom"></i>
+                    Cleanup Role Change Messages
+                  </button>
+            </div>
+            </div>
+              <div id="broadcastMessagesList" class="messages-list">
+                <!-- Broadcast messages will be populated here -->
+              </div>
+            </div>
+
+            <!-- Performance Reviews Tab -->
+            <div id="reviewsMessagesTab" class="message-tab-content">
+              <div class="section-header">
+                <h3>Performance Review Notifications</h3>
+                <button onclick="loadReviewMessages()" class="btn btn-secondary">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 2v6h-6"></path>
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                    <path d="M3 22v-6h6"></path>
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                  </svg>
+                  Refresh
+                </button>
+              </div>
+              <div id="reviewMessagesList" class="messages-list">
+                <!-- Review messages will be populated here -->
+              </div>
+            </div>
+
+            <!-- Role Change Approvals Tab -->
+            <div id="approvalsMessagesTab" class="message-tab-content">
+              <div class="section-header">
+                <h3>Role Change Approval Requests</h3>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button onclick="loadApprovalMessages()" class="btn btn-secondary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 2v6h-6"></path>
+                      <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                      <path d="M3 22v-6h6"></path>
+                      <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                    Refresh
+                  </button>
+                  <button onclick="testBurnoutMessage()" class="btn btn-primary" style="font-size: 0.875rem;">
+                    <i class="fas fa-plus"></i>
+                    Test Burnout Message
+                  </button>
+                  <button onclick="checkLocalStorage()" class="btn btn-secondary" style="font-size: 0.875rem;">
+                    <i class="fas fa-bug"></i>
+                    Debug Storage
+                  </button>
+                  <button onclick="clearAllMessageData()" class="btn btn-danger" style="font-size: 0.875rem;">
+                    <i class="fas fa-trash"></i>
+                    Clear All Messages
+                  </button>
+                </div>
+              </div>
+              <div id="approvalMessagesList" class="messages-list">
+                <!-- Approval messages will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Removed Career Progress Timeline section -->
+
+      <!-- Removed Certifications & Courses section -->
+    </div>
   </main>
 
-  <!-- Edit Profile Popup -->
-  <section id="edit-profile-card" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title" tabindex="-1">
-    <h2 id="edit-profile-title">Edit Profile</h2>
-    <label for="editJoinYear">Current Job Join Year</label>
-    <input type="text" id="editJoinYear" />
-    <label for="editRole">Role / Designation</label>
-    <input type="text" id="editRole" />
-    <label for="editSalary">Current Salary</label>
-    <input type="text" id="editSalary" />
-    <label for="editUserName">User Name</label>
-    <input type="text" id="editUserName" />
-    <label for="editEmployeePh">Employee Phone</label>
-    <input type="text" id="editEmployeePh" />
-    <label for="editEmployeeId">Employee ID</label>
-    <input type="text" id="editEmployeeId" />
-    <label for="editEmployeeName">Employee Name</label>
-    <input type="text" id="editEmployeeName" />
-    <label for="editDepartment">Department</label>
-    <input type="text" id="editDepartment" />
-    <label for="editTeam">Team</label>
-    <input type="text" id="editTeam" />
-    <button id="saveProfileBtn" type="button" aria-label="Save Profile">Save</button>
-  </section>
+  <!-- Profile Edit Modal -->
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Profile</h3>
+        <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <form id="profileForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="editName" value="John Doe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Position</label>
+          <input type="text" class="form-input" id="editPosition" value="Software Engineer">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <select class="form-input" id="editDepartment">
+            <option value="engineering">Engineering</option>
+            <option value="marketing">Marketing</option>
+            <option value="sales">Sales</option>
+            <option value="hr">Human Resources</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="editEmail" value="john.doe@company.com">
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- Overlay -->
-  <div id="popup-overlay" aria-hidden="true"></div>
+  <!-- Additional Modals -->
+  <div class="modal" id="achievementModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Achievement</h3>
+        <button class="modal-close" onclick="closeModal('achievementModal')">&times;</button>
+      </div>
+      <form id="achievementForm">
+        <div class="form-group">
+          <label class="form-label">Achievement Title</label>
+          <input type="text" class="form-input" id="achievementTitle" placeholder="e.g., Led successful project migration">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" id="achievementDescription" rows="3" placeholder="Describe your achievement..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="achievementDate">
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('achievementModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Achievement</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    // Burnout and Skill charts init
-    document.addEventListener('DOMContentLoaded', function() {
-      const burnoutCtx = document.getElementById('burnoutTrendChart').getContext('2d');
-      const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+  <div class="modal" id="skillsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Update Skills</h3>
+        <button class="modal-close" onclick="closeModal('skillsModal')">&times;</button>
+      </div>
+      <form id="skillsForm">
+        <div class="form-group">
+          <label class="form-label">Technical Skills (1-10)</label>
+          <input type="range" class="form-input" id="technicalSkill" min="1" max="10" value="8">
+          <span id="technicalValue">8</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Leadership (1-10)</label>
+          <input type="range" class="form-input" id="leadershipSkill" min="1" max="10" value="7">
+          <span id="leadershipValue">7</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Communication (1-10)</label>
+          <input type="range" class="form-input" id="communicationSkill" min="1" max="10" value="9">
+          <span id="communicationValue">9</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Problem Solving (1-10)</label>
+          <input type="range" class="form-input" id="problemSolvingSkill" min="1" max="10" value="8">
+          <span id="problemSolvingValue">8</span>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('skillsModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Skills</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-      const burnoutTrendChart = new Chart(burnoutCtx, {
-        type: 'line',
-        data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-          datasets: [{
-            label: 'Burnout Score',
-            data: [10, 12, 15, 14, 16, 18, 16],
-            borderColor: '#f3df0c',
-            backgroundColor: 'rgba(243, 223, 12, 0.28)',
-            fill: true,
-            tension: 0.25,
-            pointRadius: 5,
-            pointBackgroundColor: '#664d00',
-            borderWidth: 3,
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { beginAtZero: true, max: 25, ticks: { stepSize: 5 }, grid: { color: 'rgba(0,0,0,0.05)' }},
-            x: { grid: { color: 'rgba(0,0,0,0.05)' }}
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#222',
-              titleColor: '#ffc',
-              bodyColor: '#ffd',
-              cornerRadius: 7,
-            }
-          }
+  <!-- Added Chart Data Edit Modal -->
+  <div class="modal" id="chartDataModal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Chart Data</h3>
+        <button class="modal-close" onclick="closeModal('chartDataModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Weekly Productivity & Burnout Data</h4>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="font-weight: 600; color: var(--text-primary);">Day</div>
+          <div style="font-weight: 600; color: #10b981;">Productivity (1-10)</div>
+          <div style="font-weight: 600; color: #f59e0b;">Burnout (1-10)</div>
+        </div>
+        
+        <div id="chartDataInputs" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+          <!-- Data inputs will be generated by JavaScript -->
+        </div>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('chartDataModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveChartData()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Added Skills Data Edit Modal -->
+  <div class="modal" id="skillsDataModal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Skills Data</h3>
+        <button class="modal-close" onclick="closeModal('skillsDataModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Skill Levels (1-10 scale)</h4>
+        
+        <div class="form-group">
+          <label class="form-label">Technical Skills</label>
+          <input type="number" id="technicalSkill" min="1" max="10" value="8" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Leadership Skills</label>
+          <input type="number" id="leadershipSkill" min="1" max="10" value="7" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Communication Skills</label>
+          <input type="number" id="communicationSkill" min="1" max="10" value="9" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Problem Solving Skills</label>
+          <input type="number" id="problemSolvingSkill" min="1" max="10" value="8" class="form-input">
+        </div>
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('skillsDataModal')">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveSkillsData()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    
+class EmployeeDashboard {
+  constructor() {
+    this.chartData = {
+      labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      productivity: [7.5, 8.2, 6.8, 9.1, 7.3, 5.5, 6.0],
+      burnout: [3.2, 2.8, 4.1, 2.5, 3.7, 5.2, 4.8]
+    };
+    this.skillsData = {
+      labels: ['Technical Skills', 'Leadership', 'Communication', 'Problem Solving', 'Creativity', 'Teamwork'],
+      data: [8, 7, 9, 8, 6, 9]
+    };
+    
+    // Load profile data from localStorage
+    this.loadProfileData();
+    
+    this.initializeEventListeners();
+    this.initializeCharts();
+    this.updateProfileDisplay();
+    
+    // Initialize message badge
+    updateMessageBadge();
+
+    // Sync dynamic quick stats from profile data in localStorage
+    this.updateQuickStatsFromProfile();
+  }
+
+  updateQuickStatsFromProfile() {
+    try {
+      // Certifications & Projects counts
+      const certs = JSON.parse(localStorage.getItem('employeeCertificationsData') || '[]');
+      const projects = JSON.parse(localStorage.getItem('employeeProjectsData') || '[]');
+      const certCount = Array.isArray(certs) ? certs.length : 0;
+      const projectCount = Array.isArray(projects) ? projects.length : 0;
+
+      const certsQuick = document.getElementById('certsQuickCount');
+      const projectsQuick = document.getElementById('projectsQuickCount');
+      const projectsCompletedValue = document.getElementById('projectsCompletedValue');
+      if (certsQuick) certsQuick.textContent = String(certCount);
+      if (projectsQuick) projectsQuick.textContent = String(projectCount);
+      if (projectsCompletedValue) projectsCompletedValue.textContent = String(projectCount);
+
+      // Years here computed from Career Timeline (employeeTimelineData)
+      const timeline = JSON.parse(localStorage.getItem('employeeTimelineData') || '[]');
+      let earliestDate = null;
+      if (Array.isArray(timeline) && timeline.length > 0) {
+        const monthMap = {
+          jan: 0, january: 0,
+          feb: 1, february: 1,
+          mar: 2, march: 2,
+          apr: 3, april: 3,
+          may: 4,
+          jun: 5, june: 5,
+          jul: 6, july: 6,
+          aug: 7, august: 7,
+          sep: 8, sept: 8, september: 8,
+          oct: 9, october: 9,
+          nov: 10, november: 10,
+          dec: 11, december: 11
+        };
+        const parseDate = (val) => {
+          if (!val) return null;
+          const s = String(val).toLowerCase();
+          const yearMatch = s.match(/(19|20)\d{2}/);
+          if (!yearMatch) return null;
+          const year = parseInt(yearMatch[0]);
+          let month = 0;
+          const monthKey = Object.keys(monthMap).find(k => s.includes(k));
+          if (monthKey) month = monthMap[monthKey];
+          return new Date(year, month, 1);
+        };
+        timeline.forEach(entry => {
+          const d = parseDate(entry.startDate);
+          if (d && (!earliestDate || d < earliestDate)) earliestDate = d;
+        });
+      }
+      const yearsHereEl = document.getElementById('yearsHereValue');
+      if (yearsHereEl) {
+        if (earliestDate) {
+          const now = new Date();
+          const yearsFloat = (now - earliestDate) / (365.25 * 24 * 60 * 60 * 1000);
+          const yearsRounded = Math.max(0, Math.round(yearsFloat * 10) / 10);
+          yearsHereEl.textContent = yearsRounded.toFixed(1);
+        } else {
+          yearsHereEl.textContent = '0';
         }
-      });
+      }
+    } catch (e) {
+      console.warn('Failed to update quick stats from profile:', e);
+    }
+  }
 
-      const skillsChart = new Chart(skillsCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['JavaScript', 'React', 'Testing', 'UI/UX'],
-          datasets: [{
-            data: [85, 90, 70, 60],
-            backgroundColor: ['#3a7bd5', '#44a144', '#fca311', '#4361ee'],
-            borderWidth: 0,
-          }]
-        },
-        options: {
-          responsive: false,
-          cutout: '65%',
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true }
-          }
-        }
-      });
+  loadProfileData() {
+    // Load profile data from localStorage
+    const savedProfile = localStorage.getItem('employeeProfileData');
+    const savedSkills = localStorage.getItem('employeeSkillsData');
+    const savedTimeline = localStorage.getItem('employeeTimelineData');
+    const savedCertifications = localStorage.getItem('employeeCertificationsData');
+    const savedProjects = localStorage.getItem('employeeProjectsData');
+    const savedProfileImage = localStorage.getItem('employeeProfileImage');
+
+    if (savedProfile) {
+      this.profileData = JSON.parse(savedProfile);
+    } else {
+      // Default profile data if none exists
+      this.profileData = {
+        name: 'John Doe',
+        title: 'Software Engineer',
+        department: 'Engineering',
+        employeeId: 'EMP-2024-001',
+        location: 'San Francisco, CA',
+        pronouns: 'He/Him',
+        email: 'john.doe@company.com',
+        phone: '+1 (234) 567-8900',
+        linkedin: 'linkedin.com/in/johndoe',
+        slack: '@john.doe',
+        summary: 'Passionate software engineer with expertise in full-stack development and team leadership.',
+        hobbies: 'Rock climbing, Photography, Cooking',
+        quote: '"Code is poetry written in logic"',
+        funFact: 'Can solve a Rubik\'s cube in under 2 minutes'
+      };
+    }
+
+    // Update skills data if available from profile page
+    if (savedSkills) {
+      const skillsArray = JSON.parse(savedSkills);
+      if (skillsArray.length > 0) {
+        // Convert skills data to radar chart format
+        this.skillsData.labels = skillsArray.map(skill => skill.name);
+        this.skillsData.data = skillsArray.map(skill => skill.level / 10); // Convert percentage to 1-10 scale
+      }
+    }
+    
+    // Load profile image if available
+    if (savedProfileImage) {
+      this.profileImage = savedProfileImage;
+    }
+    
+    // Load burnout score if available
+    const savedBurnoutScore = localStorage.getItem('employeeBurnoutScore');
+    const savedBurnoutDate = localStorage.getItem('employeeBurnoutDate');
+    
+    console.log('Loading burnout score from localStorage:', savedBurnoutScore);
+    console.log('Loading burnout date from localStorage:', savedBurnoutDate);
+    
+    if (savedBurnoutScore) {
+      this.burnoutScore = parseFloat(savedBurnoutScore);
+      this.burnoutDate = savedBurnoutDate;
+      console.log('Set burnout score to:', this.burnoutScore);
+    }
+  }
+
+  updateProfileDisplay() {
+    // Update profile elements on the dashboard
+    const profileElements = {
+      'profileName': this.profileData.name,
+      'profileRole': this.profileData.title,
+      'bannerName': this.profileData.name,
+      'bannerRole': `${this.profileData.title} • ${this.profileData.department} • ${this.profileData.location}`,
+      'bioContent': this.profileData.summary
+    };
+
+    Object.keys(profileElements).forEach(elementId => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.textContent = profileElements[elementId];
+      }
     });
 
-    // Edit profile popup logic
-    document.addEventListener('DOMContentLoaded', () => {
-      const editBtn = document.getElementById('editProfileBtn');
-      const editCard = document.getElementById('edit-profile-card');
-      const overlay = document.getElementById('popup-overlay');
-      const saveBtn = document.getElementById('saveProfileBtn');
-
-      // Main form inputs
-      const inputs = {
-        joinYear: document.getElementById('joinYear'),
-        role: document.getElementById('role'),
-        salary: document.getElementById('salary'),
-        userName: document.getElementById('userName'),
-        employeePh: document.getElementById('employeePh'),
-        employeeId: document.getElementById('employeeId'),
-        employeeName: document.getElementById('employeeName'),
-        department: document.getElementById('department'),
-        team: document.getElementById('team')
-      };
-
-      // Edit popup inputs
-      const popupInputs = {
-        joinYear: document.getElementById('editJoinYear'),
-        role: document.getElementById('editRole'),
-        salary: document.getElementById('editSalary'),
-        userName: document.getElementById('editUserName'),
-        employeePh: document.getElementById('editEmployeePh'),
-        employeeId: document.getElementById('editEmployeeId'),
-        employeeName: document.getElementById('editEmployeeName'),
-        department: document.getElementById('editDepartment'),
-        team: document.getElementById('editTeam'),
-      };
-
-      function openEdit() {
-        for (const key in inputs) {
-          popupInputs[key].value = inputs[key].value;
-        }
-        editCard.style.display = 'flex';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        editCard.focus();
+    // Update profile images if available
+    if (this.profileImage) {
+      const sidebarProfileImage = document.getElementById('sidebarProfileImage');
+      const headerProfileImage = document.getElementById('headerProfileImage');
+      const bannerProfileImage = document.getElementById('bannerProfileImage');
+      
+      if (sidebarProfileImage) {
+        sidebarProfileImage.src = this.profileImage;
+        sidebarProfileImage.onerror = () => {
+          sidebarProfileImage.style.display = 'none';
+          const profileAvatar = document.getElementById('profileAvatar');
+          if (profileAvatar && this.profileData.name) {
+            const initials = this.profileData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            profileAvatar.textContent = initials;
+          }
+        };
+      }
+      if (headerProfileImage) {
+        headerProfileImage.src = this.profileImage;
+        headerProfileImage.onerror = () => {
+          headerProfileImage.style.display = 'none';
+          const userAvatar = document.querySelector('.user-avatar');
+          if (userAvatar && this.profileData.name) {
+            const initials = this.profileData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            userAvatar.textContent = initials;
+          }
+        };
+      }
+      if (bannerProfileImage) {
+        bannerProfileImage.src = this.profileImage;
+        bannerProfileImage.onerror = () => {
+          bannerProfileImage.style.display = 'none';
+        };
+      }
+    } else {
+      // Update user avatar initials if no image is available
+      const userAvatar = document.querySelector('.user-avatar');
+      if (userAvatar && this.profileData.name) {
+        const initials = this.profileData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        userAvatar.textContent = initials;
       }
 
-      function closeEdit() {
-        editCard.style.display = 'none';
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        editBtn.focus();
+      // Update profile avatar
+      const profileAvatar = document.getElementById('profileAvatar');
+      if (profileAvatar && this.profileData.name) {
+        const initials = this.profileData.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        profileAvatar.textContent = initials;
       }
-
-      editBtn.addEventListener('click', openEdit);
-
-      saveBtn.addEventListener('click', () => {
-        if (!popupInputs.employeeName.value.trim()) {
-          alert('Employee Name cannot be empty.');
-          popupInputs.employeeName.focus();
-          return;
-        }
-        for (const key in inputs) {
-          inputs[key].value = popupInputs[key].value.trim();
-        }
-        document.getElementById('sidebar-name').textContent = inputs.employeeName.value;
-        document.getElementById('sidebar-role').textContent = inputs.role.value;
-        closeEdit();
-      });
-
-      overlay.addEventListener('click', closeEdit);
-
-      // Trap focus inside popup
-      editCard.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeEdit();
-          e.preventDefault();
-        }
-        if (e.key === 'Tab') {
-          const focusable = editCard.querySelectorAll('input, button');
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          if (e.shiftKey) {
-            if (document.activeElement === first) {
-              e.preventDefault();
-              last.focus();
-            }
+    }
+    
+    // Update burnout score display
+    if (this.burnoutScore !== undefined) {
+      console.log('Updating burnout display with score:', this.burnoutScore);
+      const burnoutDisplay = document.getElementById('burnoutDisplay');
+      if (burnoutDisplay) {
+        burnoutDisplay.textContent = `${this.burnoutScore}/10`;
+        console.log('Updated burnout display element');
+      }
+      
+      // Update last measured date
+      if (this.burnoutDate) {
+        const lastMeasured = document.getElementById('burnoutLastMeasured');
+        if (lastMeasured) {
+          const date = new Date(this.burnoutDate);
+          const now = new Date();
+          const diffTime = Math.abs(now - date);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            lastMeasured.textContent = 'Last measured yesterday';
+          } else if (diffDays === 0) {
+            lastMeasured.textContent = 'Last measured today';
           } else {
-            if (document.activeElement === last) {
-              e.preventDefault();
-              first.focus();
-            }
+            lastMeasured.textContent = `Last measured ${diffDays} days ago`;
           }
         }
+      }
+    }
+  }
+
+  initializeEventListeners() {
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
       });
+    }
+
+    // Burnout slider
+    const burnoutSlider = document.getElementById('burnoutSlider');
+    const burnoutValue = document.getElementById('burnoutValue');
+    if (burnoutSlider && burnoutValue) {
+      burnoutSlider.addEventListener('input', (e) => {
+        burnoutValue.textContent = e.target.value;
+      });
+    }
+
+    // Skills sliders
+    const skillSliders = ['technicalSkill', 'leadershipSkill', 'communicationSkill', 'problemSolvingSkill'];
+    skillSliders.forEach(sliderId => {
+      const slider = document.getElementById(sliderId);
+      const valueSpan = document.getElementById(sliderId.replace('Skill', 'Value'));
+      if (slider && valueSpan) {
+        slider.addEventListener('input', (e) => {
+          valueSpan.textContent = e.target.value;
+        });
+      }
     });
-  </script>
+  }
+
+  initializeCharts() {
+    // Initialize dual axis chart
+    setTimeout(() => {
+      const ctx = document.getElementById('dualAxisChart');
+      if (ctx) {
+        this.dualAxisChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: this.chartData.labels,
+            datasets: [{
+              label: 'Productivity',
+              data: this.chartData.productivity,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              yAxisID: 'y',
+              tension: 0.4
+            }, {
+              label: 'Burnout',
+              data: this.chartData.burnout,
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              yAxisID: 'y1',
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: { display: true, text: 'Productivity Score' },
+                min: 0,
+                max: 10
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                title: { display: true, text: 'Burnout Score' },
+                min: 0,
+                max: 10,
+                grid: { drawOnChartArea: false }
+              }
+            }
+          }
+        });
+      }
+    }, 100);
+
+    // Initialize skills radar chart
+    setTimeout(() => {
+      const ctx2 = document.getElementById('skillRadarChart');
+      if (ctx2) {
+        this.skillRadarChart = new Chart(ctx2, {
+          type: 'radar',
+          data: {
+            labels: this.skillsData.labels,
+            datasets: [{
+              label: 'Skills',
+              data: this.skillsData.data,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.2)',
+              pointBackgroundColor: '#3b82f6',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#3b82f6'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 10,
+                ticks: { stepSize: 2 }
+              }
+            }
+          }
+        });
+      }
+    }, 200);
+  }
+
+  // Function to refresh dashboard data from localStorage
+  refreshDashboard() {
+    this.loadProfileData();
+    this.updateProfileDisplay();
+    
+    // Update skills chart if skills data changed
+    if (this.skillRadarChart) {
+      this.skillRadarChart.data.labels = this.skillsData.labels;
+      this.skillRadarChart.data.datasets[0].data = this.skillsData.data;
+      this.skillRadarChart.update();
+    }
+    
+    // Update burnout score display
+    if (this.burnoutScore !== undefined) {
+      console.log('Updating burnout display with score:', this.burnoutScore);
+      const burnoutDisplay = document.getElementById('burnoutDisplay');
+      if (burnoutDisplay) {
+        burnoutDisplay.textContent = `${this.burnoutScore}/10`;
+        console.log('Updated burnout display element');
+      }
+      
+      // Update last measured date
+      if (this.burnoutDate) {
+        const lastMeasured = document.getElementById('burnoutLastMeasured');
+        if (lastMeasured) {
+          const date = new Date(this.burnoutDate);
+          const now = new Date();
+          const diffTime = Math.abs(now - date);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            lastMeasured.textContent = 'Last measured yesterday';
+          } else if (diffDays === 0) {
+            lastMeasured.textContent = 'Last measured today';
+          } else {
+            lastMeasured.textContent = `Last measured ${diffDays} days ago`;
+          }
+        }
+      }
+    }
+  }
+
+  generateChartDataInputs() {
+    const container = document.getElementById('chartDataInputs');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    this.chartData.labels.forEach((day, index) => {
+      // Day label
+      const dayDiv = document.createElement('div');
+      dayDiv.textContent = day;
+      dayDiv.style.fontWeight = '500';
+      dayDiv.style.color = 'var(--text-primary)';
+      container.appendChild(dayDiv);
+      
+      // Productivity input
+      const prodInput = document.createElement('input');
+      prodInput.type = 'number';
+      prodInput.min = '1';
+      prodInput.max = '10';
+      prodInput.step = '0.1';
+      prodInput.value = this.chartData.productivity[index];
+      prodInput.className = 'form-input';
+      prodInput.id = `prod-${index}`;
+      prodInput.style.padding = '0.5rem';
+      prodInput.style.border = '1px solid #d1d5db';
+      prodInput.style.borderRadius = '0.375rem';
+      container.appendChild(prodInput);
+      
+      // Burnout input
+      const burnInput = document.createElement('input');
+      burnInput.type = 'number';
+      burnInput.min = '1';
+      burnInput.max = '10';
+      burnInput.step = '0.1';
+      burnInput.value = this.chartData.burnout[index];
+      burnInput.className = 'form-input';
+      burnInput.id = `burn-${index}`;
+      burnInput.style.padding = '0.5rem';
+      burnInput.style.border = '1px solid #d1d5db';
+      burnInput.style.borderRadius = '0.375rem';
+      container.appendChild(burnInput);
+    });
+  }
+
+  generateSkillsDataInputs() {
+    const container = document.getElementById('skillsDataInputs');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    this.skillsData.labels.forEach((skill, index) => {
+      const skillDiv = document.createElement('div');
+      skillDiv.style.marginBottom = '1rem';
+      
+      const label = document.createElement('label');
+      label.textContent = skill;
+      label.className = 'form-label';
+      
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = '1';
+      input.max = '10';
+      input.value = this.skillsData.data[index];
+      input.className = 'form-input';
+      input.id = `skill-${index}`;
+      
+      const valueSpan = document.createElement('span');
+      valueSpan.textContent = this.skillsData.data[index];
+      valueSpan.style.marginLeft = '1rem';
+      valueSpan.style.fontWeight = '600';
+      
+      input.addEventListener('input', (e) => {
+        valueSpan.textContent = e.target.value;
+      });
+      
+      skillDiv.appendChild(label);
+      skillDiv.appendChild(input);
+      skillDiv.appendChild(valueSpan);
+      container.appendChild(skillDiv);
+    });
+  }
+
+  saveChartData() {
+    this.chartData.labels.forEach((day, index) => {
+      const prodInput = document.getElementById(`prod-${index}`);
+      const burnInput = document.getElementById(`burn-${index}`);
+      
+      if (prodInput && burnInput) {
+        this.chartData.productivity[index] = parseFloat(prodInput.value);
+        this.chartData.burnout[index] = parseFloat(burnInput.value);
+      }
+    });
+    
+    
+    // Update chart
+    if (this.dualAxisChart) {
+      this.dualAxisChart.data.datasets[0].data = this.chartData.productivity;
+      this.dualAxisChart.data.datasets[1].data = this.chartData.burnout;
+      this.dualAxisChart.update();
+    }
+    
+    closeModal('chartDataModal');
+  }
+
+  // Fixed saveSkillsData function to use correct input IDs
+  saveSkillsData() {
+    // Get values from the actual input IDs in the modal
+    const technicalValue = document.getElementById('technicalSkill').value;
+    const leadershipValue = document.getElementById('leadershipSkill').value;
+    const communicationValue = document.getElementById('communicationSkill').value;
+    const problemSolvingValue = document.getElementById('problemSolvingSkill').value;
+    
+    // Update the skills data array with new values
+    this.skillsData.data = [
+      parseInt(technicalValue),
+      parseInt(leadershipValue), 
+      parseInt(communicationValue),
+      parseInt(problemSolvingValue)
+    ];
+    
+    // Update chart
+    if (this.skillRadarChart) {
+      this.skillRadarChart.data.datasets[0].data = this.skillsData.data;
+      this.skillRadarChart.update();
+    }
+    
+    closeModal('skillsDataModal');
+  }
+
+  closeProfileModal() {
+    closeModal('profileModal');
+  }
+
+  closeBurnoutModal() {
+    closeModal('burnoutModal');
+  }
+
+  saveBurnoutScore() {
+    const slider = document.getElementById('burnoutSlider');
+    if (slider) {
+      const score = slider.value;
+      document.getElementById('burnoutScoreDisplay').textContent = score;
+      document.getElementById('burnoutLastMeasured').textContent = 'Last measured just now';
+    }
+    this.closeBurnoutModal();
+  }
+}
+
+function openModal(modalId) {
+  console.log('Opening modal:', modalId); // Debug log
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'flex';
+    // Generate inputs when opening modals
+    if (modalId === 'chartDataModal' && window.dashboard) {
+      window.dashboard.generateChartDataInputs();
+    }
+    if (modalId === 'skillsDataModal' && window.dashboard) {
+      window.dashboard.generateSkillsDataInputs();
+    }
+  } else {
+    console.error('Modal not found:', modalId);
+  }
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function saveChartData() {
+  if (window.dashboard) {
+    window.dashboard.saveChartData();
+  }
+}
+
+function saveSkillsData() {
+  if (window.dashboard) {
+    window.dashboard.saveSkillsData();
+  }
+}
+
+function refreshDashboardData() {
+  if (window.dashboard) {
+    window.dashboard.refreshDashboard();
+    // Show a brief notification
+    const notification = document.createElement('div');
+    notification.textContent = 'Dashboard data refreshed!';
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+  }
+}
+
+function exportProfile() {
+  if (window.dashboard && window.dashboard.profileData) {
+    const profileData = window.dashboard.profileData;
+    const dataStr = JSON.stringify(profileData, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${profileData.name.replace(/\s+/g, '_')}_profile.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+}
+
+// Section navigation
+function showSection(sectionName) {
+  console.log('showSection called with:', sectionName);
+  
+  // Hide all sections
+  const sections = document.querySelectorAll('.section-content');
+  sections.forEach(section => section.classList.add('hidden'));
+  
+  // Remove active class from all nav buttons
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  
+  // Add active class to clicked button (with fallback)
+  if (event && event.target) {
+    const clickedButton = event.target.closest('.nav-btn');
+    if (clickedButton) {
+      clickedButton.classList.add('active');
+    }
+  }
+  
+  // Show selected section
+  if (sectionName === 'messages') {
+    const messagesSection = document.getElementById('messagesSection');
+    console.log('Messages section found:', messagesSection);
+    if (messagesSection) {
+      messagesSection.classList.remove('hidden');
+      document.getElementById('sectionTitle').textContent = 'Messages Center';
+      loadAllMessages(); // Load all messages by default
+    } else {
+      console.error('Messages section not found!');
+    }
+  } else if (sectionName === 'dashboard') {
+    // Show dashboard section
+    const dashboardSection = document.getElementById('dashboardSection');
+    console.log('Dashboard section found:', dashboardSection);
+    if (dashboardSection) {
+      dashboardSection.classList.remove('hidden');
+      document.getElementById('sectionTitle').textContent = 'Employee Dashboard';
+    } else {
+      console.error('Dashboard section not found!');
+    }
+  }
+}
+
+// Messages functionality
+let currentMessageTab = 'all';
+
+function showMessages() {
+  showSection('messages');
+}
+
+function switchMessageTab(tabName) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+  
+  // Update tab content
+  document.querySelectorAll('.message-tab-content').forEach(content => content.classList.remove('active'));
+  document.getElementById(`${tabName}MessagesTab`).classList.add('active');
+  
+  currentMessageTab = tabName;
+  
+  // Load appropriate messages
+  switch(tabName) {
+    case 'all':
+      loadAllMessages();
+      break;
+    case 'broadcast':
+      loadBroadcastMessages();
+      break;
+    case 'reviews':
+      loadReviewMessages();
+      break;
+    case 'approvals':
+      loadApprovalMessages();
+      break;
+  }
+}
+
+function loadAllMessages() {
+  const allMessages = [];
+  
+  // Get broadcast messages
+  const broadcastMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  broadcastMessages.forEach(msg => {
+    allMessages.push({...msg, type: 'broadcast'});
+  });
+  
+  // Get performance review messages (include in "All Messages")
+  const reviewMessages = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+  reviewMessages.forEach(msg => {
+    allMessages.push({
+      id: msg.id,
+      title: `Performance Review - ${msg.employeeName}`,
+      content: `Rating: ${msg.rating}/5 stars\nFeedback: ${msg.feedback}`,
+      author: 'HR Department',
+      date: msg.date,
+      read: msg.read || false,
+      type: 'review'
+    });
+  });
+  
+  // Get approval messages (including burnout dashboard approvals)
+  const approvalMessages = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  approvalMessages.forEach(msg => {
+    allMessages.push({...msg, type: 'approval'});
+  });
+  
+  // Sort by date (newest first)
+  allMessages.sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  console.log('All messages loaded:', allMessages);
+  renderMessages(allMessages, 'allMessagesList');
+  updateTabBadges();
+}
+
+function loadBroadcastMessages() {
+  const messages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  renderMessages(messages, 'broadcastMessagesList', 'broadcast');
+  updateTabBadges();
+}
+
+function loadReviewMessages() {
+  const reviews = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+  const messages = reviews.map(review => ({
+    id: review.id,
+    title: `Performance Review - ${review.employeeName}`,
+    content: `Rating: ${review.rating}/5 stars\nFeedback: ${review.feedback}`,
+    author: 'HR Department',
+    date: review.date,
+    read: review.read || false,
+    type: 'review'
+  }));
+  
+  renderMessages(messages, 'reviewMessagesList', 'review');
+  updateTabBadges();
+}
+
+function loadApprovalMessages() {
+  const messages = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  
+  console.log('Loading approval messages from roleChangeRequests:', messages);
+  
+  // Transform messages to ensure they have the right structure for display
+  const transformedMessages = messages.map(msg => ({
+    id: msg.id,
+    title: msg.title || `Role Change Request - ${msg.employeeName || 'Unknown'}`,
+    content: msg.content || `Request type: ${msg.type || 'unknown'}`,
+    author: msg.author || 'HR Department',
+    date: msg.date || new Date().toLocaleDateString(),
+    read: msg.read || false,
+    type: 'approval' // Force type to 'approval' for consistent display
+  }));
+  
+  console.log('Transformed approval messages:', transformedMessages);
+  
+  renderMessages(transformedMessages, 'approvalMessagesList', 'approval');
+  updateTabBadges();
+}
+
+function renderMessages(messages, containerId, type = null) {
+  const container = document.getElementById(containerId);
+  
+  if (!messages || messages.length === 0) {
+    container.innerHTML = `
+      <div class="empty-messages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <h4>No messages</h4>
+        <p>${type ? `No ${type} messages at the moment.` : 'No messages to display.'}</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  messages.forEach((message, index) => {
+    const messageElement = document.createElement('div');
+    messageElement.className = `message-item ${!message.read ? 'unread' : ''}`;
+    
+    const messageType = message.type || type || 'broadcast';
+    const typeBadge = getTypeBadge(messageType);
+    
+    messageElement.innerHTML = `
+      <div class="message-header">
+        <h4 class="message-title">${message.title}</h4>
+        <span class="message-type-badge ${messageType}">${typeBadge}</span>
+        </div>
+      <div class="message-meta">
+        <span class="message-author">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          ${message.author}
+        </span>
+        <span class="message-date">${message.date}</span>
+        </div>
+      <div class="message-content">${message.content.replace(/\n/g, '<br>')}</div>
+      <div class="message-actions">
+        ${!message.read ? `
+          <button class="message-action-btn read" onclick="markAsRead('${messageType}', ${index})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9,11 12,14 22,4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            Mark as Read
+        </button>
+        ` : ''}
+        <button class="message-action-btn delete" onclick="deleteMessage('${messageType}', ${index})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="3,6 5,6 21,6"></polygon>
+            <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          Delete
+        </button>
+      </div>
+    `;
+    
+    container.appendChild(messageElement);
+  });
+}
+
+function getTypeBadge(type) {
+  switch(type) {
+    case 'broadcast': return 'Broadcast';
+    case 'review': return 'Review';
+    case 'approval': return 'Approval';
+    default: return 'Message';
+  }
+}
+
+function markAsRead(type, index) {
+  let messages, storageKey;
+  
+  switch(type) {
+    case 'broadcast':
+      storageKey = 'broadcastMessages';
+      break;
+    case 'review':
+      storageKey = 'hrPerformanceReviews';
+      break;
+    case 'approval':
+      storageKey = 'roleChangeRequests';
+      break;
+    default:
+      return;
+  }
+  
+  messages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+  if (messages[index]) {
+    messages[index].read = true;
+    localStorage.setItem(storageKey, JSON.stringify(messages));
+    
+    // Reload current tab
+    switchMessageTab(currentMessageTab);
+  }
+}
+
+function markAllAsRead() {
+  // Mark all broadcast messages as read
+  const broadcastMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  broadcastMessages.forEach(message => message.read = true);
+  localStorage.setItem('broadcastMessages', JSON.stringify(broadcastMessages));
+  
+  // Mark all review messages as read
+  const reviewMessages = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+  reviewMessages.forEach(message => message.read = true);
+  localStorage.setItem('hrPerformanceReviews', JSON.stringify(reviewMessages));
+  
+  // Mark all approval messages as read
+  const approvalMessages = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  approvalMessages.forEach(message => message.read = true);
+  localStorage.setItem('roleChangeRequests', JSON.stringify(approvalMessages));
+  
+  // Reload current tab
+  switchMessageTab(currentMessageTab);
+}
+
+function deleteMessage(type, index) {
+  if (!confirm('Are you sure you want to delete this message?')) return;
+  
+  let messages, storageKey;
+  
+  switch(type) {
+    case 'broadcast':
+      storageKey = 'broadcastMessages';
+      break;
+    case 'review':
+      storageKey = 'hrPerformanceReviews';
+      break;
+    case 'approval':
+      storageKey = 'roleChangeRequests';
+      break;
+    default:
+      return;
+  }
+  
+  messages = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    messages.splice(index, 1);
+  localStorage.setItem(storageKey, JSON.stringify(messages));
+  
+  // Reload current tab
+  switchMessageTab(currentMessageTab);
+}
+
+function updateMessageBadge() {
+  const allMessages = [];
+  
+  // Count broadcast messages
+  const broadcastMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  allMessages.push(...broadcastMessages);
+  
+  // Count performance review messages
+  const reviewMessages = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+  allMessages.push(...reviewMessages);
+  
+  // Count approval messages
+  const approvalMessages = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  allMessages.push(...approvalMessages);
+  
+  const unreadCount = allMessages.filter(message => !message.read).length;
+  const badge = document.getElementById('messageBadge');
+  
+  if (unreadCount > 0) {
+    badge.textContent = unreadCount;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function updateTabBadges() {
+  // Update all messages badge (including performance reviews)
+  const allMessages = [];
+  const broadcastMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  const reviewMessages = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+  const approvalMessages = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  
+  allMessages.push(...broadcastMessages, ...reviewMessages, ...approvalMessages);
+  const allUnread = allMessages.filter(message => !message.read).length;
+  
+  const broadcastUnread = broadcastMessages.filter(message => !message.read).length;
+  const reviewUnread = reviewMessages.filter(message => !message.read).length;
+  const approvalUnread = approvalMessages.filter(message => !message.read).length;
+  
+  // Update badge counts
+  const allBadge = document.getElementById('allBadge');
+  const broadcastBadge = document.getElementById('broadcastBadge');
+  const reviewsBadge = document.getElementById('reviewsBadge');
+  const approvalsBadge = document.getElementById('approvalsBadge');
+  
+  if (allBadge) allBadge.textContent = allUnread;
+  if (broadcastBadge) broadcastBadge.textContent = broadcastUnread;
+  if (reviewsBadge) reviewsBadge.textContent = reviewUnread;
+  if (approvalsBadge) approvalsBadge.textContent = approvalUnread;
+  
+  // Update main message badge
+  updateMessageBadge();
+}
+//Drop Down Button Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  window.dashboard = new EmployeeDashboard();
+  console.log('Dashboard initialized:', window.dashboard);
+  // Refresh dynamic quick stats once the dashboard is ready
+  if (window.dashboard && typeof window.dashboard.updateQuickStatsFromProfile === 'function') {
+    window.dashboard.updateQuickStatsFromProfile();
+  }
+});
+const menuBtn = document.getElementById('userMenuBtn');
+const dropdown = document.getElementById('userDropdown');
+
+menuBtn.addEventListener('click', function(event) {
+  event.stopPropagation();
+  dropdown.classList.toggle('show');
+});
+
+// Close dropdown when clicked outside
+document.addEventListener('click', function(event) {
+  if (!menuBtn.contains(event.target) && !dropdown.contains(event.target)) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// Listen for localStorage changes from other tabs/windows
+window.addEventListener('storage', function(e) {
+  if (e.key && e.key.startsWith('employee')) {
+    console.log('Profile data updated, refreshing dashboard...');
+    if (window.dashboard) {
+      window.dashboard.refreshDashboard();
+      if (typeof window.dashboard.updateQuickStatsFromProfile === 'function') {
+        window.dashboard.updateQuickStatsFromProfile();
+      }
+      
+      // Handle profile image updates specifically
+      if (e.key === 'employeeProfileImage') {
+        window.dashboard.profileImage = e.newValue;
+        window.dashboard.updateProfileDisplay();
+      }
+      
+      // Handle burnout score updates specifically
+      if (e.key === 'employeeBurnoutScore') {
+        console.log('Received burnout score update:', e.newValue);
+        window.dashboard.burnoutScore = parseFloat(e.newValue);
+        window.dashboard.updateProfileDisplay();
+      }
+      
+      // Handle burnout date updates specifically
+      if (e.key === 'employeeBurnoutDate') {
+        window.dashboard.burnoutDate = e.newValue;
+        window.dashboard.updateProfileDisplay();
+      }
+      
+      // Handle message updates
+      if (e.key === 'broadcastMessages' || e.key === 'hrPerformanceReviews' || e.key === 'roleChangeRequests') {
+        updateTabBadges();
+        // If messages section is currently visible, reload messages
+        const messagesSection = document.getElementById('messagesSection');
+        if (messagesSection && !messagesSection.classList.contains('hidden')) {
+          switchMessageTab(currentMessageTab);
+        }
+      }
+    }
+  }
+});
+document.addEventListener("DOMContentLoaded", function () {
+    // Clean up any old role change messages that might be in broadcastMessages
+    const cleanupResult = cleanupOldRoleChangeMessages();
+    if (cleanupResult.removed > 0) {
+      console.log(`Cleaned up ${cleanupResult.removed} old role change messages from broadcastMessages`);
+    }
+    
+    // Initialize message badges
+    updateTabBadges();
+    
+    // Test function to create a sample burnout message (remove this after testing)
+    window.testBurnoutMessage = function() {
+        const roleChangeRequests = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+        
+        const testMessage = {
+            id: Date.now(),
+            employeeId: 'EMP001',
+            employeeName: 'John Doe',
+            type: 'burnout-request',
+            action: 'approved',
+            reason: 'Documentation verified',
+            date: new Date().toLocaleDateString(),
+            read: false,
+            timestamp: Date.now(),
+            title: 'Burnout Request Approved - John Doe',
+            content: 'Your burnout assessment request has been approved.\n\nReason: Documentation verified',
+            author: 'HR Department'
+        };
+        
+        roleChangeRequests.unshift(testMessage);
+        localStorage.setItem('roleChangeRequests', JSON.stringify(roleChangeRequests));
+        
+        console.log('Test burnout message created:', testMessage);
+        console.log('Total roleChangeRequests in localStorage:', roleChangeRequests.length);
+        alert('Test burnout message created! Check the Role Changes tab and All Messages tab.');
+        
+        // Refresh both tabs to show the message
+        if (currentMessageTab === 'approvals') {
+            loadApprovalMessages();
+        }
+        if (currentMessageTab === 'all') {
+            loadAllMessages();
+        }
+        
+        // Update badges
+        updateTabBadges();
+    };
+    
+    // Debug function to check localStorage contents
+    window.checkLocalStorage = function() {
+        console.log('=== LocalStorage Contents ===');
+        console.log('broadcastMessages:', JSON.parse(localStorage.getItem('broadcastMessages') || '[]'));
+        console.log('hrPerformanceReviews:', JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]'));
+        console.log('roleChangeRequests:', JSON.parse(localStorage.getItem('roleChangeRequests') || '[]'));
+        console.log('===========================');
+    };
+});
+
+// Function to show notifications
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <span>${message}</span>
+      <button onclick="this.parentElement.parentElement.remove()" class="notification-close">×</button>
+            </div>
+        `;
+  
+  // Add styles if they don't exist
+  if (!document.getElementById('notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+      }
+      .notification-success { border-left: 4px solid #4caf50; }
+      .notification-warning { border-left: 4px solid #ff9800; }
+      .notification-error { border-left: 4px solid #f44336; }
+      .notification-info { border-left: 4px solid #2196f3; }
+      .notification-content {
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .notification-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        margin-left: 12px;
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.remove();
+    }
+  }, 5000);
+}
+
+// Function to clean up old role change messages (burnout and intervention) from broadcastMessages
+function cleanupOldRoleChangeMessages() {
+  const broadcastMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+  const roleChangeRequests = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+  
+  console.log('Before cleanup - broadcastMessages:', broadcastMessages);
+  console.log('Before cleanup - roleChangeRequests:', roleChangeRequests);
+  
+  // Remove any messages that look like burnout or intervention messages from broadcastMessages
+  const filteredBroadcastMessages = broadcastMessages.filter(msg => {
+    // Check if this message is a burnout-related message
+    const isBurnoutMessage = msg.title && (
+      msg.title.includes('Burnout Request') || 
+      msg.title.includes('burnout') ||
+      msg.content && msg.content.includes('burnout')
+    );
+    
+    // Check if this message is an intervention-related message
+    const isInterventionMessage = msg.title && (
+      msg.title.includes('Intervention') ||
+      msg.content && msg.content.includes('intervention')
+    );
+    
+    if (isBurnoutMessage || isInterventionMessage) {
+      const messageType = isBurnoutMessage ? 'burnout-request' : 'intervention-request';
+      const action = isBurnoutMessage ? 
+        (msg.title.includes('Approved') ? 'approved' : 'rejected') :
+        (msg.title.includes('Approved') ? 'approved' : 'rejected');
+      
+      console.log(`Found old ${messageType} message in broadcastMessages, removing:`, msg);
+      
+      // Check if it already exists in roleChangeRequests
+      const existsInRoleChanges = roleChangeRequests.some(rc => 
+        rc.employeeId === msg.employeeId && 
+        rc.type === messageType &&
+        rc.action === action
+      );
+      
+      if (!existsInRoleChanges) {
+        // Add it to roleChangeRequests if it's not already there
+        const roleChangeMessage = {
+          id: msg.id || Date.now(),
+          employeeId: msg.employeeId || 'unknown',
+          employeeName: msg.employeeName || 'Unknown Employee',
+          type: messageType,
+          action: action,
+          reason: msg.reason || '',
+          date: msg.date || new Date().toLocaleDateString(),
+          read: msg.read || false,
+          timestamp: msg.timestamp || Date.now(),
+          title: msg.title,
+          content: msg.content,
+          author: msg.author || 'HR Department',
+          department: msg.department || ''
+        };
+        roleChangeRequests.unshift(roleChangeMessage);
+        console.log(`Added old ${messageType} message to roleChangeRequests:`, roleChangeMessage);
+      }
+      
+      return false; // Remove from broadcastMessages
+    }
+    
+    return true; // Keep in broadcastMessages
+  });
+  
+  // Update localStorage
+  localStorage.setItem('broadcastMessages', JSON.stringify(filteredBroadcastMessages));
+  localStorage.setItem('roleChangeRequests', JSON.stringify(roleChangeRequests));
+  
+  const removedCount = broadcastMessages.length - filteredBroadcastMessages.length;
+  
+  console.log('After cleanup - broadcastMessages:', filteredBroadcastMessages);
+  console.log('After cleanup - roleChangeRequests:', roleChangeRequests);
+  
+  // Show notification
+  if (removedCount > 0) {
+    showNotification(`Cleaned up ${removedCount} old role change messages from broadcast section`, 'success');
+    // Refresh the current tab to show updated content
+    if (currentMessageTab === 'broadcast') {
+      loadBroadcastMessages();
+    } else if (currentMessageTab === 'approvals') {
+      loadApprovalMessages();
+    } else if (currentMessageTab === 'all') {
+      loadAllMessages();
+    }
+    updateTabBadges();
+  } else {
+    showNotification('No old role change messages found to clean up', 'info');
+  }
+  
+  return { removed: removedCount };
+}
+
+// Function to clear all message data for testing
+function clearAllMessageData() {
+  if (confirm('Are you sure you want to clear ALL message data? This will remove all broadcast messages, performance reviews, and role change requests. This action cannot be undone.')) {
+    localStorage.removeItem('broadcastMessages');
+    localStorage.removeItem('hrPerformanceReviews');
+    localStorage.removeItem('roleChangeRequests');
+    
+    showNotification('All message data cleared successfully', 'success');
+    
+    // Refresh all tabs
+    loadAllMessages();
+    loadBroadcastMessages();
+    loadReviewMessages();
+    loadApprovalMessages();
+    updateTabBadges();
+  }
+}
+</script>
 </body>
 </html>
