@@ -1,593 +1,1491 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin Dashboard - Professional</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Reset & Base */
-    *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      user-select: none;
-    }
-    html, body {
-      height: 100%;
-      background: linear-gradient(135deg, #007cf0, #00dfd8);
-      color: #222;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-    }
-    body {
-      display: flex;
-      min-height: 100vh;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Dashboard - Enterprise</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #64748b;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --background-color: #f8fafc;
+  --card-background: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --sidebar-width: 240px;
+  /* increased collapsed width from 80px to 100px for better spacing */
+  --collapsed-width: 100px;
+}
 
-    /* Sidebar */
-    nav.sidebar {
-      width: 280px;
-      background: #004d73;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      padding: 2.5rem 1.8rem;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      box-shadow: 2px 0 22px rgba(0, 72, 105, 0.9);
-      z-index: 20;
-      user-select: none;
-    }
+/* Reset and Base */
+* {
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box;
+}
 
-    nav.sidebar h2 {
-      font-weight: 900;
-      font-size: 1.8rem;
-      text-align: center;
-      margin-bottom: 2rem;
-      letter-spacing: 1.5px;
-      user-select: text;
-    }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+  /* Remove any potential body overflow issues */
+  overflow-x: hidden;
+}
 
-    /* Profile Section in Sidebar */
-    .profile-section {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-    .profile-avatar {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #009fde;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4.5rem;
-      color: white;
-      box-shadow: 0 0 15px #00bfffaa;
-      margin-bottom: 0.5rem;
-      user-select: none;
-    }
-    .profile-name {
-      font-weight: 700;
-      font-size: 1.3rem;
-      user-select: text;
-    }
-    .profile-role {
-      font-style: italic;
-      font-weight: 500;
-      font-size: 1rem;
-      color: #74bbd3;
-      user-select: text;
-    }
-    /* Organization Info Images below profile */
-    .org-images {
-      margin-top: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.9rem;
-      user-select: none;
-    }
-    .org-images img {
-      width: 52px;
-      height: 52px;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 2px solid #007cf0;
-      background: white;
-      transition: transform 0.3s ease;
-      cursor: default;
-    }
-    .org-images img:hover,
-    .org-images img:focus {
-      outline: none;
-      transform: scale(1.2);
-      box-shadow: 0 0 12px #00afffcc;
-    }
+/* Utility Classes */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.text-sm { font-size: 0.875rem; }
 
-    /* Sidebar Navigation Buttons */
-    .nav-buttons {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .nav-buttons button {
-      background-color: #00b0ff;
-      color: white;
-      border: none;
-      padding: 0.9rem 1rem;
-      font-weight: 700;
-      border-radius: 14px;
-      font-size: 1.1rem;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 6px 16px #00a0eecc;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    .nav-buttons button:hover,
-    .nav-buttons button:focus {
-      background-color: #0083c9;
-      outline: none;
-    }
+/* Fixed sidebar styling and removed infinite scroll */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--card-background);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  overflow: hidden; /* Prevent content overflow during transitions */
+}
 
-    /* Main Content */
-    main.dashboard {
-      margin-left: 280px;
-      flex: 1;
-      padding: 3rem 3.5rem 3.5rem;
-      background: #f9fbfc;
-      min-height: 100vh;
-      overflow-y: auto;
-      box-shadow: -2px 0 22px rgba(0, 72, 105, 0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 3rem;
-    }
+.sidebar.collapsed {
+  width: var(--collapsed-width);
+}
 
-    /* Header */
-    header.header {
-      display: flex;
-      align-items: center;
-      gap: 1.3rem;
-      color: #007cf0;
-      user-select: text;
-    }
-    header.header .back-arrow {
-      font-size: 2.5rem;
-      font-weight: 900;
-      cursor: pointer;
-      color: #0099f0;
-      padding: 0 7px 3px 7px;
-      border-radius: 7px;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    header.header .back-arrow:hover,
-    header.header .back-arrow:focus {
-      background-color: #0077c4aa;
-      outline: none;
-    }
-    header.header h1 {
-      font-weight: 900;
-      font-size: 2.9rem;
-      letter-spacing: 1.6px;
-      user-select: text;
-    }
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+  min-height: 2rem; /* Prevent header height collapse */
+}
 
-    /* Metrics Row */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 26px;
-      user-select: none;
-    }
-    .card {
-      background: white;
-      padding: 30px 22px;
-      border-radius: 16px;
-      box-shadow: 0 5px 20px rgba(0, 124, 240, 0.12);
-      text-align: center;
-      font-weight: 700;
-      min-height: 120px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      color: #006692;
-      cursor: default;
-      transition: box-shadow 0.3s ease;
-    }
-    .card strong {
-      font-size: 15px;
-      text-transform: uppercase;
-      letter-spacing: 0.65px;
-      margin-bottom: 12px;
-      color: #0098d6;
-      user-select: text;
-    }
-    .card p {
-      font-size: 2.5rem;
-      margin: 0;
-      color: #00415a;
-      user-select: text;
-    }
-    .card.loading p {
-      color: #bfc7d1;
-      font-weight: 400;
-      font-size: 1.4rem;
-      animation: pulse 1.2s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
-    }
+.sidebar-header h2 {
+  font-weight: 900;
+  font-size: 1.5rem;
+  transition: opacity 0.2s ease-in-out 0.1s, transform 0.3s ease; /* Added delay and transform */
+  white-space: nowrap;
+  overflow: hidden;
+}
 
-    /* Dashboard Rows (Charts + Stats) */
-    .dashboard-row {
-      display: flex;
-      gap: 44px;
-      align-items: flex-start;
-      user-select: none;
-    }
-    .chart-block {
-      flex-grow: 2;
-      background: white;
-      border-radius: 18px;
-      padding: 28px 34px 34px 34px;
-      box-shadow: 0 6px 24px rgba(0, 124, 240, 0.12);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-width: 500px;
-    }
-    .chart-block h3 {
-      font-weight: 800;
-      color: #007cf0;
-      margin: 0 0 22px 6px;
-      letter-spacing: 1.1px;
-      font-size: 1.3rem;
-      user-select: text;
-    }
-    .chart-block canvas {
-      width: 100% !important;
-      height: 260px !important;
-      border-radius: 14px;
-      background: #f9fbfc;
-      box-shadow: inset 0 0 15px rgb(0 124 240 / 0.12);
-      user-select: none;
-    }
+.sidebar.collapsed .sidebar-header h2 {
+  opacity: 0;
+  transform: translateX(-20px); /* Smooth slide out effect */
+  transition-delay: 0s; /* Faster hide on collapse */
+}
 
-    /* Stat Boxes */
-    .stat-box {
-      flex-basis: 245px;
-      background: white;
-      border-radius: 18px;
-      padding: 34px 24px;
-      box-shadow: 0 5px 21px rgba(0, 124, 240, 0.1);
-      text-align: center;
-      color: #005670;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 190px;
-      user-select: text;
-    }
-    .stat-box h4 {
-      font-size: 1.15rem;
-      margin-bottom: 20px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      user-select: text;
-    }
-    .stat-box p {
-      font-size: 3.3rem;
-      font-weight: 900;
-      letter-spacing: 1.25px;
-      margin: 0;
-    }
-    .stat-box.green p {
-      color: #01a652;
-    }
-    .stat-box.red p {
-      color: #d64545;
-    }
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: var(--transition);
+  flex-shrink: 0; /* Prevent toggle button from shrinking */
+}
 
-    /* Document Buttons */
-    .doc-buttons {
-      display: flex;
-      gap: 30px;
-      padding-left: 12px;
-      user-select: none;
-    }
-    .doc-buttons button {
-      background: rgba(255 255 255 / 0.9);
-      border: 2px solid #00cde1;
-      color: #007799;
-      padding: 16px 30px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 0.45px;
-      box-shadow: 0 2px 12px rgb(0 205 225 / 0.7);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .doc-buttons button:hover,
-    .doc-buttons button:focus {
-      background-color: #00cde1;
-      color: white;
-      outline: none;
-      box-shadow: 0 5px 18px rgb(0 205 225 / 0.95);
-    }
-    
-    /* Responsive */
-    @media (max-width: 1250px) {
-      main.dashboard {
-        padding: 2rem 2.5rem 3rem;
-      }
-      .metrics-row {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-      }
-      .dashboard-row {
-        flex-direction: column;
-        gap: 34px;
-      }
-      .chart-block {
-        min-width: 100%;
-        height: 290px;
-      }
-      .stat-box {
-        min-width: 100%;
-        padding: 30px 22px;
-      }
-      .doc-buttons {
-        flex-direction: column;
-        gap: 20px;
-        padding-left: 0;
-      }
-    }
-    @media (max-width: 600px) {
-      .metrics-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      header.header h1 {
-        font-size: 2.2rem;
-      }
-      .stat-box h4 {
-        font-size: 1.05rem;
-      }
-      .stat-box p {
-        font-size: 2.85rem;
-      }
-      .doc-buttons button {
-        font-size: 1rem;
-        padding: 14px 22px;
-      }
-    }
-    @media (max-width: 420px) {
-      .metrics-row {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+.sidebar-toggle:hover {
+  background: var(--border-color);
+}
+
+/* Profile Section */
+.profile-section {
+  background: var(--background-color);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Hide profile section completely when sidebar is collapsed */
+.sidebar.collapsed .profile-section {
+  display: none;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+/* Remove collapsed avatar styles since profile section is hidden */
+
+.profile-info {
+  transition: all 0.2s ease-in-out;
+  transform: translateY(0);
+}
+
+/* Remove collapsed profile info styles since entire section is hidden */
+
+.profile-name {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+}
+
+.profile-role {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Improved navigation button transitions */
+.nav-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+.nav-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+  flex-shrink: 0;
+  position: relative; /* For better icon positioning */
+  overflow: hidden; /* Prevent text overflow */
+  min-width: 3rem; /* Added min-width to prevent button shrinking */
+  width: 100%; /* Fixed button width and alignment for consistent positioning */
+  justify-content: flex-start; /* Fixed button width and alignment for consistent positioning */
+}
+
+.sidebar.collapsed .nav-btn {
+  justify-content: center; /* Added collapsed state styling for perfect icon centering */
+  gap: 0; /* Added collapsed state styling for perfect icon centering */
+  padding: 0.875rem 0.5rem; /* Added collapsed state styling for perfect icon centering */
+}
+
+.nav-btn:hover {
+  background: var(--border-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.nav-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.nav-btn.active:hover {
+  background: #2563eb;
+}
+
+/* Fixed nav button text transitions to prevent jumping */
+.nav-btn span {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, width 0.2s ease-in-out; /* Added width transition to prevent layout shifts */
+  white-space: nowrap;
+  opacity: 1;
+  transform: translateX(0);
+  display: inline-block;
+  width: auto; /* Added width transition to prevent layout shifts */
+  overflow: hidden; /* Added width transition to prevent layout shifts */
+}
+
+.sidebar.collapsed .nav-btn span {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out, width 0.15s ease-in-out; /* Completely hide text to prevent any layout interference */
+  width: 0; /* Completely hide text to prevent any layout interference */
+  margin: 0; /* Completely hide text to prevent any layout interference */
+}
+
+/* Added specific styling for nav button icons to maintain alignment */
+.nav-btn i {
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+  transition: none;
+  display: inline-flex; /* Ensure icon stays perfectly positioned */
+  align-items: center; /* Ensure icon stays perfectly positioned */
+  justify-content: center; /* Ensure icon stays perfectly positioned */
+}
+
+/* Fixed main content layout and alignment */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: calc(100% - var(--sidebar-width));
+}
+
+.sidebar.collapsed ~ .main-content {
+  margin-left: var(--collapsed-width);
+  width: calc(100% - var(--collapsed-width));
+}
+
+/* Header */
+.header {
+  background: var(--card-background);
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.search-input {
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  width: 300px;
+  transition: var(--transition);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.user-menu-btn:hover {
+  background: var(--border-color);
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.user-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background: var(--border-color);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.5rem 0;
+}
+
+/* Content Area */
+.content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto; /* Only allow scrolling in content area */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.filters {
+  background: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-width: 150px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.stat-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.stat-change {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stat-change.positive {
+  color: var(--success-color);
+}
+
+.stat-change.negative {
+  color: var(--danger-color);
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  background: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+}
+
+.table-card {
+  background: var(--card-background);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--background-color);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.data-table tr:hover {
+  background: var(--background-color);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-color);
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning-color);
+}
+
+.status-inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger-color);
+}
+
+/* Added employee cards styling */
+.employee-cards-section {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-top: 24px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.employee-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.employee-search i {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.employee-search input {
+  padding: 8px 12px 8px 36px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  width: 250px;
+  transition: var(--transition);
+}
+
+.employee-search input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.department-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.department-filter select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--background-color);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-width: 150px;
+}
+
+.employee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.employee-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.employee-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.employee-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.employee-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.employee-info {
+  flex: 1;
+}
+
+.employee-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.employee-id {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #718096;
+  font-weight: 500;
+}
+
+.employee-position {
+  margin: 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.employment-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.employment-status.status-active {
+  background: #c6f6d5;
+  color: #22543d;
+}
+
+.employment-status.status-on-leave {
+  background: #fed7d7;
+  color: #742a2a;
+}
+
+.employment-status.status-resigned {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.employee-details {
+  margin-bottom: 15px;
+}
+
+.employee-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #4a5568;
+}
+
+.employee-detail i {
+  width: 14px;
+  color: #718096;
+}
+
+.employee-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.employee-status.status-online .status-dot {
+  background: #48bb78;
+}
+
+.employee-status.status-away .status-dot {
+  background: #ed8936;
+}
+
+.employee-status.status-offline .status-dot {
+  background: #a0aec0;
+}
+
+.employee-status.status-online {
+  color: #22543d;
+}
+
+.employee-status.status-away {
+  color: #744210;
+}
+
+.employee-status.status-offline {
+  color: #4a5568;
+}
+
+/* Improved responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: var(--sidebar-width);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth mobile slide */
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    transition: none; /* Disable margin transition on mobile */
+  }
+  
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  /* Ensure text is always visible on mobile */
+  .sidebar.collapsed .sidebar-header h2,
+  .sidebar.collapsed .profile-info,
+  .sidebar.collapsed .nav-btn span {
+    opacity: 1;
+    transform: translateX(0);
+    width: auto;
+    max-height: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-input {
+    width: 150px;
+  }
+  
+  .header-right {
+    gap: 1rem;
+  }
+  
+  .filters {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .employee-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .employee-search input {
+    width: 100%;
+  }
+}
+</style>
 </head>
 <body>
-
-  <nav class="sidebar" aria-label="Sidebar with profile and organization info">
-    <h2>Admin Panel</h2>
-    <section class="profile-section" aria-label="Admin profile information">
-      <div class="profile-avatar" aria-hidden="true">🛡️</div>
-      <p class="profile-name" tabindex="0">Alex Morgan</p>
-      <p class="profile-role" tabindex="0">System Administrator</p>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2>Admin Panel</h2>
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <div class="profile-avatar">🛡️</div>
+      <div class="profile-info">
+        <p class="profile-name">Alex Morgan</p>
+        <p class="profile-role">System Administrator</p>
+      </div>
     </section>
-
-    <section class="org-images" aria-label="Organization related images">
-      <img src="https://via.placeholder.com/52x52.png?text=Org1" alt="Organization Logo 1" tabindex="0" />
-      <img src="https://via.placeholder.com/52x52.png?text=DeptA" alt="Department A Logo" tabindex="0" />
-      <img src="https://via.placeholder.com/52x52.png?text=ProjX" alt="Project X Logo" tabindex="0" />
-      <img src="https://via.placeholder.com/52x52.png?text=HQ" alt="Headquarters Logo" tabindex="0" />
-      <img src="https://via.placeholder.com/52x52.png?text=Cult" alt="Company Culture Logo" tabindex="0" />
-    </section>
-
-    <div class="nav-buttons" role="navigation" aria-label="Sidebar primary actions">
-      <button type="button" aria-label="View Dashboard">Dashboard</button>
-      <button type="button" aria-label="View Employees">Employees</button>
-      <button type="button" aria-label="View Projects">Projects</button>
-      <button type="button" aria-label="View Reports">Reports</button>
-      <button type="button" aria-label="Logout">Logout</button>
+    
+    <!-- Navigation -->
+    <div class="nav-buttons">
+      <button class="nav-btn active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-chart-bar"></i>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-users"></i>
+        <span>Employees</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-project-diagram"></i>
+        <span>Projects</span>
+      </button>
+      <button class="nav-btn">
+        <i class="fas fa-file-alt"></i>
+        <span>Reports</span>
+      </button>
     </div>
   </nav>
 
-  <main class="dashboard" role="main" aria-label="Admin Dashboard main content">
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
     <header class="header">
-      <button class="back-arrow" aria-label="Go back" title="Go back" tabindex="0">←</button>
-      <h1>Admin Dashboard</h1>
+      <div class="header-left">
+        <h1>Admin Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <div class="search-bar">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search dashboard...">
+        </div>
+        <div class="user-menu">
+          <button class="user-menu-btn" id="userMenuBtn">
+            <div class="user-avatar">AM</div>
+            <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-user"></i>
+              Profile
+            </a>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-cog"></i>
+              Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item">
+              <i class="fas fa-sign-out-alt"></i>
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
     </header>
 
-    <section class="metrics-row" aria-label="Key metrics summary">
-      <div class="card loading" id="employeesCard" tabindex="0">
-        <strong>Total Employees</strong>
-        <p>Loading…</p>
+    <!-- Content -->
+    <div class="content">
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-group">
+          <label class="filter-label">Date Range</label>
+          <select class="filter-select" id="dateRange">
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Department</label>
+          <select class="filter-select" id="department">
+            <option value="all">All Departments</option>
+            <option value="engineering">Engineering</option>
+            <option value="marketing">Marketing</option>
+            <option value="sales">Sales</option>
+            <option value="design">Design</option>
+            <option value="management">Management</option>
+            <option value="analytics">Analytics</option>
+            <option value="hr">HR</option>
+          </select>
+        </div>
       </div>
-      <div class="card loading" id="teamsCard" tabindex="0">
-        <strong>Total Teams</strong>
-        <p>Loading…</p>
-      </div>
-      <div class="card loading" id="pendingProjectsCard" tabindex="0">
-        <strong>Pending Projects</strong>
-        <p>Loading…</p>
-      </div>
-      <div class="card loading" id="openPositionsCard" tabindex="0">
-        <strong>Open Job Positions</strong>
-        <p>Loading…</p>
-      </div>
-      <div class="card loading" id="monthlyRevenueCard" tabindex="0">
-        <strong>Monthly Revenue</strong>
-        <p>Loading…</p>
-      </div>
-      <div class="card loading" id="monthlyExpensesCard" tabindex="0">
-        <strong>Monthly Expenses</strong>
-        <p>Loading…</p>
-      </div>
-    </section>
 
-    <section class="dashboard-row" aria-label="Employee growth chart and ML accuracy">
-      <div class="chart-block">
-        <h3>Employee Growth</h3>
-        <canvas id="employeeGrowthChart" role="img" aria-label="Line chart showing employee growth"></canvas>
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Total Users</span>
+            <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--primary-color);">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="stat-value">12,543</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            +12.5%
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Revenue</span>
+            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">
+              <i class="fas fa-dollar-sign"></i>
+            </div>
+          </div>
+          <div class="stat-value">$89,432</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            +8.2%
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Orders</span>
+            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning-color);">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+          </div>
+          <div class="stat-value">1,234</div>
+          <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i>
+            -3.1%
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Conversion</span>
+            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+              <i class="fas fa-chart-line"></i>
+            </div>
+          </div>
+          <div class="stat-value">3.2%</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            +0.8%
+          </div>
+        </div>
       </div>
-      <div class="stat-box green" role="region" aria-live="polite" aria-atomic="true" aria-label="Machine learning accuracy">
-        <h4>ML Accuracy</h4>
-        <p id="accuracyStat">–</p>
-      </div>
-    </section>
 
-    <section class="dashboard-row" aria-label="Turnover rate and burnout statistic">
-      <div class="chart-block">
-        <h3>Attrition / Turnover Rate</h3>
-        <canvas id="turnoverChart" role="img" aria-label="Bar chart showing turnover rate"></canvas>
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Revenue Trend</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">User Distribution</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="userChart"></canvas>
+          </div>
+        </div>
       </div>
-      <div class="stat-box red" role="region" aria-live="polite" aria-atomic="true" aria-label="High burnout cases">
-        <h4>High Burnout Cases</h4>
-        <p id="burnoutCasesStat">–</p>
-      </div>
-    </section>
 
-    <section class="doc-buttons" role="region" aria-label="Documents and resources actions">
-      <button aria-label="Open HR policies documents">HR Policies 🗎</button>
-      <button aria-label="Open compliance documents">Compliance Docs 🗎</button>
-      <button aria-label="Open payroll templates">Payroll Templates 🗎</button>
-    </section>
+      <!-- Employee Cards Section -->
+      <div class="employee-cards-section" id="employeeCardsSection" style="display: none;">
+        <div class="section-header">
+          <h3 class="section-title">Employee Directory</h3>
+          <div class="employee-filters">
+            <div class="employee-search">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Search employees..." id="employeeSearch">
+            </div>
+            <div class="department-filter">
+              <select id="departmentFilter">
+                <option value="all">All Departments</option>
+                <option value="engineering">Engineering</option>
+                <option value="design">Design</option>
+                <option value="management">Management</option>
+                <option value="analytics">Analytics</option>
+                <option value="hr">HR</option>
+                <option value="sales">Sales</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="employee-grid" id="employeeGrid">
+          <!-- Employee cards will be populated here -->
+        </div>
+      </div>
+    </div>
   </main>
 
-  <script>
-    // Simulated async fetch of dashboard data
-    function fetchDashboardData() {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve({
-            totalEmployees: 1242,
-            totalTeams: 8,
-            pendingProjects: 17,
-            openPositions: 4,
-            monthlyRevenue: 2943500,
-            monthlyExpenses: 2078400,
-            accuracy: 91.3,
-            highBurnoutCases: 9,
-            growth: {
-              months: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              employeeCount: [1113, 1155, 1194, 1207, 1227, 1238, 1242]
-            },
-            turnover: {
-              months: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-              turnoverRate: [12.2, 10.5, 9.8, 11.4, 9.0, 8.9, 7.9]
-            }
-          });
-        }, 1100);
+<script>
+class DashboardManager {
+  constructor() {
+    this.currentView = 'dashboard';
+    this.employees = [
+      {
+        id: 'EMP001',
+        name: 'Sarah Johnson',
+        position: 'Frontend Developer',
+        department: 'Engineering',
+        email: 'sarah.johnson@company.com',
+        phone: '+1 (555) 123-4567',
+        dateOfJoining: '2022-03-15',
+        employmentStatus: 'Active',
+        status: 'online',
+        avatar: 'SJ'
+      },
+      {
+        id: 'EMP002',
+        name: 'Michael Chen',
+        position: 'Backend Developer',
+        department: 'Engineering',
+        email: 'michael.chen@company.com',
+        phone: '+1 (555) 234-5678',
+        dateOfJoining: '2021-08-20',
+        employmentStatus: 'Active',
+        status: 'online',
+        avatar: 'MC'
+      },
+      {
+        id: 'EMP003',
+        name: 'Emily Rodriguez',
+        position: 'UX Designer',
+        department: 'Design',
+        email: 'emily.rodriguez@company.com',
+        phone: '+1 (555) 345-6789',
+        dateOfJoining: '2023-01-10',
+        employmentStatus: 'On Leave',
+        status: 'away',
+        avatar: 'ER'
+      },
+      {
+        id: 'EMP004',
+        name: 'David Thompson',
+        position: 'Project Manager',
+        department: 'Management',
+        email: 'david.thompson@company.com',
+        phone: '+1 (555) 456-7890',
+        dateOfJoining: '2020-11-05',
+        employmentStatus: 'Active',
+        status: 'online',
+        avatar: 'DT'
+      },
+      {
+        id: 'EMP005',
+        name: 'Lisa Wang',
+        position: 'Data Analyst',
+        department: 'Analytics',
+        email: 'lisa.wang@company.com',
+        phone: '+1 (555) 567-8901',
+        dateOfJoining: '2022-07-12',
+        employmentStatus: 'Active',
+        status: 'offline',
+        avatar: 'LW'
+      },
+      {
+        id: 'EMP006',
+        name: 'James Wilson',
+        position: 'DevOps Engineer',
+        department: 'Engineering',
+        email: 'james.wilson@company.com',
+        phone: '+1 (555) 678-9012',
+        dateOfJoining: '2021-12-03',
+        employmentStatus: 'Active',
+        status: 'online',
+        avatar: 'JW'
+      },
+      {
+        id: 'EMP007',
+        name: 'Anna Martinez',
+        position: 'HR Manager',
+        department: 'HR',
+        email: 'anna.martinez@company.com',
+        phone: '+1 (555) 789-0123',
+        dateOfJoining: '2019-04-18',
+        employmentStatus: 'Active',
+        status: 'online',
+        avatar: 'AM'
+      },
+      {
+        id: 'EMP008',
+        name: 'Robert Kim',
+        position: 'Sales Representative',
+        department: 'Sales',
+        email: 'robert.kim@company.com',
+        phone: '+1 (555) 890-1234',
+        dateOfJoining: '2023-02-28',
+        employmentStatus: 'Resigned',
+        status: 'offline',
+        avatar: 'RK'
+      }
+    ];
+    this.initializeEventListeners();
+    this.loadDashboardData();
+    this.initializeCharts();
+  }
+
+  initializeEventListeners() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    
+    sidebarToggle.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('show');
+      } else {
+        sidebar.classList.toggle('collapsed');
+      }
+    });
+
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons
+        navButtons.forEach(b => b.classList.remove('active'));
+        // Add active class to clicked button
+        btn.classList.add('active');
+        
+        // Handle different views
+        if (index === 2) { // Employees button (3rd button, 0-indexed)
+          this.showEmployeeView();
+        } else {
+          this.showDashboardView();
+        }
       });
+    });
+
+    // Employee search functionality
+    document.addEventListener('input', (e) => {
+      if (e.target.id === 'employeeSearch') {
+        const searchTerm = e.target.value;
+        const departmentFilter = document.getElementById('departmentFilter').value;
+        this.filterEmployees(searchTerm, departmentFilter);
+      }
+    });
+
+    // Department filter functionality
+    document.addEventListener('change', (e) => {
+      if (e.target.id === 'departmentFilter') {
+        const searchTerm = document.getElementById('employeeSearch').value;
+        const departmentFilter = e.target.value;
+        this.filterEmployees(searchTerm, departmentFilter);
+      }
+    });
+
+    // User menu toggle
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    
+    userMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userDropdown.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+      userDropdown.classList.remove('show');
+    });
+
+    // Filter change handlers
+    document.getElementById('dateRange').addEventListener('change', () => {
+      this.refreshData();
+    });
+
+    window.addEventListener('resize', () => {
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        sidebar.classList.remove('collapsed');
+        if (!sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+        }
+      } else {
+        sidebar.classList.remove('show');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 768 && 
+          !sidebar.contains(e.target) && 
+          !sidebarToggle.contains(e.target)) {
+        sidebar.classList.remove('show');
+      }
+    });
+  }
+
+  showEmployeeView() {
+    this.currentView = 'employees';
+    const contentChildren = document.querySelectorAll('.content > *:not(#employeeCardsSection)');
+    contentChildren.forEach(child => {
+      if (!child.dataset.originalDisplay) {
+        child.dataset.originalDisplay = window.getComputedStyle(child).display;
+      }
+      child.style.display = 'none';
+    });
+    document.getElementById('employeeCardsSection').style.display = 'block';
+    this.renderEmployeeCards();
+  }
+
+  showDashboardView() {
+    this.currentView = 'dashboard';
+    const contentChildren = document.querySelectorAll('.content > *:not(#employeeCardsSection)');
+    contentChildren.forEach(child => {
+      const originalDisplay = child.dataset.originalDisplay || '';
+      child.style.display = originalDisplay;
+    });
+    document.getElementById('employeeCardsSection').style.display = 'none';
+  }
+
+  renderEmployeeCards(employeesToShow = this.employees) {
+    const employeeGrid = document.getElementById('employeeGrid');
+    employeeGrid.innerHTML = employeesToShow.map(employee => `
+      <div class="employee-card" data-employee-id="${employee.id}">
+        <div class="employee-header">
+          <div class="employee-avatar">${employee.avatar}</div>
+          <div class="employee-info">
+            <h4>${employee.name}</h4>
+            <p class="employee-id">ID: ${employee.id}</p>
+            <p class="employee-position">${employee.position}</p>
+          </div>
+          <div class="employment-status status-${employee.employmentStatus.toLowerCase().replace(' ', '-')}">
+            ${employee.employmentStatus}
+          </div>
+        </div>
+        <div class="employee-details">
+          <div class="employee-detail">
+            <i class="fas fa-building"></i>
+            <span>${employee.department}</span>
+          </div>
+          <div class="employee-detail">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Joined: ${new Date(employee.dateOfJoining).toLocaleDateString()}</span>
+          </div>
+          <div class="employee-detail">
+            <i class="fas fa-envelope"></i>
+            <span>${employee.email}</span>
+          </div>
+          <div class="employee-detail">
+            <i class="fas fa-phone"></i>
+            <span>${employee.phone}</span>
+          </div>
+        </div>
+        <div class="employee-status status-${employee.status}">
+          <div class="status-dot"></div>
+          <span>${employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  filterEmployees(searchTerm = '', departmentFilter = 'all') {
+    let filteredEmployees = this.employees;
+    
+    // Filter by search term
+    if (searchTerm) {
+      filteredEmployees = filteredEmployees.filter(employee => 
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.id.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-
-    function formatNumber(num) {
-      return num.toLocaleString();
+    
+    // Filter by department
+    if (departmentFilter !== 'all') {
+      filteredEmployees = filteredEmployees.filter(employee => 
+        employee.department.toLowerCase() === departmentFilter.toLowerCase()
+      );
     }
-    function formatCurrency(num) {
-      return "₹" + num.toLocaleString();
+    
+    this.renderEmployeeCards(filteredEmployees);
+  }
+
+  async loadDashboardData() {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      this.updateStats({
+        users: 12543,
+        revenue: 89432,
+        orders: 1234,
+        conversion: 3.2
+      });
+      
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
     }
+  }
 
-    async function initDashboard() {
-      const data = await fetchDashboardData();
-      const fillCard = (id, title, value, formatFn = v => v) => {
-        const el = document.getElementById(id);
-        el.classList.remove('loading');
-        el.innerHTML = `<strong>${title}</strong><p>${formatFn(value)}</p>`;
-      };
-      fillCard('employeesCard', 'Total Employees', data.totalEmployees, formatNumber);
-      fillCard('teamsCard', 'Total Teams', data.totalTeams, formatNumber);
-      fillCard('pendingProjectsCard', 'Pending Projects', data.pendingProjects, formatNumber);
-      fillCard('openPositionsCard', 'Open Job Positions', data.openPositions, formatNumber);
-      fillCard('monthlyRevenueCard', 'Monthly Revenue', data.monthlyRevenue, formatCurrency);
-      fillCard('monthlyExpensesCard', 'Monthly Expenses', data.monthlyExpenses, formatCurrency);
+  updateStats(data) {
+    const statValues = document.querySelectorAll('.stat-value');
+    statValues[0].textContent = data.users.toLocaleString();
+    statValues[1].textContent = `$${data.revenue.toLocaleString()}`;
+    statValues[2].textContent = data.orders.toLocaleString();
+    statValues[3].textContent = `${data.conversion}%`;
+  }
 
-      document.getElementById('accuracyStat').textContent = data.accuracy.toFixed(1) + "%";
-      document.getElementById('burnoutCasesStat').textContent = data.highBurnoutCases;
 
-      // Employee Growth Chart
-      new Chart(document.getElementById('employeeGrowthChart'), {
-        type: 'line',
-        data: {
-          labels: data.growth.months,
-          datasets: [{
-            label: 'Employees',
-            data: data.growth.employeeCount,
-            borderColor: "#007cf0",
-            backgroundColor: "rgba(0,124,240,0.14)",
-            fill: true,
-            tension: 0.25,
-            pointRadius: 5,
-            pointBackgroundColor: "#00dfd8"
-          }]
+  initializeCharts() {
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Revenue',
+          data: [65000, 59000, 80000, 81000, 56000, 89000],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { mode: 'index', intersect: false },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#e2e8f0'
+            }
           },
-          scales: {
-            y: {
-              beginAtZero: false,
-              ticks: { stepSize: 20 },
-              grid: { color: "#d9eefb" }
-            },
-            x: {
-              grid: { color: "#d9eefb" }
+          x: {
+            grid: {
+              color: '#e2e8f0'
             }
           }
         }
-      });
+      }
+    });
 
-      // Turnover Rate Bar Chart
-      new Chart(document.getElementById('turnoverChart'), {
-        type: 'bar',
-        data: {
-          labels: data.turnover.months,
-          datasets: [{
-            label: 'Turnover Rate (%)',
-            data: data.turnover.turnoverRate,
-            backgroundColor: "#c0392bcc",
-            borderRadius: 8,
-            maxBarThickness: 40,
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: true }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: Math.max(16, ...data.turnover.turnoverRate),
-              grid: { color: "#fae4e2" },
-              ticks: {
-                stepSize: 2,
-                color: "#7f1d1a"
-              }
-            },
-            x: {
-              grid: { color: "#fae4e2" },
-            }
+    const userCtx = document.getElementById('userChart').getContext('2d');
+    new Chart(userCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Desktop', 'Mobile', 'Tablet'],
+        datasets: [{
+          data: [60, 30, 10],
+          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
           }
         }
-      });
-    }
+      }
+    });
+  }
 
-    window.addEventListener('DOMContentLoaded', initDashboard);
-  </script>
+  refreshData() {
+    const dateRange = document.getElementById('dateRange').value;
+    const department = document.getElementById('department').value;
+    
+    console.log(`Refreshing data for ${dateRange} days, department: ${department}`);
+    this.loadDashboardData();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new DashboardManager();
+});
+</script>
+
 </body>
 </html>
