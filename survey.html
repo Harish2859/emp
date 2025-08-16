@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Survey - Enhanced Edition</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --primary-dark: #2563eb;
+            --accent-color: #7c3aed;
+            --accent-light: #a855f7;
+            --background-color: #f8fafc;
+            --background-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-background: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background-gradient);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Enhanced Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .back-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .header h1 i {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s infinite;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        /* Enhanced Progress Bar */
+        .progress-container {
+            background: var(--card-background);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            opacity: 0.8;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Enhanced Chart Container */
+        .chart-container {
+            background: var(--card-background);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            position: sticky;
+            top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 280px;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: var(--background-color);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Enhanced Form Styles */
+        .form-container {
+            background: var(--card-background);
+            border-radius: var(--border-radius-xl);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            margin-left: 1rem;
+        }
+
+        .section-title i {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+        }
+
+        /* Enhanced Input Styles */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--card-background);
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input[type="text"]:focus + i,
+        input[type="email"]:focus + i,
+        select:focus + i {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        textarea {
+            padding: 1rem;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Enhanced Range Slider */
+        .range-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--background-color);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .range-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .range-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            border: 3px solid white;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .range-output {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--primary-color);
+            display: inline-block;
+        }
+
+        /* Enhanced Toggle Switches */
+        .toggle-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .toggle-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .toggle-item.active {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .toggle-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background: var(--border-color);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(28px);
+        }
+
+        /* Enhanced Career Intent Chips */
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: var(--transition);
+        }
+
+        .chip:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chip:hover::before {
+            left: 100%;
+        }
+
+        .chip.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chip i {
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced Skills Section */
+        .skills-category {
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            transition: var(--transition);
+        }
+
+        .skills-category:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .skills-category h4 {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .skills-category h4 i {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+        }
+
+        .skill-input-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-input {
+            flex: 1;
+            padding: 0.875rem 1rem !important;
+            border-radius: var(--border-radius) !important;
+        }
+
+        .add-skill-btn {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .add-skill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .add-skill-btn:active {
+            transform: translateY(0);
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .skill-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .skill-tag .remove-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0;
+            margin-left: 0.25rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .skill-tag .remove-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Character Counter */
+        .char-counter {
+            text-align: right;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+
+        .char-counter.warning {
+            color: var(--warning-color);
+        }
+
+        .char-counter.danger {
+            color: var(--danger-color);
+        }
+
+        /* Enhanced Submit Button */
+        .submit-container {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 1.25rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Enhanced Success Message */
+        .success-message {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: var(--border-radius-lg);
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .success-message i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Enhanced Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .toggle-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .chips-container {
+                justify-content: center;
+            }
+            
+            .form-container,
+            .chart-container {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .skill-input-container {
+                flex-direction: column;
+            }
+            
+            .submit-btn {
+                width: 100%;
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .progress-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Enhanced Header -->
+        <header class="header">
+            <div class="header-top">
+                <button onclick="window.location.href='employee.html'" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </button>
+            </div>
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                Professional Survey
+            </h1>
+            <p>Help us understand your professional journey and preferences to create better workplace experiences.</p>
+            <div class="subtitle">Your insights drive meaningful change in our organization</div>
+        </header>
+
+        <!-- Enhanced Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <div class="progress-title">
+                    <i class="fas fa-tasks"></i>
+                    Survey Progress
+                </div>
+                <div class="progress-stats">
+                    <span id="completedFields">0 completed</span>
+                    <span>•</span>
+                    <span id="totalFields">12 total</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% Complete</div>
+        </div>
+
+        <!-- Enhanced Main Content -->
+        <div class="main-content">
+            <!-- Enhanced Form Container -->
+            <div class="form-container">
+                <form id="surveyForm">
+                    <!-- Personal Information -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Personal Information
+                        </h3>
+                        
+                        <div class="input-group">
+                            <label for="fullName">Full Name *</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="fullName" name="fullName" required placeholder="Enter your full name">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">Email Address *</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="email" name="email" required placeholder="your.email@company.com">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="department">Department *</label>
+                            <div class="input-wrapper">
+                                <select id="department" name="department" required>
+                                    <option value="">Select your department</option>
+                                    <option value="engineering">Engineering</option>
+                                    <option value="design">Design & UX</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="hr">Human Resources</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="operations">Operations</option>
+                                    <option value="product">Product Management</option>
+                                    <option value="data">Data & Analytics</option>
+                                </select>
+                                <i class="fas fa-building"></i>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="experience">Years of Experience *</label>
+                            <div class="input-wrapper">
+                                <select id="experience" name="experience" required>
+                                    <option value="">Select your experience level</option>
+                                    <option value="0-1">0-1 years (Entry Level)</option>
+                                    <option value="2-5">2-5 years (Junior)</option>
+                                    <option value="6-10">6-10 years (Mid-Level)</option>
+                                    <option value="11-15">11-15 years (Senior)</option>
+                                    <option value="16+">16+ years (Expert)</option>
+                                </select>
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Role Satisfaction -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-smile"></i>
+                            Role Satisfaction
+                        </h3>
+                        
+                        <div class="range-container">
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>😞</span>
+                                    <span>Very Unsatisfied</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Neutral</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😊</span>
+                                    <span>Very Satisfied</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="satisfaction" name="satisfaction" min="0" max="4" value="2">
+                            </div>
+                            <div class="range-output" id="satisfactionOutput">Neutral</div>
+                        </div>
+                    </section>
+
+                    <!-- Work Preferences -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Work Preferences
+                        </h3>
+                        
+                        <div class="toggle-group">
+                            <div class="toggle-item" data-preference="remote">
+                                <span class="toggle-label">Remote Work</span>
+                                <div class="toggle-switch" data-preference="remote"></div>
+                            </div>
+                            <div class="toggle-item" data-preference="flexible">
+                                <span class="toggle-label">Flexible Hours</span>
+                                <div class="toggle-switch" data-preference="flexible"></div>
+                            </div>
+                            <div class="toggle-item" data-preference="collaboration">
+                                <span class="toggle-label">Team Collaboration</span>
+                                <div class="toggle-switch" data-preference="collaboration"></div>
+                            </div>
+                            <div class="toggle-item" data-preference="development">
+                                <span class="toggle-label">Professional Development</span>
+                                <div class="toggle-switch" data-preference="development"></div>
+                            </div>
+                            <div class="toggle-item" data-preference="mentoring">
+                                <span class="toggle-label">Mentoring Others</span>
+                                <div class="toggle-switch" data-preference="mentoring"></div>
+                            </div>
+                            <div class="toggle-item" data-preference="innovation">
+                                <span class="toggle-label">Innovation Projects</span>
+                                <div class="toggle-switch" data-preference="innovation"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Career Intent -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-rocket"></i>
+                            Career Intent
+                        </h3>
+                        
+                        <div class="chips-container">
+                            <div class="chip" data-intent="leadership">
+                                <i class="fas fa-users"></i>
+                                Leadership Role
+                            </div>
+                            <div class="chip" data-intent="specialist">
+                                <i class="fas fa-star"></i>
+                                Technical Specialist
+                            </div>
+                            <div class="chip" data-intent="entrepreneur">
+                                <i class="fas fa-lightbulb"></i>
+                                Entrepreneur
+                            </div>
+                            <div class="chip" data-intent="consultant">
+                                <i class="fas fa-handshake"></i>
+                                Consultant
+                            </div>
+                            <div class="chip" data-intent="researcher">
+                                <i class="fas fa-microscope"></i>
+                                Researcher
+                            </div>
+                            <div class="chip" data-intent="educator">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                Educator
+                            </div>
+                            <div class="chip" data-intent="manager">
+                                <i class="fas fa-user-tie"></i>
+                                People Manager
+                            </div>
+                            <div class="chip" data-intent="architect">
+                                <i class="fas fa-drafting-compass"></i>
+                                Solution Architect
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Skills Assessment -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-code"></i>
+                            Skills Assessment
+                        </h3>
+                        
+                        <div class="skills-category">
+                            <h4><i class="fab fa-html5"></i> Frontend Development</h4>
+                            <div class="skill-input-container">
+                                <input type="text" class="skill-input" placeholder="e.g., React, Vue.js, Angular..." data-category="frontend">
+                                <button type="button" class="add-skill-btn" data-category="frontend">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="skills-tags" data-category="frontend"></div>
+                        </div>
+
+                        <div class="skills-category">
+                            <h4><i class="fas fa-server"></i> Backend Development</h4>
+                            <div class="skill-input-container">
+                                <input type="text" class="skill-input" placeholder="e.g., Node.js, Python, Java..." data-category="backend">
+                                <button type="button" class="add-skill-btn" data-category="backend">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="skills-tags" data-category="backend"></div>
+                        </div>
+
+                        <div class="skills-category">
+                            <h4><i class="fas fa-tools"></i> Tools & Frameworks</h4>
+                            <div class="skill-input-container">
+                                <input type="text" class="skill-input" placeholder="e.g., Docker, Kubernetes, Git..." data-category="tools">
+                                <button type="button" class="add-skill-btn" data-category="tools">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="skills-tags" data-category="tools"></div>
+                        </div>
+
+                        <div class="skills-category">
+                            <h4><i class="fas fa-database"></i> Database</h4>
+                            <div class="skill-input-container">
+                                <input type="text" class="skill-input" placeholder="e.g., PostgreSQL, MongoDB, Redis..." data-category="database">
+                                <button type="button" class="add-skill-btn" data-category="database">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="skills-tags" data-category="database"></div>
+                        </div>
+
+                        <div class="skills-category">
+                            <h4><i class="fas fa-cloud"></i> Cloud & DevOps</h4>
+                            <div class="skill-input-container">
+                                <input type="text" class="skill-input" placeholder="e.g., AWS, Azure, GCP..." data-category="cloud">
+                                <button type="button" class="add-skill-btn" data-category="cloud">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="skills-tags" data-category="cloud"></div>
+                        </div>
+                    </section>
+
+                    <!-- Wellness & Burnout Assessment -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-heart"></i>
+                            Wellness & Burnout Assessment
+                        </h3>
+                        
+                        <div class="range-container">
+                            <label for="stressLevel">How stressed do you feel at work? *</label>
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>😌</span>
+                                    <span>Very Relaxed</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Moderate</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😰</span>
+                                    <span>Very Stressed</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="stressLevel" name="stressLevel" min="1" max="10" value="5" required>
+                            </div>
+                            <div class="range-output" id="stressLevelOutput">Moderate (5/10)</div>
+                        </div>
+
+                        <div class="range-container">
+                            <label for="energyLevel">How energetic do you feel at work? *</label>
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>😴</span>
+                                    <span>Very Tired</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Moderate</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>⚡</span>
+                                    <span>Very Energetic</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="energyLevel" name="energyLevel" min="1" max="10" value="5" required>
+                            </div>
+                            <div class="range-output" id="energyLevelOutput">Moderate (5/10)</div>
+                        </div>
+
+                        <div class="range-container">
+                            <label for="workLifeBalance">How would you rate your work-life balance? *</label>
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>⚖️</span>
+                                    <span>Poor Balance</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Moderate</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>✨</span>
+                                    <span>Excellent Balance</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="workLifeBalance" name="workLifeBalance" min="1" max="10" value="5" required>
+                            </div>
+                            <div class="range-output" id="workLifeBalanceOutput">Moderate (5/10)</div>
+                        </div>
+
+                        <div class="range-container">
+                            <label for="sleepQuality">How well do you sleep? *</label>
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>😴</span>
+                                    <span>Poor Sleep</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Moderate</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😴</span>
+                                    <span>Great Sleep</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="sleepQuality" name="sleepQuality" min="1" max="10" value="5" required>
+                            </div>
+                            <div class="range-output" id="sleepQualityOutput">Moderate (5/10)</div>
+                        </div>
+
+                        <div class="range-container">
+                            <label for="workload">How manageable is your current workload? *</label>
+                            <div class="range-labels">
+                                <div class="range-label">
+                                    <span>📚</span>
+                                    <span>Overwhelming</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>😐</span>
+                                    <span>Manageable</span>
+                                </div>
+                                <div class="range-label">
+                                    <span>📖</span>
+                                    <span>Very Light</span>
+                                </div>
+                            </div>
+                            <div class="range-wrapper">
+                                <input type="range" id="workload" name="workload" min="1" max="10" value="5" required>
+                            </div>
+                            <div class="range-output" id="workloadOutput">Manageable (5/10)</div>
+                        </div>
+                    </section>
+
+                    <!-- Additional Information -->
+                    <section class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Additional Information
+                        </h3>
+                        
+                        <div class="input-group">
+                            <label for="joinDate">Company Joining Date</label>
+                            <div class="input-wrapper">
+                                <input type="date" id="joinDate" name="joinDate">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="additionalComments">Additional Comments</label>
+                            <textarea id="additionalComments" name="additionalComments" placeholder="Share any additional thoughts, feedback, or suggestions..." maxlength="500"></textarea>
+                            <div class="char-counter" id="charCounter">0/500 characters</div>
+                        </div>
+                    </section>
+
+                    <!-- Submit Section -->
+                    <div class="submit-container">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Survey
+                        </button>
+                        <div class="success-message" id="successMessage">
+                            <i class="fas fa-check-circle"></i>
+                            Survey submitted successfully! Thank you for your valuable feedback.
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Enhanced Chart Container -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3>Live Analytics Dashboard</h3>
+                    <div class="chart-subtitle">Real-time survey insights</div>
+                </div>
+                
+                <div class="chart-wrapper">
+                    <canvas id="satisfactionChart"></canvas>
+                </div>
+                
+                <div class="chart-wrapper">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSkills">0</div>
+                        <div class="stat-label">Total Skills</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completionRate">0%</div>
+                        <div class="stat-label">Completion</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced survey data object
+        const surveyData = {
+            personal: {},
+            satisfaction: 2,
+            preferences: {},
+            careerIntent: [],
+            skills: {
+                frontend: [],
+                backend: [],
+                tools: [],
+                database: [],
+                cloud: []
+            },
+            additional: {},
+            // Wellness assessment fields
+            stressLevel: 5,
+            energyLevel: 5,
+            workLifeBalance: 5,
+            sleepQuality: 5,
+            workload: 5
+        };
+
+        // Chart instances
+        let satisfactionChart;
+        let skillsChart;
+
+        // Initialize enhanced charts
+        function initCharts() {
+            // Enhanced Satisfaction Doughnut Chart
+            const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
+            satisfactionChart = new Chart(satisfactionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Very Unsatisfied', 'Unsatisfied', 'Neutral', 'Satisfied', 'Very Satisfied'],
+                    datasets: [{
+                        data: [0, 0, 1, 0, 0],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#64748b',
+                            '#10b981',
+                            '#059669'
+                        ],
+                        borderWidth: 0,
+                        cutout: '65%',
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    family: 'Inter',
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#64748b'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Current Satisfaction Level',
+                            font: {
+                                family: 'Poppins',
+                                size: 16,
+                                weight: '600'
+                            },
+                            color: '#2563eb',
+                            padding: 20
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1200,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+
+            // Enhanced Skills Bar Chart
+            const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+            skillsChart = new Chart(skillsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Frontend', 'Backend', 'Tools', 'Database', 'Cloud'],
+                    datasets: [{
+                        label: 'Skills Count',
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#7c3aed',
+                            '#059669',
+                            '#dc2626',
+                            '#ea580c'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        hoverBackgroundColor: [
+                            '#1d4ed8',
+                            '#6d28d9',
+                            '#047857',
+                            '#b91c1c',
+                            '#c2410c'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Skills by Category',
+                            font: {
+                                family: 'Poppins',
+                                size: 16,
+                                weight: '600'
+                            },
+                            color: '#2563eb',
+                            padding: 20
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: '#e2e8f0',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    family: 'Inter',
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#64748b'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Update satisfaction chart with animation
+        function updateSatisfactionChart(value) {
+            const data = [0, 0, 0, 0, 0];
+            data[value] = 1;
+            satisfactionChart.data.datasets[0].data = data;
+            satisfactionChart.update('active');
+        }
+
+        // Update skills chart with animation
+        function updateSkillsChart() {
+            const data = [
+                surveyData.skills.frontend.length,
+                surveyData.skills.backend.length,
+                surveyData.skills.tools.length,
+                surveyData.skills.database.length,
+                surveyData.skills.cloud.length
+            ];
+            skillsChart.data.datasets[0].data = data;
+            skillsChart.update('active');
+            
+            // Update total skills counter
+            const totalSkills = data.reduce((sum, count) => sum + count, 0);
+            document.getElementById('totalSkills').textContent = totalSkills;
+        }
+
+        // Enhanced progress calculation
+        function updateProgress() {
+            const totalFields = 17; // Updated to include wellness questions
+            let completedFields = 0;
+
+            // Check personal information
+            if (document.getElementById('fullName').value.trim()) completedFields++;
+            if (document.getElementById('email').value.trim()) completedFields++;
+            if (document.getElementById('department').value) completedFields++;
+            if (document.getElementById('experience').value) completedFields++;
+
+            // Satisfaction is always counted
+            completedFields++;
+
+            // Check preferences
+            if (Object.keys(surveyData.preferences).length > 0) completedFields++;
+
+            // Check career intent
+            if (surveyData.careerIntent.length > 0) completedFields++;
+
+            // Check skills
+            const hasSkills = Object.values(surveyData.skills).some(category => category.length > 0);
+            if (hasSkills) completedFields++;
+
+            // Check wellness assessment (all 5 questions are required)
+            if (surveyData.stressLevel !== undefined) completedFields++;
+            if (surveyData.energyLevel !== undefined) completedFields++;
+            if (surveyData.workLifeBalance !== undefined) completedFields++;
+            if (surveyData.sleepQuality !== undefined) completedFields++;
+            if (surveyData.workload !== undefined) completedFields++;
+
+            // Check additional info
+            if (document.getElementById('joinDate').value) completedFields++;
+            if (document.getElementById('additionalComments').value.trim()) completedFields++;
+
+            const progress = Math.round((completedFields / totalFields) * 100);
+            
+            // Update progress bar with animation
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${progress}% Complete`;
+            document.getElementById('completedFields').textContent = `${completedFields} completed`;
+            document.getElementById('totalFields').textContent = `${totalFields} total`;
+            document.getElementById('completionRate').textContent = `${progress}%`;
+        }
+
+        // Calculate burnout score based on wellness responses
+        function calculateBurnoutScore() {
+            const stressLevel = surveyData.stressLevel || 5;
+            const energyLevel = surveyData.energyLevel || 5;
+            const workLifeBalance = surveyData.workLifeBalance || 5;
+            const sleepQuality = surveyData.sleepQuality || 5;
+            const workload = surveyData.workload || 5;
+            
+            console.log('Calculating burnout score with values:', {
+                stressLevel,
+                energyLevel,
+                workLifeBalance,
+                sleepQuality,
+                workload
+            });
+            
+            // Calculate weighted burnout score (higher score = higher burnout risk)
+            // Stress level contributes most to burnout (40%)
+            // Energy level and sleep quality are inversely related to burnout (20% each)
+            // Work-life balance and workload contribute 10% each
+            let burnoutScore = 0;
+            
+            // Stress level (1-10, higher = more stress = higher burnout)
+            burnoutScore += (stressLevel / 10) * 4;
+            
+            // Energy level (1-10, higher = more energy = lower burnout)
+            burnoutScore += ((11 - energyLevel) / 10) * 2;
+            
+            // Work-life balance (1-10, higher = better balance = lower burnout)
+            burnoutScore += ((11 - workLifeBalance) / 10) * 1;
+            
+            // Sleep quality (1-10, higher = better sleep = lower burnout)
+            burnoutScore += ((11 - sleepQuality) / 10) * 2;
+            
+            // Workload (1-10, higher = more workload = higher burnout)
+            burnoutScore += (workload / 10) * 1;
+            
+            // Convert to 1-10 scale and round to 1 decimal place
+            const finalScore = Math.round(burnoutScore * 10) / 10;
+            console.log('Final burnout score:', finalScore);
+            return finalScore;
+        }
+
+        // Initialize all event listeners
+        function initEventListeners() {
+            // Personal information inputs with enhanced validation
+            document.getElementById('fullName').addEventListener('input', function() {
+                this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+                updateProgress();
+            });
+            
+            document.getElementById('email').addEventListener('input', updateProgress);
+            document.getElementById('department').addEventListener('change', updateProgress);
+            document.getElementById('experience').addEventListener('change', updateProgress);
+
+            // Enhanced satisfaction slider
+            const satisfactionSlider = document.getElementById('satisfaction');
+            const satisfactionOutput = document.getElementById('satisfactionOutput');
+            const satisfactionLabels = ['Very Unsatisfied', 'Unsatisfied', 'Neutral', 'Satisfied', 'Very Satisfied'];
+            const satisfactionEmojis = ['😞', '😕', '😐', '😊', '😄'];
+
+            satisfactionSlider.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                surveyData.satisfaction = value;
+                satisfactionOutput.textContent = `${satisfactionEmojis[value]} ${satisfactionLabels[value]}`;
+                updateSatisfactionChart(value);
+                updateProgress();
+            });
+
+            // Enhanced toggle switches
+            document.querySelectorAll('.toggle-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const toggle = this.querySelector('.toggle-switch');
+                    const preference = this.dataset.preference;
+                    
+                    toggle.classList.toggle('active');
+                    this.classList.toggle('active');
+                    
+                    if (toggle.classList.contains('active')) {
+                        surveyData.preferences[preference] = true;
+                    } else {
+                        delete surveyData.preferences[preference];
+                    }
+                    updateProgress();
+                });
+            });
+
+            // Enhanced career intent chips
+            document.querySelectorAll('.chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    const intent = this.dataset.intent;
+                    this.classList.toggle('active');
+                    
+                    if (this.classList.contains('active')) {
+                        if (!surveyData.careerIntent.includes(intent)) {
+                            surveyData.careerIntent.push(intent);
+                        }
+                    } else {
+                        const index = surveyData.careerIntent.indexOf(intent);
+                        if (index > -1) {
+                            surveyData.careerIntent.splice(index, 1);
+                        }
+                    }
+                    updateProgress();
+                });
+            });
+
+            // Enhanced skills management
+            document.querySelectorAll('.add-skill-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    const input = document.querySelector(`input[data-category="${category}"]`);
+                    addSkill(category, input.value.trim());
+                    input.value = '';
+                    input.focus();
+                });
+            });
+
+            document.querySelectorAll('.skill-input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const category = this.dataset.category;
+                        addSkill(category, this.value.trim());
+                        this.value = '';
+                    }
+                });
+            });
+
+            // Enhanced character counter
+            const textarea = document.getElementById('additionalComments');
+            const charCounter = document.getElementById('charCounter');
+            
+            textarea.addEventListener('input', function() {
+                const length = this.value.length;
+                charCounter.textContent = `${length}/500 characters`;
+                
+                if (length > 450) {
+                    charCounter.className = 'char-counter danger';
+                } else if (length > 350) {
+                    charCounter.className = 'char-counter warning';
+                } else {
+                    charCounter.className = 'char-counter';
+                }
+                updateProgress();
+            });
+
+            // Additional info
+            document.getElementById('joinDate').addEventListener('change', updateProgress);
+
+            // Wellness assessment sliders
+            const wellnessSliders = [
+                { id: 'stressLevel', output: 'stressLevelOutput', labels: ['Very Relaxed', 'Moderate', 'Very Stressed'] },
+                { id: 'energyLevel', output: 'energyLevelOutput', labels: ['Very Tired', 'Moderate', 'Very Energetic'] },
+                { id: 'workLifeBalance', output: 'workLifeBalanceOutput', labels: ['Poor Balance', 'Moderate', 'Excellent Balance'] },
+                { id: 'sleepQuality', output: 'sleepQualityOutput', labels: ['Poor Sleep', 'Moderate', 'Great Sleep'] },
+                { id: 'workload', output: 'workloadOutput', labels: ['Overwhelming', 'Manageable', 'Very Light'] }
+            ];
+
+            wellnessSliders.forEach(slider => {
+                const sliderElement = document.getElementById(slider.id);
+                const outputElement = document.getElementById(slider.output);
+                
+                sliderElement.addEventListener('input', function() {
+                    const value = parseInt(this.value);
+                    surveyData[slider.id] = value;
+                    
+                    let label;
+                    if (value <= 3) {
+                        label = slider.labels[0];
+                    } else if (value <= 7) {
+                        label = slider.labels[1];
+                    } else {
+                        label = slider.labels[2];
+                    }
+                    
+                    outputElement.textContent = `${label} (${value}/10)`;
+                    updateProgress();
+                });
+            });
+
+            // Enhanced form submission
+            document.getElementById('surveyForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Add loading state
+                const submitBtn = document.querySelector('.submit-btn');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                submitBtn.disabled = true;
+                
+                // Calculate burnout score
+                const burnoutScore = calculateBurnoutScore();
+                console.log('Calculated burnout score:', burnoutScore);
+                
+                // Save burnout score to localStorage
+                localStorage.setItem('employeeBurnoutScore', burnoutScore.toString());
+                localStorage.setItem('employeeBurnoutDate', new Date().toISOString());
+                console.log('Saved burnout score to localStorage:', burnoutScore);
+
+                // Persist survey summary for dashboard table (keyed by email)
+                const fullName = (document.getElementById('fullName').value || '').trim();
+                const emailVal = (document.getElementById('email').value || '').trim().toLowerCase();
+                const deptSelect = document.getElementById('department');
+                const deptText = deptSelect && deptSelect.selectedIndex > -1 ? deptSelect.options[deptSelect.selectedIndex].text : '';
+                try {
+                    const surveyMap = JSON.parse(localStorage.getItem('employeeSurveyResults') || '{}');
+                    surveyMap[emailVal] = {
+                        name: fullName,
+                        email: emailVal,
+                        department: deptText,
+                        burnoutPercentage: Math.round(burnoutScore * 10),
+                        lastSurvey: new Date().toISOString().slice(0, 10)
+                    };
+                    localStorage.setItem('employeeSurveyResults', JSON.stringify(surveyMap));
+                } catch (err) {
+                    console.error('Failed to save survey results for dashboard:', err);
+                }
+                
+                // Simulate submission delay
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showSuccessMessage();
+                    
+                    // Redirect back to employee dashboard after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = 'employee.html';
+                    }, 3000);
+                }, 1500);
+            });
+        }
+
+        // Enhanced add skill function
+        function addSkill(category, skill) {
+            if (skill && skill.length > 0 && !surveyData.skills[category].includes(skill)) {
+                surveyData.skills[category].push(skill);
+                renderSkillTag(category, skill);
+                updateSkillsChart();
+                updateProgress();
+            }
+        }
+
+        // Enhanced remove skill function
+        function removeSkill(category, skill) {
+            const index = surveyData.skills[category].indexOf(skill);
+            if (index > -1) {
+                surveyData.skills[category].splice(index, 1);
+                updateSkillsChart();
+                updateProgress();
+            }
+        }
+
+        // Enhanced skill tag rendering
+        function renderSkillTag(category, skill) {
+            const container = document.querySelector(`[data-category="${category}"].skills-tags`);
+            const tag = document.createElement('div');
+            tag.className = 'skill-tag';
+            tag.innerHTML = `
+                <span>${skill}</span>
+                <button type="button" class="remove-btn" onclick="removeSkillTag(this, '${category}', '${skill}')" title="Remove skill">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(tag);
+        }
+
+        // Enhanced remove skill tag function
+        function removeSkillTag(button, category, skill) {
+            const tag = button.parentElement;
+            tag.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => {
+                tag.remove();
+                removeSkill(category, skill);
+            }, 300);
+        }
+
+        // Enhanced success message
+        function showSuccessMessage() {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.add('show');
+            
+            // Scroll to success message
+            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Add confetti effect (simple version)
+            createConfetti();
+            
+            // Hide message after 6 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 6000);
+        }
+
+        // Simple confetti effect
+        function createConfetti() {
+            const colors = ['#2563eb', '#7c3aed', '#10b981', '#f59e0b', '#ef4444'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.zIndex = '9999';
+                confetti.style.borderRadius = '50%';
+                confetti.style.pointerEvents = 'none';
+                
+                document.body.appendChild(confetti);
+                
+                // Animate confetti falling
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                to {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            initEventListeners();
+            updateProgress();
+            
+            // Add entrance animations to form sections
+            const sections = document.querySelectorAll('.form-section');
+            sections.forEach((section, index) => {
+                section.style.animation = `fadeInUp 0.6s ease ${index * 0.1}s both`;
+            });
+        });
+
+        // Add some interactive hover effects
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.matches('.chip:not(.active)')) {
+                e.target.style.transform = 'translateY(-2px) scale(1.02)';
+            }
+        });
+
+        document.addEventListener('mouseout', function(e) {
+            if (e.target.matches('.chip:not(.active)')) {
+                e.target.style.transform = '';
+            }
+        });
+    </script>
+</body>
+</html>
