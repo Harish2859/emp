@@ -1,0 +1,3910 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #64748b;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #f8fafc;
+        --card-background: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --sidebar-width: 280px;
+        --collapsed-width: 100px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--background-color);
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .hr-dashboard-layout {
+        display: block;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: var(--card-background);
+        border-right: 1px solid var(--border-color);
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        overflow: hidden;
+      }
+
+      .sidebar.collapsed {
+        width: var(--collapsed-width);
+      }
+
+      .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .sidebar-header h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        transition: var(--transition-smooth);
+      }
+
+      .sidebar.collapsed .sidebar-header h2 {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      .sidebar-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        color: var(--text-secondary);
+        transition: var(--transition-smooth);
+      }
+
+      .sidebar-toggle:hover {
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+
+      .profile-section {
+        background: var(--background-color);
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        overflow: hidden;
+      }
+
+      .sidebar.collapsed .profile-section {
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        margin: 0 auto 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+      }
+
+      .profile-info {
+        transition: all 0.2s ease-in-out;
+        transform: translateY(0);
+      }
+
+      .sidebar.collapsed .profile-info {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      .profile-name {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+      }
+
+      .profile-role {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+
+      .nav-buttons {
+        flex: 1;
+        padding: 1rem 0;
+      }
+
+      .nav-btn {
+        background: transparent;
+        color: var(--text-primary);
+        border: none;
+        padding: 0.875rem 1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-align: left;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        min-width: 3rem;
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .nav-btn:hover {
+        background: var(--border-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .nav-btn.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .nav-btn.active:hover {
+        background: #2563eb;
+      }
+
+      .nav-btn i {
+        flex-shrink: 0;
+        width: 1.25rem;
+        text-align: center;
+        transition: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .nav-btn span {
+        transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, width 0.2s ease-in-out;
+        white-space: nowrap;
+        opacity: 1;
+        transform: translateX(0);
+        display: inline-block;
+        width: auto;
+        overflow: hidden;
+      }
+
+      .sidebar.collapsed .nav-btn span {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out, width 0.15s ease-in-out;
+        width: 0;
+        margin: 0;
+      }
+
+      .sidebar.collapsed .nav-btn {
+        justify-content: center;
+        gap: 0;
+        padding: 0.875rem 0.5rem;
+      }
+
+      .sidebar.collapsed .profile-section {
+        display: none;
+      }
+
+      .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: calc(100% - var(--sidebar-width));
+      }
+
+      .sidebar.collapsed ~ .main-content {
+        margin-left: var(--collapsed-width);
+        width: calc(100% - var(--collapsed-width));
+      }
+
+      .header {
+        background: var(--card-background);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-left h1 {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: var(--text-primary);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .search-bar {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 1rem;
+        color: var(--text-light);
+        z-index: 1;
+      }
+
+      .search-input {
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--background-color);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        width: 300px;
+        transition: var(--transition);
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .user-menu {
+        position: relative;
+      }
+
+      .user-menu-btn {
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .user-menu-btn:hover {
+        background-color: var(--border-color);
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+      }
+
+      .user-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--card-background);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        min-width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: var(--transition);
+        z-index: 1000;
+      }
+
+      .user-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: var(--transition);
+      }
+
+      .dropdown-item:hover {
+        background-color: var(--border-color);
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 0.5rem 0;
+      }
+
+      .content {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .section-content {
+        display: none;
+      }
+
+      .section-content.active {
+        display: block;
+      }
+
+      .profile-header-card {
+        background: var(--primary-color);
+        border-radius: 16px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      .profile-header-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .profile-header-content {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+      }
+
+      .profile-info h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .profile-subtitle {
+        opacity: 0.9;
+        font-size: 1rem;
+      }
+
+      .profile-stats {
+        display: inline-flex;
+        gap: 2rem;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-label {
+        opacity: 0.8;
+        font-size: 0.875rem;
+      }
+
+      .profile-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: var(--transition);
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .action-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        position: relative;
+        background: var(--card-background);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        text-align: left;
+        gap: 0.5rem;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        width: 100%;
+      }
+
+      .stat-title {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+
+        background: linear-gradient(135deg, #6a5acd, #8a2be2);
+        color: white;
+        font-size: 1.2rem;
+        opacity: 1 !important; /* Always visible */
+        visibility: visible !important;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-change {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+      }
+
+      .stat-change.positive {
+        color: #10b981;
+      }
+
+      .stat-change.negative {
+        color: #ef4444;
+      }
+
+      .bio-section {
+        background: var(--card-background);
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+
+      .bio-content {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+      }
+
+      .bio-edit-btn {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: var(--transition);
+      }
+
+      .bio-edit-btn:hover {
+        background-color: var(--border-color);
+        color: var(--text-primary);
+      }
+
+      .table-card {
+        background: var(--card-background);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+      }
+
+      .table-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .table-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        border: none;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      }
+
+      .btn-secondary {
+        background: var(--secondary-color);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        background-color: #475569;
+        transform: translateY(-1px);
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .data-table th {
+        background-color: var(--bg-secondary);
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+      }
+
+      .data-table td {
+        color: var(--text-secondary);
+      }
+
+      .data-table tr:hover {
+        background-color: var(--bg-secondary);
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .items-center {
+        align-items: center;
+      }
+
+      .gap-2 {
+        gap: 0.5rem;
+      }
+
+      .gap-3 {
+        gap: 0.75rem;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .chart-container {
+        position: relative;
+        width: 100%;
+      }
+
+      .file-upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 3rem;
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+      }
+
+      .file-upload-area:hover {
+        border-color: var(--primary-color);
+        background-color: rgba(102, 126, 234, 0.05);
+      }
+
+      .grid {
+        display: grid;
+      }
+
+      .space-y-4 > * + * {
+        margin-top: 1rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .client-cards-wrapper {
+        overflow: hidden;
+        position: relative;
+        height: 120px;
+      }
+
+      .client-cards-container {
+        display: flex;
+        gap: 1rem;
+        animation: scroll-clients 20s linear infinite;
+      }
+
+      .client-card {
+        flex-shrink: 0;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        min-width: 200px;
+        text-align: center;
+        transition: var(--transition-smooth);
+      }
+
+      .client-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      @keyframes scroll-clients {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+
+      /* Added Applications section styles */
+      .applications-section {
+        padding: 2rem;
+      }
+
+      .activity-chart-container {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+      }
+
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .chart-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+
+      .chart-tab {
+        padding: 0.5rem 1rem;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        border-radius: 6px;
+        transition: var(--transition-smooth);
+      }
+
+      .chart-tab.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .chart-sort {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+      }
+
+      .activity-chart {
+        height: 200px;
+      }
+
+      .stats-cards {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+        flex: 1;
+      }
+
+      .stat-icon.applications {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stat-icon.calls {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stat-info h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .stat-info p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .applications-table {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+      }
+
+      .applications-list {
+        padding: 1rem;
+      }
+
+      .application-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        margin-bottom: 0.5rem;
+      }
+
+      .application-item:hover {
+        background-color: var(--bg-secondary);
+      }
+
+      .applicant-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .application-info {
+        flex: 1;
+      }
+
+      .applicant-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .application-subject {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .application-time {
+        color: var(--text-light);
+        font-size: 0.875rem;
+      }
+
+      .email-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition-smooth);
+      }
+
+      .email-modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .email-content {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-lg);
+      }
+
+      .email-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .email-header h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .email-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: var(--transition-smooth);
+      }
+
+      .email-close:hover {
+        background-color: var(--bg-tertiary);
+        color: var(--text-primary);
+      }
+
+      .email-body {
+        padding: 1.5rem;
+      }
+
+      .email-from {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .email-from img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .email-from-info h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .email-from-info p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .email-subject {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+      }
+
+      .email-message {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      .cv-attachment {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .cv-icon {
+        width: 40px;
+        height: 40px;
+        background: #ef4444;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+      }
+
+      .cv-info h5 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+      }
+
+      .cv-info p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+      }
+
+      .email-actions {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        justify-content: flex-end;
+      }
+
+      .email-actions .action-btn {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition-smooth);
+      }
+
+      .email-actions .action-btn.accept {
+        background: #10b981;
+        color: white;
+      }
+
+      .email-actions .action-btn.reject {
+        background: #ef4444;
+        color: white;
+      }
+
+      .email-actions .action-btn.reply {
+        background: var(--primary-color);
+        color: white;
+      }
+
+             .email-actions .action-btn:hover {
+         transform: translateY(-1px);
+         box-shadow: var(--shadow-md);
+       }
+
+       /* Application status indicators */
+       .application-status {
+         font-size: 0.75rem;
+         font-weight: 500;
+         padding: 0.25rem 0.5rem;
+         border-radius: 4px;
+         display: inline-block;
+         margin-top: 0.25rem;
+       }
+
+       .status-pending {
+         background-color: #fef3c7;
+         color: #92400e;
+       }
+
+       .status-accepted {
+         background-color: #d1fae5;
+         color: #065f46;
+       }
+
+       .status-rejected {
+         background-color: #fee2e2;
+         color: #991b1b;
+       }
+
+      /* Employee Cards Styling */
+      .employee-cards-section {
+        background: var(--card-background);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        margin-top: 24px;
+        border: 1px solid var(--border-color);
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+      }
+
+      .employee-search {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .employee-search i {
+        position: absolute;
+        left: 12px;
+        color: var(--text-secondary);
+        z-index: 1;
+      }
+
+      .employee-search input {
+        padding: 8px 12px 8px 36px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        width: 250px;
+        transition: var(--transition);
+      }
+
+      .employee-search input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .department-filter {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .department-filter select {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--background-color);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        min-width: 150px;
+      }
+
+      .employee-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .employee-card {
+        background: var(--card-background);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+      }
+
+      .employee-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .employee-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 15px;
+        position: relative;
+      }
+
+      .employee-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+
+      .employee-info {
+        flex: 1;
+      }
+
+      .employee-info h4 {
+        margin: 0 0 4px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .employee-id {
+        margin: 0 0 4px 0;
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .employee-position {
+        margin: 0;
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .employment-status {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .employment-status.status-active {
+        background: #c6f6d5;
+        color: #22543d;
+      }
+
+      .employment-status.status-on-leave {
+        background: #fed7d7;
+        color: #742a2a;
+      }
+
+      .employment-status.status-resigned {
+        background: #e2e8f0;
+        color: #4a5568;
+      }
+
+      .employee-details {
+        margin-bottom: 15px;
+      }
+
+      .employee-detail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+
+      .employee-detail i {
+        width: 14px;
+        color: var(--text-light);
+      }
+
+      .employee-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .employee-status.status-online .status-dot {
+        background: #48bb78;
+      }
+
+      .employee-status.status-away .status-dot {
+        background: #ed8936;
+      }
+
+      .employee-status.status-offline .status-dot {
+        background: #a0aec0;
+      }
+
+      .employee-status.status-online {
+        color: #22543d;
+      }
+
+      .employee-status.status-away {
+        color: #744210;
+      }
+
+      .employee-status.status-offline {
+        color: #4a5568;
+      }
+
+      /* Performance Review Styling */
+      .performance-review-card {
+        background: var(--card-background);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+      }
+
+      .performance-review-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+      }
+
+      .review-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .review-employee-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .review-employee-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .review-employee-details {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+      }
+
+      .review-rating {
+        color: #f59e0b;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .review-feedback {
+        background: var(--background-color);
+        padding: 1rem;
+        border-radius: 8px;
+        margin: 1rem 0;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+
+      .review-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+      }
+
+      .review-status {
+        color: var(--success-color);
+        font-weight: 500;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          width: var(--sidebar-width);
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar.show {
+          transform: translateX(0);
+        }
+        
+        .main-content {
+          margin-left: 0;
+          width: 100%;
+          transition: none;
+        }
+        
+        .sidebar.collapsed ~ .main-content {
+          margin-left: 0;
+          width: 100%;
+        }
+        
+        .sidebar.collapsed .sidebar-header h2,
+        .sidebar.collapsed .profile-info,
+        .sidebar.collapsed .nav-btn span {
+          opacity: 1;
+          transform: translateX(0);
+          width: auto;
+          max-height: none;
+        }
+
+        .profile-header-card {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .profile-stats {
+          justify-content: center;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-cards {
+          flex-direction: column;
+        }
+
+        .search-input {
+          width: 200px;
+        }
+
+        .employee-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .section-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        
+        .employee-search input {
+          width: 100%;
+        }
+
+        .review-employee-details {
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .review-meta {
+          flex-direction: column;
+          gap: 0.5rem;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hr-dashboard-layout">
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <h2>HR Dashboard</h2>
+          <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="toggleSidebar()"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+
+        <div class="profile-section" id="profileSection">
+          <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">Arun Mehta</div>
+            <div class="profile-role">Head Of HR & People Analyst</div>
+          </div>
+        </div>
+
+        <div class="nav-buttons">
+          <button
+            class="nav-btn active"
+            onclick="setActiveSection('dashboard')"
+          >
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </button>
+          <button class="nav-btn" onclick="setActiveSection('employees')">
+            <i class="fas fa-users"></i>
+            <span>Employee Directory</span>
+          </button>
+          <button class="nav-btn" onclick="setActiveSection('performance')">
+            <i class="fas fa-chart-line"></i>
+            <span>Performance</span>
+          </button>
+          <button class="nav-btn" onclick="window.location.href='hd.html'">
+    <i class="fas fa-chart-bar"></i>
+    <span>Analytics</span>
+</button>
+
+          <button class="nav-btn" onclick="setActiveSection('documents')">
+            <i class="fas fa-file-alt"></i>
+            <span>Documents</span>
+          </button>
+          <button class="nav-btn" onclick="setActiveSection('orgchart')">
+            <i class="fas fa-sitemap"></i>
+            <span>Org Chart</span>
+          </button>
+          <!-- Added Applications navigation button -->
+          <button class="nav-btn" onclick="setActiveSection('applications')">
+            <i class="fas fa-paper-plane"></i>
+            <span>Applications</span>
+          </button>
+                     <button class="nav-btn" onclick="openProfilePage()">
+             <i class="fas fa-user"></i>
+             <span>Profile</span>
+           </button>
+           <!-- Test button for burnout functionality -->
+           <button class="nav-btn" onclick="testBurnoutFromHR()" style="background: #ff9800; color: white;">
+             <i class="fas fa-flask"></i>
+             <span>Test Burnout</span>
+           </button>
+           <!-- Test button for intervention functionality -->
+           <button class="nav-btn" onclick="testInterventionFromHR()" style="background: #e91e63; color: white;">
+             <i class="fas fa-heart"></i>
+             <span>Test Intervention</span>
+           </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+          <div
+            class="header-left"
+            style="display: flex; align-items: center; gap: 0.75rem"
+          >
+            <button
+              class="sidebar-toggle"
+              id="headerSidebarToggle"
+              onclick="toggleSidebar()"
+              style="
+                background: none;
+                border: none;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                border-radius: 8px;
+              "
+            >
+              <i class="fas fa-bars"></i>
+            </button>
+            <h1>HR Dashboard</h1>
+          </div>
+          <div class="header-right">
+            <div class="search-bar">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                class="search-input"
+                placeholder="Search employees, documents..."
+              />
+            </div>
+            <div class="user-menu">
+              <button class="user-menu-btn" onclick="toggleUserDropdown()">
+                <div class="user-avatar">AM</div>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="user-dropdown" id="userDropdown">
+                <a href="#" class="dropdown-item">
+                  <i class="fas fa-user"></i>
+                  Profile
+                </a>
+                <a href="#" class="dropdown-item">
+                  <i class="fas fa-cog"></i>
+                  Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                  <i class="fas fa-sign-out-alt"></i>
+                  Logout
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+          <!-- Dashboard Section -->
+          <div class="section-content active" id="dashboard">
+            <!-- Profile Header Card -->
+            <div class="profile-header-card">
+              <div class="profile-header-content">
+                <div class="profile-avatar-large" id="profileAvatarLarge">
+                  AM
+                </div>
+                                 <div class="profile-info">
+                   <h1 id="profileName" onclick="editProfileField(this, 'fullName')" style="cursor: pointer; border-bottom: 2px solid transparent;" onmouseover="this.style.borderBottomColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderBottomColor='transparent'">Arun Mehta</h1>
+                   <p class="profile-subtitle">
+                     <span id="profileTitle" onclick="editProfileField(this, 'position')" style="cursor: pointer; border-bottom: 2px solid transparent;" onmouseover="this.style.borderBottomColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderBottomColor='transparent'">Head Of HR & People Analyst</span> •
+                     <span id="profileDept" onclick="editProfileField(this, 'department')" style="cursor: pointer; border-bottom: 2px solid transparent;" onmouseover="this.style.borderBottomColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderBottomColor='transparent'">Human Resources</span> •
+                     <span id="profileLoc" onclick="editProfileField(this, 'location')" style="cursor: pointer; border-bottom: 2px solid transparent;" onmouseover="this.style.borderBottomColor='rgba(255,255,255,0.3)'" onmouseout="this.style.borderBottomColor='transparent'">Mumbai, India</span>
+                   </p>
+                 </div>
+              </div>
+
+              <div class="profile-stats">
+                <div class="stat-item">
+                  <p class="stat-number" id="yearsHere">3.2</p>
+                  <p class="stat-label">Years Here</p>
+                </div>
+                <div class="stat-item">
+                  <p class="stat-number" id="projectCount">12</p>
+                  <p class="stat-label">Projects</p>
+                </div>
+                <div class="stat-item">
+                  <p class="stat-number" id="certCount">5</p>
+                  <p class="stat-label">Certifications</p>
+                </div>
+              </div>
+
+              <div class="profile-actions">
+                <button class="action-btn" onclick="openEditModal()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    />
+                  </svg>
+                  Add Achievement
+                </button>
+                <button class="action-btn" onclick="openSkillsModal()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Update Skills
+                </button>
+                <button class="action-btn" onclick="exportToPDF()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                  Export PDF
+                </button>
+                                 <button class="action-btn" onclick="refreshData()">
+                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path
+                       stroke-linecap="round"
+                       stroke-linejoin="round"
+                       stroke-width="2"
+                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                     />
+                   </svg>
+                   Refresh Data
+                 </button>
+                 <button class="action-btn" onclick="refreshProfileData()">
+                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path
+                       stroke-linecap="round"
+                       stroke-linejoin="round"
+                       stroke-width="2"
+                       d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                     />
+                   </svg>
+                   Refresh Profile
+                 </button>
+              </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-title">Total Employees</div>
+                  <div
+                    class="stat-icon"
+                    style="background: var(--gradient-primary)"
+                  >
+                    <i class="fas fa-users" style="color: white"></i>
+                  </div>
+                </div>
+                <div class="stat-value">247</div>
+                <div class="stat-change positive">
+                  <i class="fas fa-arrow-up"></i>
+                  +12% from last month
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-title">New Hires</div>
+                  <div
+                    class="stat-icon"
+                    style="background: var(--gradient-success)"
+                  >
+                    <i class="fas fa-user-plus" style="color: white"></i>
+                  </div>
+                </div>
+                <div class="stat-value">18</div>
+                <div class="stat-change positive">
+                  <i class="fas fa-arrow-up"></i>
+                  +5 this month
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-title">Attrition Rate</div>
+                  <div
+                    class="stat-icon"
+                    style="background: var(--gradient-warning)"
+                  >
+                    <i class="fas fa-chart-line" style="color: white"></i>
+                  </div>
+                </div>
+                <div class="stat-value">3.2%</div>
+                <div class="stat-change negative">
+                  <i class="fas fa-arrow-down"></i>
+                  -0.8% from last quarter
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-header">
+                  <div class="stat-title">Avg Performance</div>
+                  <div
+                    class="stat-icon"
+                    style="background: var(--gradient-primary)"
+                  >
+                    <i class="fas fa-star" style="color: white"></i>
+                  </div>
+                </div>
+                <div class="stat-value">4.3</div>
+                <div class="stat-change positive">
+                  <i class="fas fa-arrow-up"></i>
+                  +0.2 from last review
+                </div>
+              </div>
+            </div>
+
+            <!-- Bio Section -->
+            <div class="bio-section">
+              <h3
+                style="
+                  margin-bottom: 1rem;
+                  font-size: 1.25rem;
+                  font-weight: 700;
+                "
+              >
+                About
+              </h3>
+              <div class="bio-content">
+                Experienced HR professional with over 4 years of expertise in
+                talent acquisition, employee engagement, and organizational
+                development. Passionate about creating inclusive workplace
+                cultures and driving strategic HR initiatives that align with
+                business objectives.
+              </div>
+                             <button class="bio-edit-btn" onclick="editBio()">
+                 <i class="fas fa-edit"></i>
+                 Edit Bio
+               </button>
+            </div>
+
+            <!-- Broadcast Message Section -->
+            <div class="bio-section" style="padding: 2rem">
+              <h3
+                style="
+                  margin-bottom: 1rem;
+                  font-size: 1.25rem;
+                  font-weight: 700;
+                "
+              >
+                Broadcast Message
+              </h3>
+              <form onsubmit="sendBroadcast(event)" class="space-y-4">
+                <div class="form-group">
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Message Title</label
+                  >
+                  <input
+                    id="messageTitle"
+                    type="text"
+                    class="search-input"
+                    placeholder="Enter message title..."
+                    style="width: 100%"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Message Content</label
+                  >
+                  <textarea
+                    id="messageContent"
+                    rows="3"
+                    class="search-input"
+                    placeholder="Enter your message content..."
+                    style="width: 100%; height: 100px"
+                    required
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Visibility</label
+                  >
+                  <select id="messageVisibility" class="search-input">
+                    <option value="all">All Employees</option>
+                    <option value="managers">Managers Only</option>
+                    <option value="staff">Staff Only</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-paper-plane"></i>
+                  Send Broadcast
+                </button>
+              </form>
+            </div>
+
+            <!-- Client Companies section -->
+            <div class="bio-section" style="padding: 2rem">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 1rem;
+                "
+              >
+                <h3 style="font-size: 1.25rem; font-weight: 700">
+                  Client Companies
+                </h3>
+                <button class="btn btn-primary" onclick="openClientModal()">
+                  <i class="fas fa-plus"></i> Add Client
+                </button>
+              </div>
+
+              <div
+                id="clientInputForm"
+                style="
+                  display: none;
+                  margin-bottom: 1.5rem;
+                  padding: 1rem;
+                  background: var(--bg-secondary);
+                  border-radius: 8px;
+                "
+              >
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr auto;
+                    gap: 1rem;
+                    align-items: end;
+                  "
+                >
+                  <div>
+                    <label
+                      style="
+                        display: block;
+                        margin-bottom: 0.5rem;
+                        font-weight: 600;
+                      "
+                      >Company Name</label
+                    >
+                    <input
+                      type="text"
+                      id="companyNameInput"
+                      placeholder="Enter company name"
+                      style="
+                        width: 100%;
+                        padding: 0.5rem;
+                        border: 1px solid var(--border-color);
+                        border-radius: 4px;
+                      "
+                    />
+                  </div>
+                  <div>
+                    <label
+                      style="
+                        display: block;
+                        margin-bottom: 0.5rem;
+                        font-weight: 600;
+                      "
+                      >Company Website URL</label
+                    >
+                    <input
+                      type="url"
+                      id="companyUrlInput"
+                      placeholder="https://company.com"
+                      style="
+                        width: 100%;
+                        padding: 0.5rem;
+                        border: 1px solid var(--border-color);
+                        border-radius: 4px;
+                      "
+                    />
+                  </div>
+                  <div style="display: flex; gap: 0.5rem">
+                    <button onclick="addClient()" class="btn btn-primary">
+                      Add
+                    </button>
+                    <button
+                      onclick="cancelAddClient()"
+                      class="btn btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="client-cards-wrapper">
+                <div class="client-cards-container" id="clientCardsContainer">
+                  <!-- Client cards will be populated here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Employee Directory Section -->
+          <div class="section-content" id="employees">
+            <div class="employee-cards-section">
+              <div class="section-header">
+                <h3 class="section-title">Employee Directory</h3>
+                <div class="employee-filters">
+                  <div class="employee-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search employees..." id="employeeSearch">
+              </div>
+                  <div class="department-filter">
+                    <select id="departmentFilter">
+                      <option value="all">All Departments</option>
+                      <option value="engineering">Engineering</option>
+                      <option value="design">Design</option>
+                      <option value="management">Management</option>
+                      <option value="analytics">Analytics</option>
+                      <option value="hr">HR</option>
+                      <option value="sales">Sales</option>
+                    </select>
+                          </div>
+                        </div>
+                        </div>
+              <div class="employee-grid" id="employeeGrid">
+                <!-- Employee cards will be populated here -->
+                          </div>
+            </div>
+          </div>
+
+          <!-- Performance Management Section -->
+          <div class="section-content" id="performance">
+            <div class="table-card">
+              <div class="table-header">
+                <h2 class="table-title">Performance Reviews</h2>
+                <button
+                  class="btn btn-primary"
+                  onclick="openPerformanceModal()"
+                  id="addReviewBtn"
+                >
+                  <i class="fas fa-plus"></i>
+                  Add Review
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  onclick="testModal()"
+                  style="margin-left: 10px;"
+                >
+                  <i class="fas fa-test"></i>
+                  Test Modal
+                </button>
+              </div>
+              <div
+                id="performanceList"
+                style="padding: 1rem"
+                class="space-y-4"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Documents Section -->
+          <div class="section-content" id="documents">
+            <div class="table-card" style="padding-bottom: 1rem">
+              <div class="table-header">
+                <h2 class="table-title">Document Upload Center</h2>
+              </div>
+              <div
+                class="file-upload-area"
+                onclick="document.getElementById('fileInput').click()"
+                style="margin: 1rem"
+              >
+                <i
+                  class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"
+                ></i>
+                <p
+                  class="text-lg font-semibold"
+                  style="color: var(--text-secondary)"
+                >
+                  Click to upload or drag and drop
+                </p>
+                <p class="text-sm" style="color: var(--text-light)">
+                  Supports PDF, DOC, DOCX, JPG, PNG (Max 10MB)
+                </p>
+                <input
+                  type="file"
+                  id="fileInput"
+                  multiple
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  class="hidden"
+                  onchange="handleFileUpload(event)"
+                />
+              </div>
+              <div
+                id="documentsList"
+                class="grid"
+                style="
+                  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                  gap: 1rem;
+                  padding: 0 1rem 1rem 1rem;
+                "
+              ></div>
+            </div>
+          </div>
+
+          <!-- Org Chart Section -->
+          <div class="section-content" id="orgchart">
+            <div class="table-card" style="padding: 1.5rem">
+              <h2 class="table-title" style="margin-bottom: 1rem">
+                Organizational Chart
+              </h2>
+              <div class="org-chart">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: center;
+                    margin: 10px 0;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <div
+                    class="stat-card"
+                    style="min-width: 150px; text-align: center"
+                  >
+                    CEO<br /><span style="color: var(--text-secondary)"
+                      >John Smith</span
+                    >
+                  </div>
+                </div>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    margin: 10px 0;
+                    flex-wrap: wrap;
+                  "
+                >
+                  <div
+                    class="stat-card"
+                    style="min-width: 150px; text-align: center"
+                  >
+                    CTO<br /><span style="color: var(--text-secondary)"
+                      >Sarah Johnson</span
+                    >
+                  </div>
+                  <div
+                    class="stat-card"
+                    style="min-width: 150px; text-align: center"
+                  >
+                    Head of HR<br /><span style="color: var(--text-secondary)"
+                      >Arun Mehta</span
+                    >
+                  </div>
+                  <div
+                    class="stat-card"
+                    style="min-width: 150px; text-align: center"
+                  >
+                    CFO<br /><span style="color: var(--text-secondary)"
+                      >Mike Davis</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Added Applications Section -->
+          <div class="section-content" id="applications">
+            <div class="activity-chart-container">
+              <div class="chart-header">
+                <div>
+                  <h3 style="margin: 0; color: #1f2937">Activity</h3>
+                  <div class="chart-tabs">
+                    <button class="chart-tab active">Application Sent</button>
+                    <button class="chart-tab">Profile Viewed</button>
+                  </div>
+                </div>
+                <div class="chart-sort">
+                  <span>Sort by</span>
+                  <select
+                    style="border: none; background: none; color: #3b82f6"
+                  >
+                    <option>Last 7 days</option>
+                    <option>Last 30 days</option>
+                    <option>Last 90 days</option>
+                  </select>
+                </div>
+              </div>
+              <div class="activity-chart">
+                <canvas id="activityChart" width="800" height="200"></canvas>
+              </div>
+            </div>
+
+            <div class="stats-cards">
+              <div class="stat-card">
+                <div class="stat-icon applications">
+                  <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>30</h3>
+                  <p>Application Sent</p>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon calls">
+                  <i class="fas fa-phone"></i>
+                </div>
+                <div class="stat-info">
+                  <h3>6</h3>
+                  <p>Scheduled Calls</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="applications-table">
+              <div class="table-header">
+                <h3>Recent Applications</h3>
+              </div>
+              <div class="applications-list" id="applicationsList">
+                <!-- Applications will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+             <!-- Added Email Modal for Applications -->
+       <div class="email-modal" id="emailModal">
+         <div class="email-content">
+           <div class="email-header">
+             <h3>Application Details</h3>
+             <button class="email-close" onclick="closeEmailModal()">
+               &times;
+             </button>
+           </div>
+           <div class="email-body" id="emailBody">
+             <!-- Email content will be populated by JavaScript -->
+           </div>
+           <div class="email-actions">
+             <button class="action-btn accept" onclick="acceptApplication()">
+               <i class="fas fa-check"></i> Accept Application
+             </button>
+             <button class="action-btn reject" onclick="rejectApplication()">
+               <i class="fas fa-times"></i> Reject Application
+             </button>
+             <button class="action-btn reply" onclick="replyToApplication()">
+               <i class="fas fa-reply"></i> Reply
+             </button>
+           </div>
+         </div>
+       </div>
+
+       <!-- Performance Review Modal -->
+       <div class="email-modal" id="performanceModal">
+         <div class="email-content" style="max-width:600px;">
+           <div class="email-header">
+             <h3>Add Performance Review</h3>
+             <button class="email-close" onclick="closePerformanceModal()">&times;</button>
+           </div>
+           <div class="email-body">
+             <form id="perfForm" onsubmit="submitPerformance(event)">
+               <div class="form-group">
+                 <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--text-primary);">Employee Name</label>
+                 <input type="text" id="perfEmpName" class="search-input" style="width:100%" placeholder="Enter employee name" required />
+               </div>
+               <div class="form-group">
+                 <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--text-primary);">Employee ID</label>
+                 <input type="text" id="perfEmpId" class="search-input" style="width:100%" placeholder="Enter employee ID" required />
+               </div>
+               <div class="form-group">
+                 <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--text-primary);">Employee Email</label>
+                 <input type="email" id="perfEmpEmail" class="search-input" style="width:100%" placeholder="Enter employee email" required />
+               </div>
+               <div class="form-group">
+                 <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--text-primary);">Performance Feedback</label>
+                 <textarea id="perfFeedback" rows="4" class="search-input" style="width:100%" placeholder="Provide detailed feedback about the employee's performance..." required></textarea>
+               </div>
+               <div class="form-group">
+                 <label style="display:block; margin-bottom:0.5rem; font-weight:600; color:var(--text-primary);">Star Rating (1-5)</label>
+                 <select id="perfRating" class="search-input" style="width:100%" required>
+                   <option value="">Select rating</option>
+                   <option value="5">5 - Excellent (Outstanding performance)</option>
+                   <option value="4">4 - Very Good (Above expectations)</option>
+                   <option value="3">3 - Good (Meets expectations)</option>
+                   <option value="2">2 - Fair (Below expectations)</option>
+                   <option value="1">1 - Poor (Unsatisfactory)</option>
+                 </select>
+               </div>
+               <div class="email-actions" style="justify-content:flex-end;">
+                 <button type="button" class="action-btn" onclick="closePerformanceModal()" style="background:#6b7280; color:white;">Cancel</button>
+                 <button type="submit" class="action-btn reply"><i class="fas fa-save"></i> Save Review</button>
+               </div>
+             </form>
+           </div>
+         </div>
+       </div>
+
+       <!-- Reply Modal for Applications -->
+       <div class="email-modal" id="replyModal">
+         <div class="email-content">
+           <div class="email-header">
+             <h3>Reply to Application</h3>
+             <button class="email-close" onclick="closeReplyModal()">
+               &times;
+             </button>
+           </div>
+           <div class="email-body">
+             <form id="replyForm" onsubmit="sendReply(event)">
+               <div class="form-group">
+                 <label>To:</label>
+                 <input type="email" id="replyToField" readonly class="search-input" style="width: 100%; background-color: #f3f4f6;">
+               </div>
+               <div class="form-group">
+                 <label>Subject:</label>
+                 <input type="text" id="replySubjectField" class="search-input" style="width: 100%;" required>
+               </div>
+               <div class="form-group">
+                 <label>Message:</label>
+                 <textarea id="replyMessageField" rows="6" class="search-input" style="width: 100%;" required></textarea>
+               </div>
+               <div class="email-actions">
+                 <button type="button" class="action-btn" onclick="closeReplyModal()" style="background: #6b7280;">
+                   Cancel
+                 </button>
+                 <button type="submit" class="action-btn reply">
+                   <i class="fas fa-paper-plane"></i> Send Reply
+                 </button>
+               </div>
+             </form>
+           </div>
+         </div>
+       </div>
+    </div>
+
+    <script>
+      // Test function
+      window.testModal = function() {
+        alert('Test button works!');
+        console.log('Test modal function called');
+      };
+
+      // Global function for testing
+      window.openPerformanceModal = function() {
+        console.log('Global openPerformanceModal function called!');
+        alert('Modal opening...');
+        const modal = document.getElementById('performanceModal');
+        if (modal) {
+          modal.classList.add('active');
+          console.log('Modal should be visible now');
+        } else {
+          console.error('Modal not found!');
+          alert('Modal not found!');
+        }
+      };
+
+      // HR Profile & Timeline state
+      let hrProfile = {
+        fullName: "Arun Mehta",
+        position: "Head Of HR & People Analyst",
+        department: "Human Resources",
+        employeeId: "HR-2024-001",
+        location: "Mumbai, India",
+        email: "arun.mehta@company.com",
+        phone: "+91 98765 43210",
+        linkedin: "https://linkedin.com/in/arunmehta",
+        pronouns: "He/Him",
+        photo: "",
+      };
+
+      let clientCompanies = [
+        { name: "Microsoft", url: "https://microsoft.com" },
+        { name: "Google", url: "https://google.com" },
+        { name: "Apple", url: "https://apple.com" },
+        { name: "Amazon", url: "https://amazon.com" },
+        { name: "Meta", url: "https://meta.com" },
+      ];
+
+      // Applications data with status tracking
+      let applicationsData = [
+        {
+          id: 1,
+          name: "Esther Howard",
+          email: "esther.howard@email.com",
+          subject: "Application for Senior Developer Position",
+          time: "1:24 PM",
+          avatar:
+            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+          message:
+            "Dear HR Team,\n\nI am writing to express my strong interest in the Senior Developer position at your company. With over 5 years of experience in full-stack development, I believe I would be a valuable addition to your team.\n\nI have extensive experience with React, Node.js, and modern web technologies. My previous role involved leading a team of developers and delivering high-quality software solutions.\n\nI have attached my resume for your review. I would welcome the opportunity to discuss how my skills and experience can contribute to your team's success.\n\nThank you for your consideration.\n\nBest regards,\nEsther Howard",
+          cv: "Esther_Howard_Resume.pdf",
+          status: "pending", // pending, accepted, rejected
+          appliedDate: new Date("2024-01-15"),
+        },
+        {
+          id: 2,
+          name: "Jane Cooper",
+          email: "jane.cooper@email.com",
+          subject: "Marketing Manager Position Application",
+          time: "12:32 PM",
+          avatar:
+            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+          message:
+            "Hello,\n\nI am excited to apply for the Marketing Manager position. With 7 years of experience in digital marketing and campaign management, I have successfully increased brand awareness and revenue for multiple companies.\n\nMy expertise includes social media marketing, content strategy, and data analytics. I have led campaigns that resulted in 40% increase in customer engagement.\n\nPlease find my resume attached. I look forward to hearing from you.\n\nBest regards,\nJane Cooper",
+          cv: "Jane_Cooper_Resume.pdf",
+          status: "pending",
+          appliedDate: new Date("2024-01-14"),
+        },
+        {
+          id: 3,
+          name: "Wade Warren",
+          email: "wade.warren@email.com",
+          subject: "UI/UX Designer Application",
+          time: "Yesterday at 8:57 PM",
+          avatar:
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          message:
+            "Dear Hiring Manager,\n\nI am writing to apply for the UI/UX Designer position. As a creative professional with 4 years of experience in user interface and user experience design, I am passionate about creating intuitive and engaging digital experiences.\n\nI have worked with various design tools including Figma, Adobe Creative Suite, and Sketch. My portfolio includes mobile apps, web applications, and e-commerce platforms.\n\nI would love to discuss how my design skills can help improve your user experience.\n\nThank you,\nWade Warren",
+          cv: "Wade_Warren_Portfolio.pdf",
+          status: "pending",
+          appliedDate: new Date("2024-01-13"),
+        },
+        {
+          id: 4,
+          name: "Robert Fox",
+          email: "robert.fox@email.com",
+          subject: "Data Analyst Position",
+          time: "Yesterday at 8:49 PM",
+          avatar:
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+          message:
+            "Hello HR Team,\n\nI am interested in the Data Analyst position at your company. With a strong background in statistics and data visualization, I can help turn complex data into actionable insights.\n\nI am proficient in Python, R, SQL, and various data visualization tools. In my previous role, I developed dashboards that helped reduce operational costs by 15%.\n\nI have attached my resume and would appreciate the opportunity to discuss my qualifications further.\n\nSincerely,\nRobert Fox",
+          cv: "Robert_Fox_Resume.pdf",
+          status: "pending",
+          appliedDate: new Date("2024-01-12"),
+        },
+      ];
+
+      // Application statistics
+      let applicationStats = {
+        total: 0,
+        accepted: 0,
+        rejected: 0,
+        pending: 0
+      };
+
+      let currentApplication = null;
+      let activeSection = "dashboard";
+      let sidebarCollapsed = false;
+
+      // Navigation functions
+      function setActiveSection(sectionId) {
+        // Hide all content sections
+        const contentSections = document.querySelectorAll(".section-content");
+        contentSections.forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        // Deactivate all nav buttons
+        const navButtons = document.querySelectorAll(".nav-btn");
+        navButtons.forEach((btn) => {
+          btn.classList.remove("active");
+        });
+
+        // Activate the selected section
+        const selectedSection = document.getElementById(sectionId);
+        if (selectedSection) {
+          selectedSection.classList.add("active");
+        }
+
+        // Activate the corresponding nav button
+        const selectedButton = Array.from(navButtons).find((btn) => {
+          const spanText = btn.querySelector("span").textContent.toLowerCase();
+          return (
+            spanText.includes(sectionId.toLowerCase()) ||
+            (sectionId === "employees" && spanText.includes("employee")) ||
+            (sectionId === "orgchart" && spanText.includes("org"))
+          );
+        });
+
+        if (selectedButton) {
+          selectedButton.classList.add("active");
+        }
+
+        activeSection = sectionId;
+
+        // Initialize charts if analytics section is selected
+        if (sectionId === "analytics") {
+          setTimeout(initializeCharts, 100);
+        }
+      }
+
+             function toggleSidebar() {
+         const sidebar = document.getElementById("sidebar");
+         const mainContent = document.querySelector(".main-content");
+         
+         if (sidebar.classList.contains("collapsed")) {
+           sidebar.classList.remove("collapsed");
+           mainContent.style.marginLeft = "280px";
+           
+           // Restore profile info in sidebar
+           const profileInfo = document.querySelector('.profile-info');
+           if (profileInfo) profileInfo.style.display = 'flex';
+         } else {
+           sidebar.classList.add("collapsed");
+           mainContent.style.marginLeft = "80px";
+           
+           // Hide profile info in sidebar when collapsed
+           const profileInfo = document.querySelector('.profile-info');
+           if (profileInfo) profileInfo.style.display = 'none';
+         }
+         
+         sidebarCollapsed = !sidebarCollapsed;
+       }
+
+             function toggleUserDropdown() {
+         const dropdown = document.getElementById("userDropdown");
+         dropdown.classList.toggle("show");
+       }
+
+       function openProfilePage() {
+         // Store current profile data before navigating
+         const currentProfile = {
+           fullName: hrProfile.fullName,
+           position: hrProfile.position,
+           department: hrProfile.department,
+           location: hrProfile.location,
+           email: hrProfile.email,
+           phone: hrProfile.phone,
+           linkedin: hrProfile.linkedin
+         };
+         localStorage.setItem('hrProfileData', JSON.stringify(currentProfile));
+         
+         // Navigate to profile page
+         window.location.href = 'hp.html';
+       }
+
+       function loadProfileData() {
+         const savedProfile = localStorage.getItem('hrProfileData');
+         if (savedProfile) {
+           const profileData = JSON.parse(savedProfile);
+           
+           // Update hrProfile object
+           hrProfile = { ...hrProfile, ...profileData };
+           
+           // Update UI elements
+           const profileName = document.getElementById('profileName');
+           const profileTitle = document.getElementById('profileTitle');
+           const profileDept = document.getElementById('profileDept');
+           const profileLoc = document.getElementById('profileLoc');
+           
+           if (profileName) profileName.textContent = profileData.fullName || 'Arun Mehta';
+           if (profileTitle) profileTitle.textContent = profileData.position || 'Head Of HR & People Analyst';
+           if (profileDept) profileDept.textContent = profileData.department || 'Human Resources';
+           if (profileLoc) profileLoc.textContent = profileData.location || 'Mumbai, India';
+           
+           // Update sidebar profile info
+           const sidebarProfileName = document.querySelector('.profile-name');
+           if (sidebarProfileName) sidebarProfileName.textContent = profileData.fullName || 'Arun Mehta';
+           
+           const sidebarProfileRole = document.querySelector('.profile-role');
+           if (sidebarProfileRole) sidebarProfileRole.textContent = profileData.position || 'Head Of HR & People Analyst';
+           
+           // Update bio section if it exists
+           if (profileData.summary) {
+             const bioContent = document.querySelector('.bio-content');
+             if (bioContent) bioContent.textContent = profileData.summary;
+           }
+           
+           // Update profile image if it exists
+           const savedImage = localStorage.getItem('hrProfileImage');
+           if (savedImage) {
+             // Update sidebar profile avatar
+             const sidebarAvatar = document.querySelector('.profile-avatar');
+             if (sidebarAvatar) {
+               sidebarAvatar.innerHTML = `<img src="${savedImage}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+             }
+             
+             // Update main profile avatar
+             const mainProfileAvatar = document.getElementById('profileAvatarLarge');
+             if (mainProfileAvatar) {
+               mainProfileAvatar.innerHTML = `<img src="${savedImage}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+             }
+           }
+         }
+       }
+
+       // Function to manually refresh profile data (can be called from anywhere)
+       function refreshProfileData() {
+         loadProfileData();
+         showNotification('Profile data refreshed!', 'success');
+       }
+
+       // Notification system for better user feedback
+       function showNotification(message, type = 'info') {
+         const notification = document.createElement('div');
+         notification.textContent = message;
+         notification.style.cssText = `
+           position: fixed;
+           top: 20px;
+           right: 20px;
+           background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+           color: white;
+           padding: 12px 20px;
+           border-radius: 8px;
+           z-index: 10000;
+           font-weight: 500;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+           animation: slideInRight 0.3s ease-out;
+         `;
+         document.body.appendChild(notification);
+         setTimeout(() => notification.remove(), 3000);
+       }
+
+       // Add CSS animation for notifications
+       const style = document.createElement('style');
+       style.textContent = `
+         @keyframes slideInRight {
+           from { 
+             opacity: 0;
+             transform: translateX(100%);
+           }
+           to { 
+             opacity: 1;
+             transform: translateX(0);
+           }
+         }
+       `;
+       document.head.appendChild(style);
+
+       // Profile field editing functionality
+       function editProfileField(element, fieldName) {
+         const currentValue = element.textContent;
+         
+         // Create input field
+         const input = document.createElement('input');
+         input.type = 'text';
+         input.value = currentValue;
+         input.style.cssText = `
+           background: transparent;
+           border: none;
+           color: white;
+           font-size: inherit;
+           font-weight: inherit;
+           width: 100%;
+           outline: none;
+           border-bottom: 2px solid rgba(255,255,255,0.8);
+         `;
+         
+         // Create save button
+         const saveBtn = document.createElement('button');
+         saveBtn.textContent = '✓';
+         saveBtn.style.cssText = `
+           background: rgba(255,255,255,0.2);
+           border: none;
+           color: white;
+           padding: 2px 8px;
+           border-radius: 4px;
+           margin-left: 8px;
+           cursor: pointer;
+           font-size: 12px;
+         `;
+         
+         // Create cancel button
+         const cancelBtn = document.createElement('button');
+         cancelBtn.textContent = '✗';
+         cancelBtn.style.cssText = `
+           background: rgba(255,255,255,0.2);
+           border: none;
+           color: white;
+           padding: 2px 8px;
+           border-radius: 4px;
+           margin-left: 4px;
+           cursor: pointer;
+           font-size: 12px;
+         `;
+         
+         // Save functionality
+         saveBtn.onclick = function() {
+           const newValue = input.value.trim();
+           if (newValue) {
+             element.textContent = newValue;
+             
+             // Update hrProfile object
+             hrProfile[fieldName] = newValue;
+             
+             // Update localStorage
+             const savedProfile = localStorage.getItem('hrProfileData');
+             if (savedProfile) {
+               const profileData = JSON.parse(savedProfile);
+               profileData[fieldName] = newValue;
+               localStorage.setItem('hrProfileData', JSON.stringify(profileData));
+             }
+             
+             // Update sidebar if needed
+             if (fieldName === 'fullName') {
+               const sidebarName = document.querySelector('.profile-name');
+               if (sidebarName) sidebarName.textContent = newValue;
+             }
+             if (fieldName === 'position') {
+               const sidebarRole = document.querySelector('.profile-role');
+               if (sidebarRole) sidebarRole.textContent = newValue;
+             }
+             
+             showNotification(`${fieldName} updated successfully!`, 'success');
+           }
+           
+           // Clean up
+           input.remove();
+           saveBtn.remove();
+           cancelBtn.remove();
+         };
+         
+         // Cancel functionality
+         cancelBtn.onclick = function() {
+           element.textContent = currentValue;
+           input.remove();
+           saveBtn.remove();
+           cancelBtn.remove();
+         };
+         
+         // Replace text with input
+         element.textContent = '';
+         element.appendChild(input);
+         element.appendChild(saveBtn);
+         element.appendChild(cancelBtn);
+         
+         // Focus on input
+         input.focus();
+         input.select();
+         
+         // Handle Enter key
+         input.onkeydown = function(e) {
+           if (e.key === 'Enter') {
+             saveBtn.click();
+           } else if (e.key === 'Escape') {
+             cancelBtn.click();
+           }
+         };
+       }
+
+       // Bio editing functionality
+       function editBio() {
+         const bioContent = document.querySelector('.bio-content');
+         const bioEditBtn = document.querySelector('.bio-edit-btn');
+         
+         if (bioContent && bioEditBtn) {
+           // Create textarea for editing
+           const textarea = document.createElement('textarea');
+           textarea.value = bioContent.textContent;
+           textarea.className = 'bio-content';
+           textarea.style.width = '100%';
+           textarea.style.minHeight = '100px';
+           textarea.style.resize = 'vertical';
+           textarea.style.border = '1px solid var(--border-color)';
+           textarea.style.borderRadius = '6px';
+           textarea.style.padding = '0.5rem';
+           textarea.style.fontFamily = 'inherit';
+           
+           // Create save button
+           const saveBtn = document.createElement('button');
+           saveBtn.textContent = 'Save Bio';
+           saveBtn.className = 'btn btn-primary';
+           saveBtn.style.marginTop = '1rem';
+           saveBtn.onclick = function() {
+             const newBio = textarea.value;
+             bioContent.textContent = newBio;
+             
+             // Update hrProfile object
+             hrProfile.summary = newBio;
+             
+             // Save to localStorage
+             const savedProfile = localStorage.getItem('hrProfileData');
+             if (savedProfile) {
+               const profileData = JSON.parse(savedProfile);
+               profileData.summary = newBio;
+               localStorage.setItem('hrProfileData', JSON.stringify(profileData));
+             }
+             
+             // Show notification
+             showNotification('Bio updated successfully!', 'success');
+             
+             // Remove edit mode
+             bioContent.style.display = 'block';
+             bioEditBtn.style.display = 'block';
+             textarea.remove();
+             saveBtn.remove();
+           };
+           
+           // Create cancel button
+           const cancelBtn = document.createElement('button');
+           cancelBtn.textContent = 'Cancel';
+           cancelBtn.className = 'btn btn-secondary';
+           cancelBtn.style.marginTop = '1rem';
+           cancelBtn.style.marginLeft = '0.5rem';
+           cancelBtn.onclick = function() {
+             // Restore original content
+             bioContent.style.display = 'block';
+             bioEditBtn.style.display = 'block';
+             textarea.remove();
+             saveBtn.remove();
+             cancelBtn.remove();
+           };
+           
+           // Replace content with textarea
+           bioContent.style.display = 'none';
+           bioEditBtn.style.display = 'none';
+           
+           // Insert textarea and buttons
+           bioContent.parentNode.insertBefore(textarea, bioContent.nextSibling);
+           bioContent.parentNode.insertBefore(saveBtn, textarea.nextSibling);
+           bioContent.parentNode.insertBefore(cancelBtn, saveBtn.nextSibling);
+           
+           // Focus on textarea
+           textarea.focus();
+         }
+       }
+
+             // Applications functions
+       function loadApplications() {
+         updateApplicationsDisplay();
+       }
+
+      function openEmailModal(application) {
+        currentApplication = application;
+        const modal = document.getElementById("emailModal");
+        const emailBody = document.getElementById("emailBody");
+
+        emailBody.innerHTML = `
+                <div class="email-from">
+                    <img src="${application.avatar}" alt="${application.name}">
+                    <div class="email-from-info">
+                        <h4>${application.name}</h4>
+                        <p>${application.email} • ${application.time}</p>
+                    </div>
+                </div>
+                <div class="email-subject">${application.subject}</div>
+                <div class="email-message">${application.message.replace(
+                  /\n/g,
+                  "<br>"
+                )}</div>
+                <div class="cv-attachment">
+                    <div class="cv-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="cv-info">
+                        <h5>${application.cv}</h5>
+                        <p>PDF Document • 245 KB</p>
+                    </div>
+                </div>
+            `;
+
+        modal.classList.add("active");
+      }
+
+      function closeEmailModal() {
+        document.getElementById("emailModal").classList.remove("active");
+        currentApplication = null;
+      }
+
+             function acceptApplication() {
+         if (currentApplication) {
+           // Update application status
+           currentApplication.status = "accepted";
+           currentApplication.processedDate = new Date();
+           
+           // Update the applicationsData array
+           const appIndex = applicationsData.findIndex(app => app.id === currentApplication.id);
+           if (appIndex !== -1) {
+             applicationsData[appIndex] = currentApplication;
+           }
+           
+           // Send acceptance email
+           sendEmail(
+             currentApplication.email,
+             "Application Accepted",
+             `Dear ${currentApplication.name},\n\nWe are pleased to inform you that your application for the ${currentApplication.subject} has been accepted!\n\nWe will contact you within 2-3 business days to schedule an interview and discuss next steps.\n\nBest regards,\nHR Team\nharishm.personnel@gmail.com`
+           );
+
+           // Update statistics and refresh display
+           updateApplicationStats();
+           updateApplicationsDisplay();
+           drawActivityChart();
+           
+           alert(
+             `Application from ${currentApplication.name} has been accepted!`
+           );
+           closeEmailModal();
+         }
+       }
+
+             function rejectApplication() {
+         if (currentApplication) {
+           // Update application status
+           currentApplication.status = "rejected";
+           currentApplication.processedDate = new Date();
+           
+           // Update the applicationsData array
+           const appIndex = applicationsData.findIndex(app => app.id === currentApplication.id);
+           if (appIndex !== -1) {
+             applicationsData[appIndex] = currentApplication;
+           }
+           
+           // Send rejection email
+           sendEmail(
+             currentApplication.email,
+             "Application Status Update",
+             `Dear ${currentApplication.name},\n\nThank you for your interest in our company and for applying to the ${currentApplication.subject} position.\n\nAfter careful consideration of your application, we have decided to move forward with other candidates whose qualifications more closely match our current needs.\n\nWe appreciate the time you took to apply and wish you the best in your job search.\n\nBest regards,\nHR Team\nharishm.personnel@gmail.com`
+           );
+
+           // Update statistics and refresh display
+           updateApplicationStats();
+           updateApplicationsDisplay();
+           drawActivityChart();
+           
+           alert(
+             `Application from ${currentApplication.name} has been rejected.`
+           );
+           closeEmailModal();
+         }
+       }
+
+             function replyToApplication() {
+         if (currentApplication) {
+           // Show reply modal
+           const replyModal = document.getElementById("replyModal");
+           const replyToField = document.getElementById("replyToField");
+           const replySubjectField = document.getElementById("replySubjectField");
+           const replyMessageField = document.getElementById("replyMessageField");
+           
+           // Pre-fill the reply form
+           replyToField.value = currentApplication.email;
+           replySubjectField.value = "Re: " + currentApplication.subject;
+           replyMessageField.value = `Dear ${currentApplication.name},\n\nThank you for your application. We will review it and get back to you soon.\n\nBest regards,\nHR Team\nharishm.personnel@gmail.com`;
+           
+           replyModal.classList.add("active");
+         }
+       }
+
+             function sendEmail(to, subject, message) {
+         console.log(`[v0] Sending email to: ${to}`);
+         console.log(`[v0] From: harishm.personnel@gmail.com`);
+         console.log(`[v0] Subject: ${subject}`);
+         console.log(`[v0] Message: ${message}`);
+         
+         // Store email in localStorage for tracking
+         const emailData = {
+           to: to,
+           from: "harishm.personnel@gmail.com",
+           subject: subject,
+           message: message,
+           timestamp: new Date().toISOString(),
+           status: "sent"
+         };
+         
+         const emails = JSON.parse(localStorage.getItem('hrEmails') || '[]');
+         emails.push(emailData);
+         localStorage.setItem('hrEmails', JSON.stringify(emails));
+         
+         console.log(`Email stored in localStorage:`, emailData);
+       }
+
+       // Update application statistics
+       function updateApplicationStats() {
+         applicationStats.total = applicationsData.length;
+         applicationStats.accepted = applicationsData.filter(app => app.status === "accepted").length;
+         applicationStats.rejected = applicationsData.filter(app => app.status === "rejected").length;
+         applicationStats.pending = applicationsData.filter(app => app.status === "pending").length;
+         
+         // Update the display
+         updateStatsDisplay();
+       }
+
+       // Update statistics display
+       function updateStatsDisplay() {
+         const applicationsCount = document.querySelector('.stat-info h3');
+         if (applicationsCount) {
+           applicationsCount.textContent = applicationStats.total;
+         }
+       }
+
+       // Update applications display with status indicators
+       function updateApplicationsDisplay() {
+         const applicationsList = document.getElementById("applicationsList");
+         if (!applicationsList) return;
+
+         applicationsList.innerHTML = "";
+
+         applicationsData.forEach((app) => {
+           const applicationItem = document.createElement("div");
+           applicationItem.className = "application-item";
+           applicationItem.onclick = () => openEmailModal(app);
+
+           // Add status indicator
+           const statusClass = app.status === "accepted" ? "status-accepted" : 
+                             app.status === "rejected" ? "status-rejected" : "status-pending";
+           const statusText = app.status === "accepted" ? "✓ Accepted" : 
+                            app.status === "rejected" ? "✗ Rejected" : "⏳ Pending";
+
+           applicationItem.innerHTML = `
+             <img src="${app.avatar}" alt="${app.name}" class="applicant-avatar">
+             <div class="application-info">
+                 <div class="applicant-name">${app.name}</div>
+                 <div class="application-subject">${app.subject}</div>
+                 <div class="application-status ${statusClass}">${statusText}</div>
+             </div>
+             <div class="application-time">${app.time}</div>
+         `;
+
+           applicationsList.appendChild(applicationItem);
+         });
+       }
+
+             function drawActivityChart() {
+         const canvas = document.getElementById("activityChart");
+         if (!canvas) return;
+
+         const ctx = canvas.getContext("2d");
+
+         // Clear canvas
+         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+         // Generate chart data from applications
+         const last7Days = [];
+         const labels = [];
+         
+         for (let i = 6; i >= 0; i--) {
+           const date = new Date();
+           date.setDate(date.getDate() - i);
+           const dateStr = date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
+           labels.push(dateStr);
+           
+           // Count applications for this date
+           const count = applicationsData.filter(app => {
+             const appDate = new Date(app.appliedDate);
+             return appDate.toDateString() === date.toDateString();
+           }).length;
+           
+           last7Days.push(count);
+         }
+
+        // Chart dimensions
+        const padding = 40;
+        const chartWidth = canvas.width - 2 * padding;
+        const chartHeight = canvas.height - 2 * padding;
+
+                 // Find max value for scaling
+         const maxValue = Math.max(...last7Days) || 1;
+
+         // Draw grid lines
+         ctx.strokeStyle = "#f3f4f6";
+         ctx.lineWidth = 1;
+
+         for (let i = 0; i <= 4; i++) {
+           const y = padding + (chartHeight / 4) * i;
+           ctx.beginPath();
+           ctx.moveTo(padding, y);
+           ctx.lineTo(canvas.width - padding, y);
+           ctx.stroke();
+         }
+
+         // Draw chart line
+         ctx.strokeStyle = "#3b82f6";
+         ctx.lineWidth = 3;
+         ctx.beginPath();
+
+         last7Days.forEach((value, index) => {
+           const x = padding + (chartWidth / (last7Days.length - 1)) * index;
+           const y = padding + chartHeight - (value / maxValue) * chartHeight;
+
+           if (index === 0) {
+             ctx.moveTo(x, y);
+           } else {
+             ctx.lineTo(x, y);
+           }
+         });
+
+         ctx.stroke();
+
+         // Draw data points
+         ctx.fillStyle = "#3b82f6";
+         last7Days.forEach((value, index) => {
+           const x = padding + (chartWidth / (last7Days.length - 1)) * index;
+           const y = padding + chartHeight - (value / maxValue) * chartHeight;
+
+           ctx.beginPath();
+           ctx.arc(x, y, 4, 0, 2 * Math.PI);
+           ctx.fill();
+         });
+
+         // Draw labels
+         ctx.fillStyle = "#6b7280";
+         ctx.font = "12px Arial";
+         ctx.textAlign = "center";
+
+         labels.forEach((label, index) => {
+           const x = padding + (chartWidth / (last7Days.length - 1)) * index;
+           ctx.fillText(label, x, canvas.height - 10);
+         });
+
+         // Draw y-axis labels
+         ctx.textAlign = "right";
+         for (let i = 0; i <= 4; i++) {
+           const value = Math.round((maxValue / 4) * (4 - i));
+           const y = padding + (chartHeight / 4) * i + 4;
+           ctx.fillText(value.toString(), padding - 10, y);
+         }
+      }
+
+      // Client companies functions
+      function openClientModal() {
+        const form = document.getElementById("clientInputForm");
+        form.style.display = form.style.display === "none" ? "block" : "none";
+      }
+
+      function addClient() {
+        const nameInput = document.getElementById("companyNameInput");
+        const urlInput = document.getElementById("companyUrlInput");
+
+        if (nameInput.value && urlInput.value) {
+          clientCompanies.push({
+            name: nameInput.value,
+            url: urlInput.value,
+          });
+
+          nameInput.value = "";
+          urlInput.value = "";
+          document.getElementById("clientInputForm").style.display = "none";
+
+          renderClientCards();
+        }
+      }
+
+      function cancelAddClient() {
+        document.getElementById("companyNameInput").value = "";
+        document.getElementById("companyUrlInput").value = "";
+        document.getElementById("clientInputForm").style.display = "none";
+      }
+
+             function renderClientCards() {
+         const container = document.getElementById("clientCardsContainer");
+         if (!container) return;
+
+         container.innerHTML = "";
+
+         // Duplicate the array to create seamless loop
+         const duplicatedClients = [...clientCompanies, ...clientCompanies];
+
+         duplicatedClients.forEach((client) => {
+           const card = document.createElement("div");
+           card.className = "client-card";
+           
+           // Extract domain from URL to show appropriate icon
+           const domain = new URL(client.url).hostname.replace('www.', '');
+           const icon = getDomainIcon(domain);
+           
+           card.innerHTML = `
+                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                         <i class="${icon}" style="font-size: 1.2rem; color: var(--primary-color);"></i>
+                         <h4 style="font-weight: 600;">${client.name}</h4>
+                     </div>
+                     <a href="${client.url}" target="_blank" style="color: var(--primary-color); text-decoration: none; font-size: 0.875rem;">
+                         Visit Website
+                     </a>
+                 `;
+           container.appendChild(card);
+         });
+       }
+
+       function getDomainIcon(domain) {
+         const domainIcons = {
+           'microsoft.com': 'fab fa-microsoft',
+           'google.com': 'fab fa-google',
+           'apple.com': 'fab fa-apple',
+           'amazon.com': 'fab fa-amazon',
+           'meta.com': 'fab fa-facebook',
+           'facebook.com': 'fab fa-facebook',
+           'twitter.com': 'fab fa-twitter',
+           'linkedin.com': 'fab fa-linkedin',
+           'github.com': 'fab fa-github',
+           'youtube.com': 'fab fa-youtube',
+           'instagram.com': 'fab fa-instagram',
+           'netflix.com': 'fab fa-netflix',
+           'spotify.com': 'fab fa-spotify',
+           'discord.com': 'fab fa-discord',
+           'slack.com': 'fab fa-slack',
+           'zoom.us': 'fas fa-video',
+           'teams.microsoft.com': 'fas fa-users',
+           'notion.so': 'fas fa-sticky-note',
+           'figma.com': 'fab fa-figma',
+           'adobe.com': 'fab fa-adobe',
+           'salesforce.com': 'fab fa-salesforce',
+           'hubspot.com': 'fas fa-hub',
+           'shopify.com': 'fas fa-shopping-cart',
+           'stripe.com': 'fab fa-stripe',
+           'airbnb.com': 'fas fa-home',
+           'uber.com': 'fas fa-car',
+           'lyft.com': 'fas fa-car-side',
+           'doordash.com': 'fas fa-utensils',
+           'grubhub.com': 'fas fa-hamburger',
+           'spotify.com': 'fab fa-spotify',
+           'pinterest.com': 'fab fa-pinterest',
+           'reddit.com': 'fab fa-reddit',
+           'tiktok.com': 'fab fa-tiktok',
+           'snapchat.com': 'fab fa-snapchat',
+           'whatsapp.com': 'fab fa-whatsapp',
+           'telegram.org': 'fab fa-telegram',
+           'signal.org': 'fas fa-comment',
+           'dropbox.com': 'fab fa-dropbox',
+           'box.com': 'fas fa-box',
+           'onedrive.live.com': 'fas fa-cloud',
+           'drive.google.com': 'fab fa-google-drive',
+           'icloud.com': 'fas fa-cloud',
+           'aws.amazon.com': 'fab fa-aws',
+           'azure.microsoft.com': 'fab fa-microsoft',
+           'cloud.google.com': 'fab fa-google',
+           'heroku.com': 'fas fa-cloud',
+           'vercel.com': 'fas fa-bolt',
+           'netlify.com': 'fas fa-rocket',
+           'wordpress.com': 'fab fa-wordpress',
+           'squarespace.com': 'fas fa-square',
+           'wix.com': 'fas fa-window-maximize',
+           'webflow.com': 'fas fa-code',
+           'bubble.io': 'fas fa-bubble',
+           'zapier.com': 'fas fa-bolt',
+           'ifttt.com': 'fas fa-link',
+           'make.com': 'fas fa-cogs',
+           'n8n.io': 'fas fa-network-wired',
+           'airtable.com': 'fas fa-table',
+           'notion.so': 'fas fa-sticky-note',
+           'clickup.com': 'fas fa-tasks',
+           'asana.com': 'fas fa-project-diagram',
+           'trello.com': 'fab fa-trello',
+           'monday.com': 'fas fa-calendar-week',
+           'jira.atlassian.com': 'fab fa-jira',
+           'confluence.atlassian.com': 'fas fa-book',
+           'slack.com': 'fab fa-slack',
+           'discord.com': 'fab fa-discord',
+           'teams.microsoft.com': 'fas fa-users',
+           'zoom.us': 'fas fa-video',
+           'meet.google.com': 'fab fa-google',
+           'skype.com': 'fab fa-skype',
+           'webex.com': 'fas fa-video',
+           'gotomeeting.com': 'fas fa-users',
+           'bluejeans.com': 'fas fa-video',
+           'ringcentral.com': 'fas fa-phone',
+           '8x8.com': 'fas fa-phone',
+           'vonage.com': 'fas fa-phone',
+           'twilio.com': 'fab fa-twilio',
+           'sendgrid.com': 'fas fa-envelope',
+           'mailchimp.com': 'fas fa-envelope',
+           'constantcontact.com': 'fas fa-envelope',
+           'convertkit.com': 'fas fa-envelope',
+           'activecampaign.com': 'fas fa-envelope',
+           'klaviyo.com': 'fas fa-envelope',
+           'drip.com': 'fas fa-tint',
+           'intercom.com': 'fas fa-comments',
+           'zendesk.com': 'fas fa-headset',
+           'freshdesk.com': 'fas fa-headset',
+           'helpscout.com': 'fas fa-headset',
+           'front.com': 'fas fa-headset',
+           'gorgias.com': 'fas fa-headset',
+           'reviews.io': 'fas fa-star',
+           'trustpilot.com': 'fas fa-shield-alt',
+           'yelp.com': 'fas fa-star',
+           'foursquare.com': 'fas fa-map-marker-alt',
+           'tripadvisor.com': 'fas fa-plane',
+           'booking.com': 'fas fa-bed',
+           'expedia.com': 'fas fa-plane',
+           'kayak.com': 'fas fa-search',
+           'skyscanner.com': 'fas fa-plane',
+           'hotels.com': 'fas fa-bed',
+           'orbitz.com': 'fas fa-plane',
+           'priceline.com': 'fas fa-tag',
+           'trivago.com': 'fas fa-search',
+           'hotwire.com': 'fas fa-fire',
+           'cheaptickets.com': 'fas fa-ticket-alt',
+           'lastminute.com': 'fas fa-clock',
+           'groupon.com': 'fas fa-tags',
+           'living.social': 'fas fa-heart',
+           'wowcher.co.uk': 'fas fa-gift',
+           'vouchercloud.com': 'fas fa-ticket-alt',
+           'myvouchercodes.co.uk': 'fas fa-percentage',
+           'studentbeans.com': 'fas fa-graduation-cap',
+           'unidays.com': 'fas fa-graduation-cap',
+           'nus.org.uk': 'fas fa-graduation-cap',
+           'totesport.com': 'fas fa-trophy',
+           'bet365.com': 'fas fa-dice',
+           'williamhill.com': 'fas fa-dice',
+           'ladbrokes.com': 'fas fa-dice',
+           'paddypower.com': 'fas fa-dice',
+           'betfair.com': 'fas fa-dice',
+           'skybet.com': 'fas fa-dice',
+           'virginbet.com': 'fas fa-dice',
+           'mrgreen.com': 'fas fa-dice',
+           'leo-vegas.com': 'fas fa-dice',
+           'casumo.com': 'fas fa-dice',
+           'royalpanda.com': 'fas fa-dice',
+           'comeon.com': 'fas fa-dice',
+           'nordicbet.com': 'fas fa-dice',
+           'unibet.com': 'fas fa-dice',
+           'bwin.com': 'fas fa-dice',
+           'party-poker.com': 'fas fa-dice',
+           'pokerstars.com': 'fas fa-dice',
+           '888.com': 'fas fa-dice',
+           'pokerstars.net': 'fas fa-dice',
+           'fulltilt.com': 'fas fa-dice',
+           'ultimatebet.com': 'fas fa-dice',
+           'absolutepoker.com': 'fas fa-dice',
+           'paradisepoker.com': 'fas fa-dice',
+           'titanpoker.com': 'fas fa-dice',
+           'everestpoker.com': 'fas fa-dice',
+           'bwin.com': 'fas fa-dice',
+           'party.com': 'fas fa-dice',
+           'pokerstars.com': 'fas fa-dice',
+           '888.com': 'fas fa-dice',
+           'pokerstars.net': 'fas fa-dice',
+           'fulltilt.com': 'fas fa-dice',
+           'ultimatebet.com': 'fas fa-dice',
+           'absolutepoker.com': 'fas fa-dice',
+           'paradisepoker.com': 'fas fa-dice',
+           'titanpoker.com': 'fas fa-dice',
+           'everestpoker.com': 'fas fa-dice'
+         };
+         
+         // Return the icon class for the domain, or a default icon
+         return domainIcons[domain] || 'fas fa-globe';
+       }
+
+      // Placeholder functions for missing functionality
+      function openEditModal() {
+        alert("Edit modal functionality would be implemented here");
+      }
+
+      function openSkillsModal() {
+        alert("Skills modal functionality would be implemented here");
+      }
+
+      function exportToPDF() {
+        alert("PDF export functionality would be implemented here");
+      }
+
+      function refreshData() {
+        alert("Data refresh functionality would be implemented here");
+      }
+
+function sendBroadcast(event) {
+    event.preventDefault();
+    const title = document.getElementById("messageTitle").value;
+    const content = document.getElementById("messageContent").value;
+    const visibility = document.getElementById("messageVisibility").value;
+
+    // Get existing messages or create empty array
+    const existingMessages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+    
+    // Create new message with proper format
+    const newMessage = {
+        id: Date.now(), // Unique ID
+        title: title,
+        content: content,
+        visibility: visibility,
+        author: 'HR Team',
+        date: new Date().toLocaleDateString(),
+        read: false,
+        timestamp: Date.now()
+    };
+    
+    // Add new message to existing messages
+    existingMessages.unshift(newMessage); // Add to beginning of array
+    
+    // Store updated messages array
+    localStorage.setItem('broadcastMessages', JSON.stringify(existingMessages));
+
+    console.log('Broadcast message stored:', newMessage); // Debugging line
+    console.log('Total messages in storage:', existingMessages.length);
+
+    alert(`Broadcast sent!\nTitle: ${title}\nVisibility: ${visibility}`);
+
+    document.getElementById("messageTitle").value = "";
+    document.getElementById("messageContent").value = "";
+      }
+
+
+      const HR_DOCS_KEY = 'hrDocuments';
+      function handleFileUpload(event) {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        const existing = JSON.parse(localStorage.getItem(HR_DOCS_KEY) || '[]');
+        files.forEach((file) => {
+          existing.unshift({
+            id: Date.now() + Math.random(),
+            name: file.name,
+            size: file.size,
+            type: file.type || 'application/octet-stream',
+            uploadedAt: new Date().toISOString()
+          });
+        });
+        localStorage.setItem(HR_DOCS_KEY, JSON.stringify(existing));
+        renderDocumentsList();
+        if (event.target) event.target.value = '';
+        showNotification(`${files.length} file(s) added to documents`, 'success');
+      }
+
+      function formatBytes(bytes) {
+        if (bytes === 0 || bytes === undefined || bytes === null) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+
+      function renderDocumentsList() {
+        const container = document.getElementById('documentsList');
+        if (!container) return;
+        const docs = JSON.parse(localStorage.getItem(HR_DOCS_KEY) || '[]');
+        if (!docs.length) {
+          container.innerHTML = '<div style="color:#6b7280; font-style: italic; padding: 0.5rem;">No documents uploaded yet.</div>';
+          return;
+        }
+        container.innerHTML = docs.map((d, index) => `
+          <div class="stat-card" style="display:flex; align-items:center; justify-content:space-between; gap: 0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div class="stat-icon" style="width:36px; height:36px; border-radius:8px; background: var(--bg-secondary); color: var(--text-secondary);">
+                <i class="fas ${d.type && d.type.includes('pdf') ? 'fa-file-pdf' : d.type && d.type.includes('image') ? 'fa-file-image' : 'fa-file'}"></i>
+              </div>
+              <div>
+                <div style="font-weight:600; color: var(--text-primary);">${d.name}</div>
+                <div style="font-size:0.8rem; color: var(--text-secondary);">${formatBytes(d.size)} • ${new Date(d.uploadedAt).toLocaleString()}</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary" style="padding: 0.5rem 0.75rem;" onclick="deleteDocument(${index})"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function deleteDocument(index) {
+        const docs = JSON.parse(localStorage.getItem(HR_DOCS_KEY) || '[]');
+        if (index < 0 || index >= docs.length) return;
+        docs.splice(index, 1);
+        localStorage.setItem(HR_DOCS_KEY, JSON.stringify(docs));
+        renderDocumentsList();
+        showNotification('Document removed', 'success');
+      }
+
+      function loadDocuments() {
+        renderDocumentsList();
+      }
+
+      // Employee data and functions
+      let employees = [
+        {
+          id: 'EMP001',
+          name: 'Sarah Johnson',
+          position: 'Frontend Developer',
+          department: 'Engineering',
+          email: 'sarah.johnson@company.com',
+          phone: '+1 (555) 123-4567',
+          dateOfJoining: '2022-03-15',
+          employmentStatus: 'Active',
+          status: 'online',
+          avatar: 'SJ'
+        },
+        {
+          id: 'EMP002',
+          name: 'Michael Chen',
+          position: 'Backend Developer',
+          department: 'Engineering',
+          email: 'michael.chen@company.com',
+          phone: '+1 (555) 234-5678',
+          dateOfJoining: '2021-08-20',
+          employmentStatus: 'Active',
+          status: 'online',
+          avatar: 'MC'
+        },
+        {
+          id: 'EMP003',
+          name: 'Emily Rodriguez',
+          position: 'UX Designer',
+          department: 'Design',
+          email: 'emily.rodriguez@company.com',
+          phone: '+1 (555) 345-6789',
+          dateOfJoining: '2023-01-10',
+          employmentStatus: 'On Leave',
+          status: 'away',
+          avatar: 'ER'
+        },
+        {
+          id: 'EMP004',
+          name: 'David Thompson',
+          position: 'Project Manager',
+          department: 'Management',
+          email: 'david.thompson@company.com',
+          phone: '+1 (555) 456-7890',
+          dateOfJoining: '2020-11-05',
+          employmentStatus: 'Active',
+          status: 'online',
+          avatar: 'DT'
+        },
+        {
+          id: 'EMP005',
+          name: 'Lisa Wang',
+          position: 'Data Analyst',
+          department: 'Analytics',
+          email: 'lisa.wang@company.com',
+          phone: '+1 (555) 567-8901',
+          dateOfJoining: '2022-07-12',
+          employmentStatus: 'Active',
+          status: 'offline',
+          avatar: 'LW'
+        },
+        {
+          id: 'EMP006',
+          name: 'James Wilson',
+          position: 'DevOps Engineer',
+          department: 'Engineering',
+          email: 'james.wilson@company.com',
+          phone: '+1 (555) 678-9012',
+          dateOfJoining: '2021-12-03',
+          employmentStatus: 'Active',
+          status: 'online',
+          avatar: 'JW'
+        },
+        {
+          id: 'EMP007',
+          name: 'Anna Martinez',
+          position: 'HR Manager',
+          department: 'HR',
+          email: 'anna.martinez@company.com',
+          phone: '+1 (555) 789-0123',
+          dateOfJoining: '2019-04-18',
+          employmentStatus: 'Active',
+          status: 'online',
+          avatar: 'AM'
+        },
+        {
+          id: 'EMP008',
+          name: 'Robert Kim',
+          position: 'Sales Representative',
+          department: 'Sales',
+          email: 'robert.kim@company.com',
+          phone: '+1 (555) 890-1234',
+          dateOfJoining: '2023-02-28',
+          employmentStatus: 'Resigned',
+          status: 'offline',
+          avatar: 'RK'
+        }
+      ];
+
+      function renderEmployeeCards(employeesToShow = employees) {
+        const employeeGrid = document.getElementById('employeeGrid');
+        if (!employeeGrid) return;
+        
+        employeeGrid.innerHTML = employeesToShow.map(employee => `
+          <div class="employee-card" data-employee-id="${employee.id}">
+            <div class="employee-header">
+              <div class="employee-avatar">${employee.avatar}</div>
+              <div class="employee-info">
+                <h4>${employee.name}</h4>
+                <p class="employee-id">ID: ${employee.id}</p>
+                <p class="employee-position">${employee.position}</p>
+              </div>
+              <div class="employment-status status-${employee.employmentStatus.toLowerCase().replace(' ', '-')}">
+                ${employee.employmentStatus}
+              </div>
+            </div>
+            <div class="employee-details">
+              <div class="employee-detail">
+                <i class="fas fa-building"></i>
+                <span>${employee.department}</span>
+              </div>
+              <div class="employee-detail">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Joined: ${new Date(employee.dateOfJoining).toLocaleDateString()}</span>
+              </div>
+              <div class="employee-detail">
+                <i class="fas fa-envelope"></i>
+                <span>${employee.email}</span>
+              </div>
+              <div class="employee-detail">
+                <i class="fas fa-phone"></i>
+                <span>${employee.phone}</span>
+              </div>
+            </div>
+            <div class="employee-status status-${employee.status}">
+              <div class="status-dot"></div>
+              <span>${employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function filterEmployees(searchTerm = '', departmentFilter = 'all') {
+        let filteredEmployees = employees;
+        
+        // Filter by search term
+        if (searchTerm) {
+          filteredEmployees = filteredEmployees.filter(employee => 
+            employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            employee.id.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+        }
+        
+        // Filter by department
+        if (departmentFilter !== 'all') {
+          filteredEmployees = filteredEmployees.filter(employee => 
+            employee.department.toLowerCase() === departmentFilter.toLowerCase()
+          );
+        }
+        
+        renderEmployeeCards(filteredEmployees);
+      }
+
+      function loadEmployees() {
+        renderEmployeeCards();
+        
+        // Add event listeners for search and filter
+        const employeeSearch = document.getElementById('employeeSearch');
+        const departmentFilter = document.getElementById('departmentFilter');
+        
+        if (employeeSearch) {
+          employeeSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value;
+            const departmentValue = departmentFilter ? departmentFilter.value : 'all';
+            filterEmployees(searchTerm, departmentValue);
+          });
+        }
+        
+        if (departmentFilter) {
+          departmentFilter.addEventListener('change', (e) => {
+            const searchTerm = employeeSearch ? employeeSearch.value : '';
+            const departmentValue = e.target.value;
+            filterEmployees(searchTerm, departmentValue);
+          });
+        }
+      }
+
+                    // Initialize everything when DOM is loaded
+        document.addEventListener("DOMContentLoaded", function () {
+          loadProfileData(); // Load profile data from localStorage
+          loadApplications();
+          updateApplicationStats(); // Initialize stats
+          drawActivityChart();
+          renderClientCards();
+        loadEmployees(); // Load employee cards
+        loadDocuments(); // Load persisted documents
+        renderPerformanceList(); // Show saved reviews
+          
+          // Add event listener for Add Review button as backup
+          const addReviewBtn = document.getElementById('addReviewBtn');
+          if (addReviewBtn) {
+            addReviewBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              console.log('Add Review button clicked via event listener');
+              openPerformanceModal();
+            });
+          }
+          
+          // Also add a simple test to make sure the function exists
+          console.log('openPerformanceModal function exists:', typeof window.openPerformanceModal);
+          console.log('testModal function exists:', typeof window.testModal);
+          
+          // Listen for profile changes from hp.html
+          window.addEventListener('storage', function(e) {
+            if (e.key === 'hrProfileData' || e.key === 'hrProfileImage') {
+              loadProfileData(); // Reload profile data when it changes
+            }
+          });
+
+         // Close dropdowns when clicking outside
+         document.addEventListener("click", function (event) {
+           const userMenu = document.querySelector(".user-menu");
+           const dropdown = document.getElementById("userDropdown");
+
+           if (!userMenu.contains(event.target)) {
+             dropdown.classList.remove("show");
+           }
+         });
+       });
+
+       // Reply modal functions
+       function closeReplyModal() {
+         document.getElementById("replyModal").classList.remove("active");
+       }
+
+       function sendReply(event) {
+         event.preventDefault();
+         
+         const to = document.getElementById("replyToField").value;
+         const subject = document.getElementById("replySubjectField").value;
+         const message = document.getElementById("replyMessageField").value;
+         
+         if (to && subject && message) {
+           sendEmail(to, subject, message);
+           alert("Reply sent successfully!");
+           closeReplyModal();
+         }
+       }
+
+      let performanceReviews = JSON.parse(localStorage.getItem('hrPerformanceReviews') || '[]');
+
+
+
+      window.closePerformanceModal = function() {
+        const modal = document.getElementById('performanceModal');
+        if (modal) {
+          modal.classList.remove('active');
+        }
+      }
+
+      window.submitPerformance = function(e) {
+        e.preventDefault();
+        const empName = document.getElementById('perfEmpName').value.trim();
+        const empId = document.getElementById('perfEmpId').value.trim();
+        const empEmail = document.getElementById('perfEmpEmail').value.trim();
+        const feedback = document.getElementById('perfFeedback').value.trim();
+        const rating = parseInt(document.getElementById('perfRating').value, 10);
+        
+        if (!empName || !empId || !empEmail || !feedback || !rating) {
+          showNotification('Please fill in all fields', 'error');
+          return;
+        }
+        
+        const review = {
+          id: Date.now(),
+          employeeName: empName,
+          empId: empId,
+          empEmail: empEmail,
+          feedback: feedback,
+          rating: rating,
+          date: new Date().toLocaleDateString(),
+          createdAt: new Date().toISOString(),
+          read: false
+        };
+        
+        performanceReviews.unshift(review);
+        localStorage.setItem('hrPerformanceReviews', JSON.stringify(performanceReviews));
+        renderPerformanceList();
+        pushReviewToMessages(review);
+        showNotification('Performance review saved and sent to employee messages!', 'success');
+        closePerfModal();
+      }
+
+      function renderPerformanceList() {
+        const list = document.getElementById('performanceList');
+        if (!list) return;
+        
+        if (!performanceReviews.length) {
+          list.innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+              <i class="fas fa-clipboard-list" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+              <p style="font-style: italic;">No performance reviews yet.</p>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">Click "Add Review" to create the first review.</p>
+            </div>`;
+          return;
+        }
+        
+        list.innerHTML = performanceReviews.map((r, index) => `
+          <div class="performance-review-card">
+            <div class="review-header">
+              <div class="review-employee-info">
+                <div class="review-employee-name">${r.employeeName || 'Unknown Employee'}</div>
+                <div class="review-employee-details">
+                  <span><i class="fas fa-id-badge"></i> ${r.empId}</span>
+                  <span><i class="fas fa-envelope"></i> ${r.empEmail}</span>
+                </div>
+              </div>
+              <div class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+            </div>
+            <div class="review-feedback">${r.feedback}</div>
+            <div class="review-meta">
+              <span><i class="fas fa-calendar"></i> ${r.date || new Date(r.createdAt).toLocaleDateString()}</span>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span class="review-status"><i class="fas fa-check-circle"></i> Sent to employee</span>
+                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deletePerformanceReview(${index})">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function deletePerformanceReview(index) {
+        if (!confirm('Are you sure you want to delete this performance review? This action cannot be undone.')) {
+          return;
+        }
+        
+        // Remove from performance reviews
+        performanceReviews.splice(index, 1);
+        localStorage.setItem('hrPerformanceReviews', JSON.stringify(performanceReviews));
+        
+        // Also remove from broadcast messages if it exists
+        const messages = JSON.parse(localStorage.getItem('broadcastMessages') || '[]');
+        const reviewToDelete = performanceReviews[index]; // Get the review before it was deleted
+        if (reviewToDelete) {
+          const messageIndex = messages.findIndex(msg => msg.id === reviewToDelete.id);
+          if (messageIndex !== -1) {
+            messages.splice(messageIndex, 1);
+            localStorage.setItem('broadcastMessages', JSON.stringify(messages));
+          }
+        }
+        
+        renderPerformanceList();
+        showNotification('Performance review deleted successfully!', 'success');
+      }
+
+            function pushReviewToMessages(r) {
+        // Performance reviews are stored in hrPerformanceReviews and will be displayed
+        // in the Performance Reviews tab in employee.html
+        // No need to add to broadcastMessages since they're already in hrPerformanceReviews
+        console.log('Performance review saved to hrPerformanceReviews for employee:', r.employeeName);
+      }
+
+      // Function to handle burnout dashboard approvals/rejections
+      function handleBurnoutRequest(employeeId, employeeName, action, reason = '') {
+        const roleChangeRequests = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+        
+        const request = {
+          id: Date.now(),
+          employeeId: employeeId,
+          employeeName: employeeName,
+          type: 'burnout-request',
+          action: action, // 'approved' or 'rejected'
+          reason: reason,
+          date: new Date().toLocaleDateString(),
+          read: false,
+          timestamp: Date.now(),
+          title: `Burnout Request ${action === 'approved' ? 'Approved' : 'Rejected'} - ${employeeName}`,
+          content: `Your burnout assessment request has been ${action}${reason ? `.\n\nReason: ${reason}` : '.'}`,
+          author: 'HR Department'
+        };
+        
+        roleChangeRequests.unshift(request);
+        localStorage.setItem('roleChangeRequests', JSON.stringify(roleChangeRequests));
+        
+        console.log(`Burnout request ${action} for employee: ${employeeName}`);
+        showNotification(`Burnout request ${action} for ${employeeName}`, 'success');
+      }
+
+      // Example usage functions for burnout dashboard
+      function approveBurnoutRequest(employeeId, employeeName) {
+        handleBurnoutRequest(employeeId, employeeName, 'approved');
+      }
+
+      function rejectBurnoutRequest(employeeId, employeeName, reason) {
+        handleBurnoutRequest(employeeId, employeeName, 'rejected', reason);
+      }
+
+      // Test function to create a sample burnout message (for testing)
+      window.testBurnoutFromHR = function() {
+        console.log('Testing burnout message creation from HR side...');
+        handleBurnoutRequest('EMP001', 'John Doe', 'approved', 'Documentation verified');
+        console.log('Burnout message should now be in roleChangeRequests localStorage');
+        
+        // Show success message
+        if (typeof showNotification === 'function') {
+          showNotification('Test burnout message created successfully!', 'success');
+        } else {
+          alert('Test burnout message created successfully! Check the employee.html Role Changes tab.');
+        }
+      };
+      
+      // Test function to create a sample intervention message (for testing)
+      window.testInterventionFromHR = function() {
+        console.log('Testing intervention message creation from HR side...');
+        // Simulate an intervention approval
+        const roleChangeRequests = JSON.parse(localStorage.getItem('roleChangeRequests') || '[]');
+        const interventionMessage = {
+          id: Date.now(),
+          employeeId: 'EMP002',
+          employeeName: 'Harish M',
+          type: 'intervention-request',
+          action: 'approved',
+          reason: '',
+          date: new Date().toLocaleDateString(),
+          read: false,
+          timestamp: Date.now(),
+          title: 'Intervention Approved for Harish M',
+          content: 'Your intervention request has been approved. We will contact you with next steps. (Dept: Sales)',
+          author: 'HR Dashboard',
+          department: 'Sales'
+        };
+        
+        roleChangeRequests.unshift(interventionMessage);
+        localStorage.setItem('roleChangeRequests', JSON.stringify(roleChangeRequests));
+        
+        console.log('Intervention message should now be in roleChangeRequests localStorage');
+        
+        // Show success message
+        if (typeof showNotification === 'function') {
+          showNotification('Test intervention message created successfully!', 'success');
+        } else {
+          alert('Test intervention message created successfully! Check the employee.html Role Changes tab.');
+        }
+      };
+    </script>
+  </body>
+</html>
